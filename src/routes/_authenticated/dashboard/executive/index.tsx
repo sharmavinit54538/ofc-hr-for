@@ -4,6 +4,7 @@ import {
   BarChart3,
   Users,
   TrendingUp,
+  Wallet,
   ShieldCheck,
   Sparkles,
   ArrowRight,

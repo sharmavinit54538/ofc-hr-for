@@ -206,7 +206,6 @@ import { Route as AuthenticatedDashboardWorkforceDepartmentsRouteImport } from '
 import { Route as AuthenticatedDashboardWorkforceDesignationsRouteImport } from './routes/_authenticated/dashboard/workforce/designations'
 import { Route as AuthenticatedDashboardWorkforceEmployeesRouteImport } from './routes/_authenticated/dashboard/workforce/employees'
 import { Route as AuthenticatedDashboardWorkforceExecutivesRouteImport } from './routes/_authenticated/dashboard/workforce/executives'
-import { Route as AuthenticatedDashboardWorkforceItAdminsRouteImport } from './routes/_authenticated/dashboard/workforce/it-admins'
 import { Route as AuthenticatedDashboardWorkforceManagersRouteImport } from './routes/_authenticated/dashboard/workforce/managers'
 import { Route as AuthenticatedDashboardWorkforceOrgChartRouteImport } from './routes/_authenticated/dashboard/workforce/org-chart'
 
@@ -1379,12 +1378,6 @@ const AuthenticatedDashboardWorkforceExecutivesRoute =
     path: '/workforce/executives',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
-const AuthenticatedDashboardWorkforceItAdminsRoute =
-  AuthenticatedDashboardWorkforceItAdminsRouteImport.update({
-    id: '/workforce/it-admins',
-    path: '/workforce/it-admins',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
 const AuthenticatedDashboardWorkforceManagersRoute =
   AuthenticatedDashboardWorkforceManagersRouteImport.update({
     id: '/workforce/managers',
@@ -1571,7 +1564,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/workforce/designations': typeof AuthenticatedDashboardWorkforceDesignationsRoute
   '/dashboard/workforce/employees': typeof AuthenticatedDashboardWorkforceEmployeesRoute
   '/dashboard/workforce/executives': typeof AuthenticatedDashboardWorkforceExecutivesRoute
-  '/dashboard/workforce/it-admins': typeof AuthenticatedDashboardWorkforceItAdminsRoute
   '/dashboard/workforce/managers': typeof AuthenticatedDashboardWorkforceManagersRoute
   '/dashboard/workforce/org-chart': typeof AuthenticatedDashboardWorkforceOrgChartRoute
   '/dashboard/ai-workforce/': typeof AuthenticatedDashboardAiWorkforceIndexRoute
@@ -1766,7 +1758,6 @@ export interface FileRoutesByTo {
   '/dashboard/workforce/designations': typeof AuthenticatedDashboardWorkforceDesignationsRoute
   '/dashboard/workforce/employees': typeof AuthenticatedDashboardWorkforceEmployeesRoute
   '/dashboard/workforce/executives': typeof AuthenticatedDashboardWorkforceExecutivesRoute
-  '/dashboard/workforce/it-admins': typeof AuthenticatedDashboardWorkforceItAdminsRoute
   '/dashboard/workforce/managers': typeof AuthenticatedDashboardWorkforceManagersRoute
   '/dashboard/workforce/org-chart': typeof AuthenticatedDashboardWorkforceOrgChartRoute
   '/dashboard/ai-workforce': typeof AuthenticatedDashboardAiWorkforceIndexRoute
@@ -1969,7 +1960,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/workforce/designations': typeof AuthenticatedDashboardWorkforceDesignationsRoute
   '/_authenticated/dashboard/workforce/employees': typeof AuthenticatedDashboardWorkforceEmployeesRoute
   '/_authenticated/dashboard/workforce/executives': typeof AuthenticatedDashboardWorkforceExecutivesRoute
-  '/_authenticated/dashboard/workforce/it-admins': typeof AuthenticatedDashboardWorkforceItAdminsRoute
   '/_authenticated/dashboard/workforce/managers': typeof AuthenticatedDashboardWorkforceManagersRoute
   '/_authenticated/dashboard/workforce/org-chart': typeof AuthenticatedDashboardWorkforceOrgChartRoute
   '/_authenticated/dashboard/ai-workforce/': typeof AuthenticatedDashboardAiWorkforceIndexRoute
@@ -2172,7 +2162,6 @@ export interface FileRouteTypes {
     | '/dashboard/workforce/designations'
     | '/dashboard/workforce/employees'
     | '/dashboard/workforce/executives'
-    | '/dashboard/workforce/it-admins'
     | '/dashboard/workforce/managers'
     | '/dashboard/workforce/org-chart'
     | '/dashboard/ai-workforce/'
@@ -2367,7 +2356,6 @@ export interface FileRouteTypes {
     | '/dashboard/workforce/designations'
     | '/dashboard/workforce/employees'
     | '/dashboard/workforce/executives'
-    | '/dashboard/workforce/it-admins'
     | '/dashboard/workforce/managers'
     | '/dashboard/workforce/org-chart'
     | '/dashboard/ai-workforce'
@@ -2569,7 +2557,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/workforce/designations'
     | '/_authenticated/dashboard/workforce/employees'
     | '/_authenticated/dashboard/workforce/executives'
-    | '/_authenticated/dashboard/workforce/it-admins'
     | '/_authenticated/dashboard/workforce/managers'
     | '/_authenticated/dashboard/workforce/org-chart'
     | '/_authenticated/dashboard/ai-workforce/'
@@ -3993,13 +3980,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceExecutivesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/workforce/it-admins': {
-      id: '/_authenticated/dashboard/workforce/it-admins'
-      path: '/workforce/it-admins'
-      fullPath: '/dashboard/workforce/it-admins'
-      preLoaderRoute: typeof AuthenticatedDashboardWorkforceItAdminsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/workforce/managers': {
       id: '/_authenticated/dashboard/workforce/managers'
       path: '/workforce/managers'
@@ -4336,7 +4316,6 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardWorkforceDesignationsRoute: typeof AuthenticatedDashboardWorkforceDesignationsRoute
   AuthenticatedDashboardWorkforceEmployeesRoute: typeof AuthenticatedDashboardWorkforceEmployeesRoute
   AuthenticatedDashboardWorkforceExecutivesRoute: typeof AuthenticatedDashboardWorkforceExecutivesRoute
-  AuthenticatedDashboardWorkforceItAdminsRoute: typeof AuthenticatedDashboardWorkforceItAdminsRoute
   AuthenticatedDashboardWorkforceManagersRoute: typeof AuthenticatedDashboardWorkforceManagersRoute
   AuthenticatedDashboardWorkforceOrgChartRoute: typeof AuthenticatedDashboardWorkforceOrgChartRoute
   AuthenticatedDashboardAiWorkforceIndexRoute: typeof AuthenticatedDashboardAiWorkforceIndexRoute
@@ -4601,8 +4580,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardWorkforceEmployeesRoute,
     AuthenticatedDashboardWorkforceExecutivesRoute:
       AuthenticatedDashboardWorkforceExecutivesRoute,
-    AuthenticatedDashboardWorkforceItAdminsRoute:
-      AuthenticatedDashboardWorkforceItAdminsRoute,
     AuthenticatedDashboardWorkforceManagersRoute:
       AuthenticatedDashboardWorkforceManagersRoute,
     AuthenticatedDashboardWorkforceOrgChartRoute:

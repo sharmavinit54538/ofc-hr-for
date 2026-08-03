@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Users, Crown, Building2, Loader2, Mail, ShieldCheck, Briefcase } from "lucide-react";
+import { Users, Crown, Building2, Loader2, Mail, ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/admin/page-header";
 import { useListEmployeesQuery, useListDepartmentsQuery } from "@/services/employeeApi";
 

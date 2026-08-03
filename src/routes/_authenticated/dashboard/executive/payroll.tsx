@@ -81,7 +81,7 @@ function ExecutivePayrollPage() {
           </div>
           <div className="mt-3">
             <div className="font-display text-2xl font-bold text-foreground">
-              {isLoading ? <Loader2 className="size-5 animate-spin text-muted-foreground" /> : activeHeadcount}
+              {isLoading ? <Loader2 className="size-5 animate-spin" /> : activeHeadcount}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Out of {totalHeadcount} Registered Employees</p>
           </div>
@@ -96,7 +96,7 @@ function ExecutivePayrollPage() {
           </div>
           <div className="mt-3">
             <div className="font-display text-2xl font-bold text-amber-400">
-              {isLoading ? <Loader2 className="size-5 animate-spin text-muted-foreground" /> : rawDepartments.length}
+              {isLoading ? <Loader2 className="size-5 animate-spin" /> : rawDepartments.length}
             </div>
             <p className="text-xs text-muted-foreground mt-1">Configured Departments</p>
           </div>

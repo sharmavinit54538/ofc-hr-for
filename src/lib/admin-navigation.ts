@@ -139,15 +139,6 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         statusBadge: "Management",
       },
       {
-        id: "it-admins",
-        title: "IT Administrators",
-        description: "Dedicated directory of IT administrators, system engineers, and security controllers",
-        href: "/dashboard/workforce/it-admins",
-        icon: Shield,
-        stats: "IT Security Hub",
-        statusBadge: "Admin Suite",
-      },
-      {
         id: "departments",
         title: "Departments",
         description: "Business units, cost centers, and departmental leadership structure",

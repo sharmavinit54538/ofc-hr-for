@@ -8,8 +8,6 @@ import {
   UserCheck,
   Loader2,
   Mail,
-  MapPin,
-  ShieldCheck,
 } from "lucide-react";
 import { PageHeader } from "@/components/admin/page-header";
 import { useListEmployeesQuery, useListDepartmentsQuery } from "@/services/employeeApi";
