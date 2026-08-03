@@ -1,0 +1,360 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * OFC HR design system — premium enterprise glassmorphism.
+ * All colors are oklch semantic tokens. Never hardcode colors in components.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+
+  --animate-aurora: aurora 18s ease-in-out infinite;
+  --animate-float-slow: float-slow 12s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+}
+
+:root {
+  --radius: 0.875rem;
+
+  --background: oklch(0.985 0.005 250);
+  --foreground: oklch(0.19 0.03 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.03 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.03 265);
+
+  --primary: oklch(0.5 0.19 268);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --primary-glow: oklch(0.7 0.15 220);
+
+  --secondary: oklch(0.955 0.012 260);
+  --secondary-foreground: oklch(0.28 0.05 265);
+  --muted: oklch(0.96 0.008 260);
+  --muted-foreground: oklch(0.53 0.03 262);
+  --accent: oklch(0.72 0.14 200);
+  --accent-foreground: oklch(0.18 0.03 265);
+
+  --destructive: oklch(0.58 0.22 22);
+  --destructive-foreground: oklch(0.99 0.005 250);
+  --success: oklch(0.62 0.15 158);
+  --success-foreground: oklch(0.99 0.005 250);
+
+  --border: oklch(0.905 0.012 260);
+  --input: oklch(0.905 0.012 260);
+  --ring: oklch(0.5 0.19 268);
+
+  --glass: oklch(1 0 0 / 62%);
+  --glass-border: oklch(1 0 0 / 70%);
+
+  --gradient-brand: linear-gradient(135deg, var(--primary), var(--primary-glow));
+  --gradient-surface: linear-gradient(
+    160deg,
+    oklch(1 0 0 / 80%),
+    oklch(0.97 0.015 265 / 55%)
+  );
+  --shadow-float: 0 24px 70px -28px oklch(0.35 0.14 268 / 38%);
+  --shadow-card: 0 2px 8px -2px oklch(0.3 0.06 265 / 10%), 0 18px 48px -24px oklch(0.3 0.1 265 / 22%);
+  --shadow-glow: 0 0 0 1px oklch(0.5 0.19 268 / 12%), 0 12px 40px -12px oklch(0.5 0.19 268 / 35%);
+}
+
+.dark {
+  --background: oklch(0.155 0.028 268);
+  --foreground: oklch(0.965 0.008 255);
+  --card: oklch(0.205 0.03 268);
+  --card-foreground: oklch(0.965 0.008 255);
+  --popover: oklch(0.205 0.03 268);
+  --popover-foreground: oklch(0.965 0.008 255);
+
+  --primary: oklch(0.68 0.17 272);
+  --primary-foreground: oklch(0.16 0.03 268);
+  --primary-glow: oklch(0.75 0.13 205);
+
+  --secondary: oklch(0.26 0.035 268);
+  --secondary-foreground: oklch(0.95 0.008 255);
+  --muted: oklch(0.25 0.03 268);
+  --muted-foreground: oklch(0.7 0.025 262);
+  --accent: oklch(0.72 0.13 198);
+  --accent-foreground: oklch(0.16 0.03 268);
+
+  --destructive: oklch(0.68 0.2 22);
+  --destructive-foreground: oklch(0.16 0.03 268);
+  --success: oklch(0.7 0.15 158);
+  --success-foreground: oklch(0.16 0.03 268);
+
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.68 0.17 272);
+
+  --glass: oklch(0.24 0.03 268 / 55%);
+  --glass-border: oklch(1 0 0 / 12%);
+
+  --gradient-surface: linear-gradient(
+    160deg,
+    oklch(0.28 0.04 268 / 72%),
+    oklch(0.2 0.03 268 / 45%)
+  );
+  --shadow-float: 0 28px 80px -30px oklch(0.05 0.02 268 / 80%);
+  --shadow-card: 0 2px 10px -2px oklch(0.05 0.02 268 / 60%), 0 22px 56px -26px oklch(0.05 0.02 268 / 70%);
+  --shadow-glow: 0 0 0 1px oklch(0.68 0.17 272 / 22%), 0 14px 46px -14px oklch(0.68 0.17 272 / 45%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ── Hide scrollbars utility ─────────────────────────────────────── */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility glass-panel {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(28px) saturate(160%);
+  box-shadow: var(--shadow-card);
+}
+
+@utility glass-soft {
+  background: var(--gradient-surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+@utility text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-gradient-brand {
+  background: var(--gradient-brand);
+}
+
+@utility shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility hover-lift {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-float);
+  }
+}
+
+@utility story-link {
+  position: relative;
+  display: inline-block;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-primary);
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease;
+  }
+  &:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+
+@keyframes aurora {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.85;
+  }
+  33% {
+    transform: translate3d(6%, -8%, 0) scale(1.15);
+    opacity: 1;
+  }
+  66% {
+    transform: translate3d(-7%, 6%, 0) scale(1.05);
+    opacity: 0.75;
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(1.5deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Premium elevation layer (extended tokens) ─────────────────────────── */
+
+:root {
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-glow-lg: 0 0 60px -10px oklch(0.5 0.19 268 / 45%);
+  --shadow-inset-highlight: inset 0 1px 0 oklch(1 0 0 / 45%);
+  --gradient-mesh:
+    radial-gradient(at 20% 20%, oklch(0.5 0.19 268 / 25%) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, oklch(0.72 0.14 200 / 20%) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, oklch(0.7 0.15 220 / 18%) 0px, transparent 50%);
+}
+
+.dark {
+  --shadow-glow-lg: 0 0 70px -12px oklch(0.68 0.17 272 / 50%);
+  --shadow-inset-highlight: inset 0 1px 0 oklch(1 0 0 / 8%);
+  --gradient-mesh:
+    radial-gradient(at 18% 18%, oklch(0.68 0.17 272 / 30%) 0px, transparent 52%),
+    radial-gradient(at 82% 4%, oklch(0.72 0.13 198 / 22%) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, oklch(0.75 0.13 205 / 20%) 0px, transparent 55%);
+}
+
+@utility bg-gradient-mesh {
+  background-image: var(--gradient-mesh);
+}
+
+@utility shadow-glow-lg {
+  box-shadow: var(--shadow-glow-lg);
+}
+
+/* Physical glass: layered shadow + 1px inner top highlight */
+@utility glass-tile {
+  background: var(--gradient-surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: var(--shadow-card), var(--shadow-inset-highlight);
+}
+
+@utility glass-elevated {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(30px) saturate(170%);
+  box-shadow: var(--shadow-float), var(--shadow-inset-highlight);
+}
+
+@utility noise-overlay {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(8%, 6%, 0) scale(1.18); }
+}
+
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  50% { transform: translate3d(-9%, -7%, 0) scale(0.92); }
+}
+
+@keyframes theme-reveal {
+  from { clip-path: circle(0% at 92% 6%); }
+  to { clip-path: circle(150% at 92% 6%); }
+}
+
+::view-transition-new(root) {
+  animation: theme-reveal 0.6s var(--ease-premium);
+}
+
+::view-transition-old(root) {
+  animation: none;
+}
