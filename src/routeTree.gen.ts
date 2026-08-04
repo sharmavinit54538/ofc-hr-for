@@ -60,6 +60,7 @@ import { Route as AuthenticatedDashboardAttendanceGeofenceRouteImport } from './
 import { Route as AuthenticatedDashboardAttendanceLogsRouteImport } from './routes/_authenticated/dashboard/attendance/logs'
 import { Route as AuthenticatedDashboardAttendanceOvertimeRouteImport } from './routes/_authenticated/dashboard/attendance/overtime'
 import { Route as AuthenticatedDashboardAttendanceShiftsRouteImport } from './routes/_authenticated/dashboard/attendance/shifts'
+import { Route as AuthenticatedDashboardCalendarIndexRouteImport } from './routes/_authenticated/dashboard/calendar/index'
 import { Route as AuthenticatedDashboardCommunicationIndexRouteImport } from './routes/_authenticated/dashboard/communication/index'
 import { Route as AuthenticatedDashboardCommunicationAnnouncementsRouteImport } from './routes/_authenticated/dashboard/communication/announcements'
 import { Route as AuthenticatedDashboardCommunicationBroadcastRouteImport } from './routes/_authenticated/dashboard/communication/broadcast'
@@ -501,6 +502,12 @@ const AuthenticatedDashboardAttendanceShiftsRoute =
   AuthenticatedDashboardAttendanceShiftsRouteImport.update({
     id: '/attendance/shifts',
     path: '/attendance/shifts',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardCalendarIndexRoute =
+  AuthenticatedDashboardCalendarIndexRouteImport.update({
+    id: '/calendar/',
+    path: '/calendar/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardCommunicationIndexRoute =
@@ -1578,6 +1585,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/approvals/': typeof AuthenticatedDashboardApprovalsIndexRoute
   '/dashboard/assets/': typeof AuthenticatedDashboardAssetsIndexRoute
   '/dashboard/attendance/': typeof AuthenticatedDashboardAttendanceIndexRoute
+  '/dashboard/calendar/': typeof AuthenticatedDashboardCalendarIndexRoute
   '/dashboard/communication/': typeof AuthenticatedDashboardCommunicationIndexRoute
   '/dashboard/compliance/': typeof AuthenticatedDashboardComplianceIndexRoute
   '/dashboard/documents/': typeof AuthenticatedDashboardDocumentsIndexRoute
@@ -1773,6 +1781,7 @@ export interface FileRoutesByTo {
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsIndexRoute
   '/dashboard/assets': typeof AuthenticatedDashboardAssetsIndexRoute
   '/dashboard/attendance': typeof AuthenticatedDashboardAttendanceIndexRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarIndexRoute
   '/dashboard/communication': typeof AuthenticatedDashboardCommunicationIndexRoute
   '/dashboard/compliance': typeof AuthenticatedDashboardComplianceIndexRoute
   '/dashboard/documents': typeof AuthenticatedDashboardDocumentsIndexRoute
@@ -1976,6 +1985,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/approvals/': typeof AuthenticatedDashboardApprovalsIndexRoute
   '/_authenticated/dashboard/assets/': typeof AuthenticatedDashboardAssetsIndexRoute
   '/_authenticated/dashboard/attendance/': typeof AuthenticatedDashboardAttendanceIndexRoute
+  '/_authenticated/dashboard/calendar/': typeof AuthenticatedDashboardCalendarIndexRoute
   '/_authenticated/dashboard/communication/': typeof AuthenticatedDashboardCommunicationIndexRoute
   '/_authenticated/dashboard/compliance/': typeof AuthenticatedDashboardComplianceIndexRoute
   '/_authenticated/dashboard/documents/': typeof AuthenticatedDashboardDocumentsIndexRoute
@@ -2179,6 +2189,7 @@ export interface FileRouteTypes {
     | '/dashboard/approvals/'
     | '/dashboard/assets/'
     | '/dashboard/attendance/'
+    | '/dashboard/calendar/'
     | '/dashboard/communication/'
     | '/dashboard/compliance/'
     | '/dashboard/documents/'
@@ -2374,6 +2385,7 @@ export interface FileRouteTypes {
     | '/dashboard/approvals'
     | '/dashboard/assets'
     | '/dashboard/attendance'
+    | '/dashboard/calendar'
     | '/dashboard/communication'
     | '/dashboard/compliance'
     | '/dashboard/documents'
@@ -2576,6 +2588,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/approvals/'
     | '/_authenticated/dashboard/assets/'
     | '/_authenticated/dashboard/attendance/'
+    | '/_authenticated/dashboard/calendar/'
     | '/_authenticated/dashboard/communication/'
     | '/_authenticated/dashboard/compliance/'
     | '/_authenticated/dashboard/documents/'
@@ -2969,6 +2982,13 @@ declare module '@tanstack/react-router' {
       path: '/attendance/shifts'
       fullPath: '/dashboard/attendance/shifts'
       preLoaderRoute: typeof AuthenticatedDashboardAttendanceShiftsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/calendar/': {
+      id: '/_authenticated/dashboard/calendar/'
+      path: '/calendar'
+      fullPath: '/dashboard/calendar/'
+      preLoaderRoute: typeof AuthenticatedDashboardCalendarIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/communication/': {
@@ -4343,6 +4363,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardApprovalsIndexRoute: typeof AuthenticatedDashboardApprovalsIndexRoute
   AuthenticatedDashboardAssetsIndexRoute: typeof AuthenticatedDashboardAssetsIndexRoute
   AuthenticatedDashboardAttendanceIndexRoute: typeof AuthenticatedDashboardAttendanceIndexRoute
+  AuthenticatedDashboardCalendarIndexRoute: typeof AuthenticatedDashboardCalendarIndexRoute
   AuthenticatedDashboardCommunicationIndexRoute: typeof AuthenticatedDashboardCommunicationIndexRoute
   AuthenticatedDashboardComplianceIndexRoute: typeof AuthenticatedDashboardComplianceIndexRoute
   AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
@@ -4615,6 +4636,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAssetsIndexRoute,
     AuthenticatedDashboardAttendanceIndexRoute:
       AuthenticatedDashboardAttendanceIndexRoute,
+    AuthenticatedDashboardCalendarIndexRoute:
+      AuthenticatedDashboardCalendarIndexRoute,
     AuthenticatedDashboardCommunicationIndexRoute:
       AuthenticatedDashboardCommunicationIndexRoute,
     AuthenticatedDashboardComplianceIndexRoute:
