@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function GoogleLogo() {
@@ -27,9 +30,9 @@ function MicrosoftLogo() {
   return (
     <svg viewBox="0 0 23 23" className="h-5 w-5 shrink-0" aria-hidden="true" focusable="false">
       <path fill="#F25022" d="M1 1h10v10H1z" />
-      <path fill="#7FBA00" d="M12 1h10v10H12z" />
+      <path fill="#7FBA00" d="M12 1h10v10H1z" />
       <path fill="#00A4EF" d="M1 12h10v10H1z" />
-      <path fill="#FFB900" d="M12 12h10v10H12z" />
+      <path fill="#FFB900" d="M12 12h10v10H1z" />
     </svg>
   );
 }
@@ -52,24 +55,70 @@ const providers = [
 ];
 
 export function SocialLoginButtons({ className }: { className?: string }) {
-  const handleSocialSignIn = (providerId: string) => {
-    const apiBase = (import.meta.env["VITE_API_BASE_URL"] as string | undefined) || "http://localhost:8000";
-    window.location.href = `${apiBase}/api/v1/sso/${providerId}/login`;
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+
+  const handleSocialSignIn = async (providerId: string) => {
+    try {
+      setLoadingProvider(providerId);
+      console.log(`[OAuth] Initiating ${providerId} login flow...`);
+
+      const apiBase = (import.meta.env["VITE_API_BASE_URL"] as string | undefined) || "http://localhost:8000";
+      const redirectTarget = `${window.location.origin}/auth/callback`;
+
+      const requestUrl = `${apiBase}/api/v1/sso/${providerId}/login?redirect_to=${encodeURIComponent(redirectTarget)}`;
+      console.log(`[OAuth] Fetching authorization_url from:`, requestUrl);
+
+      const res = await fetch(requestUrl, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`SSO initialization endpoint returned HTTP ${res.status}`);
+      }
+
+      const response = await res.json();
+      console.log(`[OAuth] Backend response received:`, response);
+
+      const authUrl = response?.data?.authorization_url;
+      if (!authUrl) {
+        throw new Error("Authorization URL missing from backend response");
+      }
+
+      console.log(`[OAuth] Redirecting browser to authorization_url:`, authUrl);
+      window.location.href = authUrl;
+    } catch (err: any) {
+      console.error(`[OAuth] ${providerId} login initiation failed:`, err);
+      toast.error(`Sign in with ${providerId} failed`, {
+        description: err?.message || "Could not initiate social login request.",
+      });
+      setLoadingProvider(null);
+    }
   };
 
   return (
     <div className={cn("grid grid-cols-3 gap-2.5", className)}>
-      {providers.map(({ id, name, Logo }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => handleSocialSignIn(id)}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border/80 bg-background/60 px-3 text-xs font-semibold text-foreground transition-all duration-200 hover:border-primary/40 hover:bg-accent hover:text-foreground active:scale-[0.98] dark:bg-card/40"
-        >
-          <Logo />
-          <span className="truncate">{name}</span>
-        </button>
-      ))}
+      {providers.map(({ id, name, Logo }) => {
+        const isLoading = loadingProvider === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            disabled={loadingProvider !== null}
+            onClick={() => handleSocialSignIn(id)}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border/80 bg-background/60 px-3 text-xs font-semibold text-foreground transition-all duration-200 hover:border-primary/40 hover:bg-accent hover:text-foreground active:scale-[0.98] disabled:opacity-50 dark:bg-card/40"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            ) : (
+              <Logo />
+            )}
+            <span className="truncate">{name}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
