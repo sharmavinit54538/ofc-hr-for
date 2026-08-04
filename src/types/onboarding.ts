@@ -65,3 +65,28 @@ export interface OnboardingDocumentCreateInput {
 export interface OnboardingDocumentUpdateInput {
   status: "Verified" | "Rejected";
 }
+
+export interface OnboardingTaskItem {
+  id: string;
+  task_title: string;
+  assigned_to: string;
+  candidate_name: string;
+  status: "Completed" | "In Progress" | "Pending";
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  due_date: string;
+  tracking_info?: string;
+}
+
+export interface OnboardingTaskCreateInput {
+  task_title: string;
+  assigned_to: string;
+  candidate_name: string;
+  priority?: "HIGH" | "MEDIUM" | "LOW" | undefined;
+  due_date: string;
+  tracking_info?: string | undefined;
+}
+
+export interface OnboardingTaskUpdateInput {
+  status?: "Completed" | "In Progress" | "Pending" | undefined;
+  priority?: "HIGH" | "MEDIUM" | "LOW" | undefined;
+}

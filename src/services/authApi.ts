@@ -9,6 +9,9 @@ import type {
   OnboardingDocumentItem,
   OnboardingDocumentCreateInput,
   OnboardingDocumentUpdateInput,
+  OnboardingTaskItem,
+  OnboardingTaskCreateInput,
+  OnboardingTaskUpdateInput,
 } from "@/types/onboarding";
 
 export interface RegisterRequest {
@@ -349,6 +352,46 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Onboarding" as const, id: "DOCUMENTS_LIST" }],
     }),
+
+    // ── Task Checklists & IT Dispatch ───────────────────────────────────────
+    listOnboardingTasks: builder.query<ApiResponse<OnboardingTaskItem[]>, { status?: string; search?: string } | void>({
+      query: (params) => {
+        const queryParams: Record<string, any> = {};
+        if (params && params["status"]) queryParams["status"] = params["status"];
+        if (params && params["search"]) queryParams["search"] = params["search"];
+        return {
+          url: "/api/v1/hr-admin/onboarding/tasks",
+          params: queryParams,
+        };
+      },
+      providesTags: [{ type: "Onboarding" as const, id: "TASKS_LIST" }],
+    }),
+
+    createOnboardingTask: builder.mutation<ApiResponse<OnboardingTaskItem>, OnboardingTaskCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/hr-admin/onboarding/tasks",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "TASKS_LIST" }],
+    }),
+
+    updateOnboardingTaskStatus: builder.mutation<ApiResponse<OnboardingTaskItem>, { id: string; body: OnboardingTaskUpdateInput }>({
+      query: ({ id, body }) => ({
+        url: `/api/v1/hr-admin/onboarding/tasks/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "TASKS_LIST" }],
+    }),
+
+    deleteOnboardingTask: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/hr-admin/onboarding/tasks/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "TASKS_LIST" }],
+    }),
   }),
 });
 
@@ -380,4 +423,8 @@ export const {
   useCreateOnboardingDocumentMutation,
   useUpdateOnboardingDocumentStatusMutation,
   useDeleteOnboardingDocumentMutation,
+  useListOnboardingTasksQuery,
+  useCreateOnboardingTaskMutation,
+  useUpdateOnboardingTaskStatusMutation,
+  useDeleteOnboardingTaskMutation,
 } = authApi;
