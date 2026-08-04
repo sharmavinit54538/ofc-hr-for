@@ -7,17 +7,23 @@ import {
   XCircle,
   AlertTriangle,
   Search,
-  Filter,
   ArrowRight,
   ThumbsUp,
   ThumbsDown,
   Layers,
+  Loader2,
+  Inbox,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
 import { ModuleCard } from "@/components/admin/module-card";
 import { SIDEBAR_NAV_ITEMS } from "@/lib/admin-navigation";
-import { MOCK_APPROVALS, ApprovalItem } from "@/lib/approvals/mock-data";
+import {
+  useGetApprovalsQuery,
+  useGetApprovalSummaryQuery,
+  useUpdateApprovalStatusMutation,
+  useBulkApprovalActionMutation,
+} from "@/services/approvalsApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/approvals/")({
   component: ApprovalsLandingPage,
@@ -25,41 +31,58 @@ export const Route = createFileRoute("/_authenticated/dashboard/approvals/")({
 
 function ApprovalsLandingPage() {
   const approvalNav = SIDEBAR_NAV_ITEMS.find((item) => item.id === "approvals");
-  const [items, setItems] = useState<ApprovalItem[]>(MOCK_APPROVALS);
   const [activeTab, setActiveTab] = useState<"All" | "Pending" | "Approved" | "Rejected">("Pending");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleApprove = (id: string) => {
-    setItems(items.map((i) => (i.id === id ? { ...i, status: "Approved" } : i)));
-    toast.success("Request Approved", { description: "Workflow status updated to Approved." });
+  const queryParams: { type?: string; status?: string; q?: string } = {};
+  if (activeTab !== "All") queryParams.status = activeTab;
+  if (searchQuery) queryParams.q = searchQuery;
+
+  const { data: listRes, isLoading: listLoading } = useGetApprovalsQuery(queryParams);
+
+  const { data: summaryRes, isLoading: summaryLoading } = useGetApprovalSummaryQuery();
+  const [updateStatus] = useUpdateApprovalStatusMutation();
+  const [bulkAction] = useBulkApprovalActionMutation();
+
+  const items = listRes?.data ?? [];
+  const summary = summaryRes?.data;
+
+  const handleApprove = async (id: string) => {
+    try {
+      await updateStatus({ approvalId: id, body: { action: "Approved" } }).unwrap();
+      toast.success("Request Approved", { description: "Workflow status updated to Approved." });
+    } catch {
+      toast.error("Failed to approve request.");
+    }
   };
 
-  const handleReject = (id: string) => {
-    setItems(items.map((i) => (i.id === id ? { ...i, status: "Rejected" } : i)));
-    toast.error("Request Rejected", { description: "Workflow status updated to Rejected." });
+  const handleReject = async (id: string) => {
+    try {
+      await updateStatus({ approvalId: id, body: { action: "Rejected" } }).unwrap();
+      toast.error("Request Rejected", { description: "Workflow status updated to Rejected." });
+    } catch {
+      toast.error("Failed to reject request.");
+    }
   };
 
-  const handleBulkApprove = () => {
-    setItems(items.map((i) => (i.status === "Pending" ? { ...i, status: "Approved" } : i)));
-    toast.success("Bulk Approvals Executed", { description: "All pending items approved." });
+  const handleBulkApprove = async () => {
+    try {
+      const res = await bulkAction({ action: "Approved" }).unwrap();
+      toast.success("Bulk Approvals Executed", {
+        description: `${res.data?.updated_count ?? 0} pending items approved.`,
+      });
+    } catch {
+      toast.error("Bulk approval failed.");
+    }
   };
-
-  const filtered = items.filter((i) => {
-    const matchesTab = activeTab === "All" ? true : i.status === activeTab;
-    const matchesSearch =
-      i.requestTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      i.requesterName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      i.type.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTab && matchesSearch;
-  });
 
   const kpiCards = [
-    { title: "Pending Approvals", value: items.filter((i) => i.status === "Pending").length.toString(), sub: "Action Required", icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { title: "Approved Requests", value: items.filter((i) => i.status === "Approved").length.toString(), sub: "Completed Workflow", icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { title: "Rejected Requests", value: items.filter((i) => i.status === "Rejected").length.toString(), sub: "Declined by Manager", icon: XCircle, color: "text-rose-500", bg: "bg-rose-500/10" },
-    { title: "Urgent Priority", value: items.filter((i) => i.priority === "Urgent").length.toString(), sub: "SLA < 24 Hours", icon: AlertTriangle, color: "text-rose-500", bg: "bg-rose-500/10" },
-    { title: "Total Workflows", value: items.length.toString(), sub: "Across 12 Categories", icon: Layers, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-    { title: "Avg Turnaround", value: "4.2 Hours", sub: "Fast Approval Velocity", icon: CheckSquare, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { title: "Pending Approvals", value: summary?.pending_count?.toString() ?? "0", sub: "Action Required", icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
+    { title: "Approved Requests", value: summary?.approved_count?.toString() ?? "0", sub: "Completed Workflow", icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { title: "Rejected Requests", value: summary?.rejected_count?.toString() ?? "0", sub: "Declined by Manager", icon: XCircle, color: "text-rose-500", bg: "bg-rose-500/10" },
+    { title: "Urgent Priority", value: summary?.urgent_count?.toString() ?? "0", sub: "SLA < 24 Hours", icon: AlertTriangle, color: "text-rose-500", bg: "bg-rose-500/10" },
+    { title: "Total Workflows", value: summary?.total_count?.toString() ?? "0", sub: "Across All Categories", icon: Layers, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+    { title: "Avg Turnaround", value: summary?.avg_turnaround ?? "0 Hours", sub: "Approval Velocity", icon: CheckSquare, color: "text-purple-500", bg: "bg-purple-500/10" },
   ];
 
   return (
@@ -79,27 +102,33 @@ function ApprovalsLandingPage() {
       />
 
       {/* Top KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-        {kpiCards.map((kpi) => {
-          const Icon = kpi.icon;
-          return (
-            <div key={kpi.title} className="glass-tile rounded-2xl p-4 transition-all hover-lift">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  {kpi.title}
-                </span>
-                <div className={`flex size-8 items-center justify-center rounded-xl ${kpi.bg} ${kpi.color}`}>
-                  <Icon className="size-4" />
+      {summaryLoading ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="size-6 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+          {kpiCards.map((kpi) => {
+            const Icon = kpi.icon;
+            return (
+              <div key={kpi.title} className="glass-tile rounded-2xl p-4 transition-all hover-lift">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {kpi.title}
+                  </span>
+                  <div className={`flex size-8 items-center justify-center rounded-xl ${kpi.bg} ${kpi.color}`}>
+                    <Icon className="size-4" />
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <div className="font-display text-2xl font-bold text-foreground">{kpi.value}</div>
+                  <p className="mt-0.5 text-[10px] font-medium text-muted-foreground truncate">{kpi.sub}</p>
                 </div>
               </div>
-              <div className="mt-2">
-                <div className="font-display text-2xl font-bold text-foreground">{kpi.value}</div>
-                <p className="mt-0.5 text-[10px] font-medium text-muted-foreground truncate">{kpi.sub}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Main Approval Action Queue */}
       <div className="space-y-4">
@@ -132,73 +161,85 @@ function ApprovalsLandingPage() {
           </div>
         </div>
 
-        <div className="glass-tile overflow-hidden rounded-2xl border border-border">
-          <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
-                <tr>
-                  <th className="px-5 py-3.5 font-bold">Approval ID</th>
-                  <th className="px-5 py-3.5 font-bold">Category Type</th>
-                  <th className="px-5 py-3.5 font-bold">Request Title</th>
-                  <th className="px-5 py-3.5 font-bold">Requester</th>
-                  <th className="px-5 py-3.5 font-bold">Priority</th>
-                  <th className="px-5 py-3.5 font-bold">Submitted Time</th>
-                  <th className="px-5 py-3.5 font-bold">Status</th>
-                  <th className="px-5 py-3.5 font-bold text-right">Quick Decision</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {filtered.map((item) => (
-                  <tr key={item.id} className="transition-colors hover:bg-secondary/40">
-                    <td className="px-5 py-4 font-mono font-bold text-primary">{item.approvalId}</td>
-                    <td className="px-5 py-4 font-bold text-foreground">{item.type}</td>
-                    <td className="px-5 py-4 font-semibold text-foreground max-w-xs truncate">{item.requestTitle}</td>
-                    <td className="px-5 py-4 text-muted-foreground">{item.requesterName} ({item.requesterDept})</td>
-                    <td className="px-5 py-4">
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                        item.priority === "Urgent" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "bg-amber-500/10 text-amber-400"
-                      }`}>
-                        {item.priority}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4 font-mono text-muted-foreground">{item.submittedDate}</td>
-                    <td className="px-5 py-4">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                        item.status === "Approved"
-                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-                          : item.status === "Rejected"
-                          ? "border-rose-500/20 bg-rose-500/10 text-rose-400"
-                          : "border-amber-500/20 bg-amber-500/10 text-amber-400"
-                      }`}>
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4 text-right">
-                      {item.status === "Pending" ? (
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            onClick={() => handleApprove(item.id)}
-                            className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 inline-flex items-center gap-1"
-                          >
-                            <ThumbsUp className="size-3" /> Approve
-                          </button>
-                          <button
-                            onClick={() => handleReject(item.id)}
-                            className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-xs font-bold text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 inline-flex items-center gap-1"
-                          >
-                            <ThumbsDown className="size-3" /> Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground font-mono text-[11px]">{item.status}</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {listLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="size-6 animate-spin text-primary" />
           </div>
-        </div>
+        ) : items.length === 0 ? (
+          <div className="glass-tile rounded-2xl flex flex-col items-center justify-center py-16 gap-3">
+            <Inbox className="size-12 text-muted-foreground/40" />
+            <p className="text-sm font-semibold text-muted-foreground">No approval requests found</p>
+            <p className="text-xs text-muted-foreground/60">When approval requests are created, they will appear here.</p>
+          </div>
+        ) : (
+          <div className="glass-tile overflow-hidden rounded-2xl border border-border">
+            <div className="overflow-x-auto no-scrollbar">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
+                  <tr>
+                    <th className="px-5 py-3.5 font-bold">Approval ID</th>
+                    <th className="px-5 py-3.5 font-bold">Category Type</th>
+                    <th className="px-5 py-3.5 font-bold">Request Title</th>
+                    <th className="px-5 py-3.5 font-bold">Requester</th>
+                    <th className="px-5 py-3.5 font-bold">Priority</th>
+                    <th className="px-5 py-3.5 font-bold">Submitted Time</th>
+                    <th className="px-5 py-3.5 font-bold">Status</th>
+                    <th className="px-5 py-3.5 font-bold text-right">Quick Decision</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {items.map((item) => (
+                    <tr key={item.id} className="transition-colors hover:bg-secondary/40">
+                      <td className="px-5 py-4 font-mono font-bold text-primary">{item.approvalId}</td>
+                      <td className="px-5 py-4 font-bold text-foreground">{item.type}</td>
+                      <td className="px-5 py-4 font-semibold text-foreground max-w-xs truncate">{item.requestTitle}</td>
+                      <td className="px-5 py-4 text-muted-foreground">{item.requesterName} ({item.requesterDept})</td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                          item.priority === "Urgent" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "bg-amber-500/10 text-amber-400"
+                        }`}>
+                          {item.priority}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 font-mono text-muted-foreground">{item.submittedDate}</td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
+                          item.status === "Approved"
+                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                            : item.status === "Rejected"
+                            ? "border-rose-500/20 bg-rose-500/10 text-rose-400"
+                            : "border-amber-500/20 bg-amber-500/10 text-amber-400"
+                        }`}>
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        {item.status === "Pending" ? (
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => handleApprove(item.id)}
+                              className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 inline-flex items-center gap-1"
+                            >
+                              <ThumbsUp className="size-3" /> Approve
+                            </button>
+                            <button
+                              onClick={() => handleReject(item.id)}
+                              className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-xs font-bold text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 inline-flex items-center gap-1"
+                            >
+                              <ThumbsDown className="size-3" /> Reject
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground font-mono text-[11px]">{item.status}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sub-Modules */}
