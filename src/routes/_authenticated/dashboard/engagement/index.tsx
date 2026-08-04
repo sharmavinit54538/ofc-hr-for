@@ -9,29 +9,55 @@ import {
   ThumbsUp,
   Sparkles,
   Trophy,
-  Plus,
+  Loader2,
+  Inbox,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
-import { ModuleCard } from "@/components/admin/module-card";
-import { SIDEBAR_NAV_ITEMS } from "@/lib/admin-navigation";
-import { MOCK_RECOGNITIONS, MOCK_REWARDS } from "@/lib/engagement/mock-data";
+import {
+  useGetEngagementSummaryQuery,
+  useGetRecognitionsQuery,
+  useCreateRecognitionMutation,
+} from "@/services/engagementApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagement/")({
   component: EmployeeEngagementLandingPage,
 });
 
 function EmployeeEngagementLandingPage() {
-  const engagementNav = SIDEBAR_NAV_ITEMS.find((item) => item.id === "engagement");
-  const [posts] = useState(MOCK_RECOGNITIONS);
+  const { data: summaryRes } = useGetEngagementSummaryQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const { data: recRes, isLoading: isLoadingRec } = useGetRecognitionsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const [createRecognition] = useCreateRecognitionMutation();
+
+  const summary = summaryRes?.data;
+  const posts = recRes?.data ?? [];
+
+  const handleSendKudos = async () => {
+    try {
+      await createRecognition({
+        recipientName: "Team Member",
+        badge: "Innovation Star",
+        message: "Outstanding dedication and teamwork!",
+      }).unwrap();
+      toast.success("Recognition Kudos Sent!");
+    } catch {
+      toast.error("Failed to send kudos.");
+    }
+  };
 
   const kpiCards = [
-    { title: "Kudos & Shoutouts", value: "180", sub: "Given this month", icon: HeartHandshake, color: "text-rose-500", bg: "bg-rose-500/10" },
-    { title: "Points Given", value: "4,200", sub: "Redeemable points", icon: Gift, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { title: "Badges Awarded", value: "48", sub: "Tenure & Innovation", icon: Award, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-    { title: "Pulse eNPS Score", value: "+86", sub: "Top Decile Culture", icon: MessageSquare, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { title: "Team Events", value: "12", sub: "Scheduled H2", icon: PartyPopper, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { title: "Active Participation", value: "94.2%", sub: "Workforce Engagement", icon: Trophy, color: "text-sky-500", bg: "bg-sky-500/10" },
+    { title: "Kudos & Shoutouts", value: (summary?.kudos_count ?? posts.length).toString(), sub: "Given this month", icon: HeartHandshake, color: "text-rose-500", bg: "bg-rose-500/10" },
+    { title: "Points Given", value: (summary?.points_given ?? 0).toString(), sub: "Redeemable points", icon: Gift, color: "text-amber-500", bg: "bg-amber-500/10" },
+    { title: "Badges Awarded", value: (summary?.badges_awarded ?? 0).toString(), sub: "Tenure & Innovation", icon: Award, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+    { title: "Pulse eNPS Score", value: (summary?.enps_score ? `+${summary.enps_score}` : "0").toString(), sub: "Culture Pulse", icon: MessageSquare, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { title: "Team Events", value: (summary?.team_events_count ?? 0).toString(), sub: "Scheduled Events", icon: PartyPopper, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { title: "Active Participation", value: `${summary?.active_participation_pct ?? 0}%`, sub: "Workforce Engagement", icon: Trophy, color: "text-sky-500", bg: "bg-sky-500/10" },
   ];
 
   return (
@@ -42,7 +68,7 @@ function EmployeeEngagementLandingPage() {
         breadcrumbs={[{ label: "Employee Engagement" }]}
         actions={
           <button
-            onClick={() => toast.success("Recognition Kudos Sent!")}
+            onClick={handleSendKudos}
             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
           >
             <Sparkles className="size-4" /> Send Kudos Shoutout
@@ -73,17 +99,29 @@ function EmployeeEngagementLandingPage() {
         })}
       </div>
 
-      {/* Recognition Wall Feed & Leaderboard */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Wall Feed */}
-        <div className="glass-tile space-y-4 rounded-2xl p-5 lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-              <HeartHandshake className="size-4 text-rose-500" /> Live Recognition Wall Feed
-            </h3>
-            <span className="text-xs text-muted-foreground">Updated real-time</span>
-          </div>
+      {/* Recognition Wall Feed */}
+      <div className="glass-tile space-y-4 rounded-2xl p-5">
+        <div className="flex items-center justify-between">
+          <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
+            <HeartHandshake className="size-4 text-rose-500" /> Live Recognition Wall Feed
+          </h3>
+          <span className="text-xs text-muted-foreground">Updated real-time</span>
+        </div>
 
+        {isLoadingRec ? (
+          <div className="p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Loader2 className="size-5 animate-spin text-primary" />
+            Loading recognition posts...
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Recognition Shoutouts Found</p>
+            <p className="text-[11px] max-w-xs">
+              Click "Send Kudos Shoutout" above to post the first peer appreciation message.
+            </p>
+          </div>
+        ) : (
           <div className="space-y-3">
             {posts.map((post) => (
               <div key={post.id} className="rounded-xl border border-border/50 bg-card/40 p-4 text-xs space-y-2">
@@ -114,46 +152,7 @@ function EmployeeEngagementLandingPage() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Engagement Leaderboard */}
-        <div className="glass-tile space-y-4 rounded-2xl p-5">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-              <Trophy className="size-4 text-amber-400" /> Culture Champions Leaderboard
-            </h3>
-          </div>
-
-          <div className="space-y-3 text-xs">
-            {MOCK_REWARDS.map((r, idx) => (
-              <div key={r.id} className="flex items-center justify-between rounded-xl border border-border/40 bg-card/40 p-3">
-                <div className="flex items-center gap-3">
-                  <span className={`font-display text-base font-bold ${idx === 0 ? "text-amber-400" : "text-muted-foreground"}`}>
-                    #{idx + 1}
-                  </span>
-                  <div>
-                    <h4 className="font-bold text-foreground">{r.employeeName}</h4>
-                    <p className="text-[10px] text-muted-foreground">{r.tier}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-primary">{r.pointsBalance} Pts</div>
-                  <div className="text-[10px] text-muted-foreground">{r.pointsEarnedYtd} YTD</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Sub-Modules */}
-      <div className="space-y-4">
-        <h2 className="font-display text-lg font-bold text-foreground">Employee Engagement Sub-Modules</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {engagementNav?.subModules.map((subModule) => (
-            <ModuleCard key={subModule.id} module={subModule} />
-          ))}
-        </div>
+        )}
       </div>
     </div>
   );
