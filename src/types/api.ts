@@ -28,7 +28,11 @@ export interface ListParams {
   status?: string | undefined;
   from_date?: string | undefined;
   to_date?: string | undefined;
+  category_id?: string | undefined;
+  category?: string | undefined;
+  feedback_type?: string | undefined;
   filters?: Record<string, string | number | boolean | undefined> | undefined;
+  [key: string]: any;
 }
 
 export interface IdParam {

@@ -81,39 +81,39 @@ export interface AssetCreateInput {
   tag_id: string;
   name: string;
   serial_number: string;
-  category_id?: string;
-  vendor_id?: string;
-  status?: AssetStatus;
-  condition?: AssetCondition;
-  purchase_date?: string;
-  purchase_cost?: number;
-  warranty_expiry?: string;
-  department?: string;
-  location?: string;
-  notes?: string;
+  category_id?: string | undefined;
+  vendor_id?: string | undefined;
+  status?: AssetStatus | undefined;
+  condition?: AssetCondition | undefined;
+  purchase_date?: string | undefined;
+  purchase_cost?: number | undefined;
+  warranty_expiry?: string | undefined;
+  department?: string | undefined;
+  location?: string | undefined;
+  notes?: string | undefined;
 }
 
 export interface AssetUpdateInput {
-  name?: string;
-  serial_number?: string;
-  category_id?: string;
-  vendor_id?: string;
-  status?: AssetStatus;
-  condition?: AssetCondition;
-  purchase_date?: string;
-  purchase_cost?: number;
-  warranty_expiry?: string;
-  department?: string;
-  location?: string;
-  notes?: string;
+  name?: string | undefined;
+  serial_number?: string | undefined;
+  category_id?: string | undefined;
+  vendor_id?: string | undefined;
+  status?: AssetStatus | undefined;
+  condition?: AssetCondition | undefined;
+  purchase_date?: string | undefined;
+  purchase_cost?: number | undefined;
+  warranty_expiry?: string | undefined;
+  department?: string | undefined;
+  location?: string | undefined;
+  notes?: string | undefined;
 }
 
 export interface AssetAssignInput {
   asset_id: string;
   employee_id: string;
   assigned_date: string;
-  expected_return_date?: string;
-  notes?: string;
+  expected_return_date?: string | undefined;
+  notes?: string | undefined;
 }
 
 export interface AssetReturnInput {
