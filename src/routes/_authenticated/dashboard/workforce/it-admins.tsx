@@ -40,7 +40,7 @@ interface ITAdminDisplayItem {
   status: string;
 }
 
-export function ITAdminsPage() {
+function ITAdminsPage() {
   const { data: employeesRes, isLoading: isLoadingEmps } = useListEmployeesQuery({ page: 1, page_size: 200 });
   const { data: departmentsRes } = useListDepartmentsQuery();
   const [createEmployee, { isLoading: isCreating }] = useCreateEmployeeMutation();
@@ -71,13 +71,23 @@ export function ITAdminsPage() {
   const rawDepartments = useMemo(() => departmentsRes?.data ?? [], [departmentsRes]);
 
   // Filter employees for IT Admins (role === IT_ADMIN or IT department / IT job titles)
-  const itAdminsList = useMemo(() => {
-    return rawEmployees.filter(
+  const itAdminsList = useMemo<ITAdminDisplayItem[]>(() => {
+    const filtered = rawEmployees.filter(
       (e) =>
         e.role === "IT_ADMIN" ||
         e.job_title?.toLowerCase().includes("it admin") ||
-        e.job_title?.toLowerCase().includes("system admin")
+        e.job_title?.toLowerCase().includes("system admin") ||
+        e.department?.toLowerCase().includes("it")
     );
+    return filtered.map((e) => ({
+      id: e.id,
+      employee_id: e.employee_id || `IT-${e.id.substring(0, 5)}`,
+      full_name: e.full_name,
+      email: e.email,
+      department: e.department || "IT Infrastructure & Security",
+      job_title: e.job_title || "IT Administrator",
+      status: e.status === "Active" ? "Active" : "Inactive",
+    }));
   }, [rawEmployees]);
 
   const filteredAdmins = useMemo(() => {

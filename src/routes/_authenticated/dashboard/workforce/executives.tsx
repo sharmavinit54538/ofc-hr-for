@@ -40,7 +40,7 @@ interface ExecutiveDisplayItem {
   status: string;
 }
 
-export function ExecutivesPage() {
+function ExecutivesPage() {
   const { data: employeesRes, isLoading: isLoadingEmps } = useListEmployeesQuery({ page: 1, page_size: 200 });
   const { data: departmentsRes } = useListDepartmentsQuery();
   const [createEmployee, { isLoading: isCreating }] = useCreateEmployeeMutation();
@@ -89,7 +89,7 @@ export function ExecutivesPage() {
       email: e.email,
       department: e.department || "Executive Board / Corporate",
       job_title: e.job_title || "Executive Leadership",
-      status: e.is_active ? "Active" : "Inactive",
+      status: e.status === "Active" ? "Active" : "Inactive",
     }));
   }, [rawEmployees]);
 

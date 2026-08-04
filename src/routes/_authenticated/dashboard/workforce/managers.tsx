@@ -53,7 +53,7 @@ interface ManagerDisplayItem {
   is_dept_head: boolean;
 }
 
-export function ManagersPage() {
+function ManagersPage() {
   const { data: employeesRes, isLoading: isLoadingEmps } = useListEmployeesQuery({ page: 1, page_size: 200 });
   const { data: departmentsRes } = useListDepartmentsQuery();
   const [createEmployee, { isLoading: isCreating }] = useCreateEmployeeMutation();
@@ -64,9 +64,9 @@ export function ManagersPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [createdCredentials, setCreatedCredentials] = useState<{
     email: string;
-    tempPassword: str;
-    fullName: str;
-    employeeId: str;
+    tempPassword: string;
+    fullName: string;
+    employeeId: string;
   } | null>(null);
 
   // Form State for creating new Manager
@@ -82,11 +82,11 @@ export function ManagersPage() {
 
   // Compute Manager list: employees with role MANAGER or EXECUTIVE or managers referenced in employee reporting structure
   const managersList = useMemo<ManagerDisplayItem[]>(() => {
-    // Collect all employee manager_ids
+    // Collect all employee reporting_manager_ids
     const directReportsMap = new Map<string, number>();
     rawEmployees.forEach((emp) => {
-      if (emp.manager_id) {
-        directReportsMap.set(emp.manager_id, (directReportsMap.get(emp.manager_id) || 0) + 1);
+      if (emp.reporting_manager_id) {
+        directReportsMap.set(emp.reporting_manager_id, (directReportsMap.get(emp.reporting_manager_id) || 0) + 1);
       }
     });
 
@@ -109,7 +109,7 @@ export function ManagersPage() {
       department: m.department || "General Management",
       job_title: m.job_title || "Department Manager",
       direct_reports_count: directReportsMap.get(m.id) || 0,
-      status: m.is_active ? "Active" : "Inactive",
+      status: m.status === "Active" ? "Active" : "Inactive",
       is_dept_head: deptHeadNames.has(m.full_name?.toLowerCase()),
     }));
   }, [rawEmployees, rawDepartments]);

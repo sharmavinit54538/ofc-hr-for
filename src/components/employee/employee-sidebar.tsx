@@ -62,11 +62,10 @@ export const EmployeeSidebar = memo(function EmployeeSidebar({
     >
       {/* ── Brand Header ────────────────────────────────────────── */}
       <div className="flex h-16 shrink-0 items-center justify-between px-4">
-        {!collapsed && <Logo compact />}
-        {collapsed && (
-          <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-gradient-brand font-display text-xs font-bold text-primary-foreground shadow-glow">
-            OFC
-          </div>
+        {!collapsed ? (
+          <Logo />
+        ) : (
+          <Logo variant="iconOnly" className="mx-auto" />
         )}
 
         <div className="flex items-center gap-1">
