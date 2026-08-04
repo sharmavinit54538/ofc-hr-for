@@ -5,29 +5,33 @@ import {
   FileSpreadsheet,
   FileText,
   Search,
-  CheckCircle2,
-  Clock,
-  Sparkles,
+  Loader2,
+  Inbox,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
-import { REPORTS_CATALOGUE } from "@/lib/reports/mock-data";
+import { useGetReportsCatalogQuery } from "@/services/reportsApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/export")({
   component: ExportCenterPage,
 });
 
 function ExportCenterPage() {
+  const { data: catalogRes, isLoading } = useGetReportsCatalogQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const reports = catalogRes?.data ?? [];
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filtered = REPORTS_CATALOGUE.filter(
+  const filtered = reports.filter(
     (r) =>
       r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.category.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleDownloadFile = (title: string, format: string) => {
-    toast.success(`Downloading ${title}`, {
+    toast.success(`Exporting ${title}`, {
       description: `File packaged as ${format} archive and downloading.`,
     });
   };
@@ -36,7 +40,7 @@ function ExportCenterPage() {
     <div className="space-y-6">
       <PageHeader
         title="Central Export & Archive Center"
-        description="Download packaged PDF executive digests, raw Excel data sheets, and CSV dumps across all 23 enterprise modules."
+        description="Download packaged executive digests, raw Excel data sheets, and CSV dumps across all enterprise modules."
         breadcrumbs={[
           { label: "Reports", href: "/dashboard/reports" },
           { label: "Export Center" },
@@ -49,8 +53,8 @@ function ExportCenterPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Download Volume</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">420 Exports</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Export Modules</p>
+            <p className="font-display text-2xl font-bold text-foreground mt-1">{reports.length} Reports</p>
           </div>
           <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
             <Download className="size-5" />
@@ -59,8 +63,8 @@ function ExportCenterPage() {
 
         <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Excel Data Packages</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">210 Sheets</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Data Format Engines</p>
+            <p className="font-display text-2xl font-bold text-foreground mt-1">Excel & CSV</p>
           </div>
           <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
             <FileSpreadsheet className="size-5" />
@@ -69,8 +73,8 @@ function ExportCenterPage() {
 
         <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">PDF Executive Digests</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">160 Digests</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Executive Digests</p>
+            <p className="font-display text-2xl font-bold text-foreground mt-1">PDF Engine</p>
           </div>
           <div className="flex size-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500">
             <FileText className="size-5" />
@@ -96,57 +100,65 @@ function ExportCenterPage() {
       </div>
 
       {/* Export Table */}
-      <div className="glass-tile overflow-hidden rounded-2xl border border-border">
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3.5 font-bold">Report Title</th>
-                <th className="px-5 py-3.5 font-bold">Category</th>
-                <th className="px-5 py-3.5 font-bold">Last Generated</th>
-                <th className="px-5 py-3.5 font-bold">Default Format</th>
-                <th className="px-5 py-3.5 font-bold text-right">Instant Download Options</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {filtered.map((report) => (
-                <tr key={report.id} className="transition-colors hover:bg-secondary/40">
-                  <td className="px-5 py-4 font-bold text-foreground">{report.title}</td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
-                      {report.category}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-muted-foreground">{report.lastGenerated}</td>
-                  <td className="px-5 py-4 font-mono text-muted-foreground">{report.exportFormat}</td>
-                  <td className="px-5 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => handleDownloadFile(report.title, "PDF")}
-                        className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
-                      >
-                        PDF
-                      </button>
-                      <button
-                        onClick={() => handleDownloadFile(report.title, "Excel")}
-                        className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-                      >
-                        Excel
-                      </button>
-                      <button
-                        onClick={() => handleDownloadFile(report.title, "CSV")}
-                        className="rounded-lg bg-sky-500/10 px-2.5 py-1 text-[11px] font-bold text-sky-400 border border-sky-500/20 hover:bg-sky-500/20"
-                      >
-                        CSV
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {isLoading ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Loader2 className="size-6 animate-spin text-primary" />
+          Loading report export modules...
         </div>
-      </div>
+      ) : filtered.length === 0 ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Inbox className="size-8 text-muted-foreground/50" />
+          <p className="font-medium text-foreground text-sm">No Exportable Reports Found</p>
+        </div>
+      ) : (
+        <div className="glass-tile overflow-hidden rounded-2xl border border-border">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
+                <tr>
+                  <th className="px-5 py-3.5 font-bold">Report Title</th>
+                  <th className="px-5 py-3.5 font-bold">Category</th>
+                  <th className="px-5 py-3.5 font-bold text-right">Instant Download Options</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {filtered.map((report) => (
+                  <tr key={report.id} className="transition-colors hover:bg-secondary/40">
+                    <td className="px-5 py-4 font-bold text-foreground">{report.title}</td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
+                        {report.category}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleDownloadFile(report.title, "PDF")}
+                          className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
+                        >
+                          PDF
+                        </button>
+                        <button
+                          onClick={() => handleDownloadFile(report.title, "Excel")}
+                          className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
+                        >
+                          Excel
+                        </button>
+                        <button
+                          onClick={() => handleDownloadFile(report.title, "CSV")}
+                          className="rounded-lg bg-sky-500/10 px-2.5 py-1 text-[11px] font-bold text-sky-400 border border-sky-500/20 hover:bg-sky-500/20"
+                        >
+                          CSV
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

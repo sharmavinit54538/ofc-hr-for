@@ -27,14 +27,14 @@ function ManagerAttendancePage() {
     return employees.map((emp) => ({
       id: emp.id,
       name: emp.full_name,
-      clockIn: emp.is_active ? "09:00 AM" : "—",
-      clockOut: emp.is_active ? "06:00 PM" : "—",
-      hours: emp.is_active ? "9h 00m" : "—",
-      status: emp.is_active ? "Active" : "Inactive",
+      clockIn: emp.status === "Active" ? "09:00 AM" : "—",
+      clockOut: emp.status === "Active" ? "06:00 PM" : "—",
+      hours: emp.status === "Active" ? "9h 00m" : "—",
+      status: emp.status === "Active" ? "Active" : "Inactive",
     }));
   }, [employees]);
 
-  const activeCount = useMemo(() => employees.filter((e) => e.is_active).length, [employees]);
+  const activeCount = useMemo(() => employees.filter((e) => e.status === "Active").length, [employees]);
 
   return (
     <div className="space-y-6">

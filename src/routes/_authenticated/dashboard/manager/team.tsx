@@ -89,12 +89,12 @@ function ManagerTeamPage() {
                 </div>
                 <span
                   className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                    m.is_active
+                    m.status === "Active"
                       ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
                       : "border-rose-500/20 bg-rose-500/10 text-rose-500"
                   }`}
                 >
-                  {m.is_active ? "Active" : "Inactive"}
+                  {m.status === "Active" ? "Active" : "Inactive"}
                 </span>
               </div>
 

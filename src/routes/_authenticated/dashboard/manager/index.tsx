@@ -81,7 +81,7 @@ function ManagerDashboardHome() {
           <div className="mt-2">
             <div className="font-display text-2xl font-bold text-foreground">{teamMembers.length}</div>
             <p className="mt-0.5 text-[10px] font-medium text-emerald-500">
-              {teamMembers.filter((m) => m.is_active).length} Active Members
+              {teamMembers.filter((m) => m.status === "Active").length} Active Members
             </p>
           </div>
         </div>
@@ -253,7 +253,7 @@ function ManagerDashboardHome() {
                       </div>
                     </div>
                     <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-500">
-                      {member.is_active ? "Active" : "Inactive"}
+                      {member.status === "Active" ? "Active" : "Inactive"}
                     </span>
                   </div>
                 ))}

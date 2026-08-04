@@ -1,79 +1,76 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReportViewLayout } from "@/components/admin/report-view-layout";
-import { UserPlus, UserCheck, Clock, Gift } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { useGetRecruitmentReportQuery } from "@/services/reportsApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/recruitment")({
   component: RecruitmentReportPage,
 });
 
 function RecruitmentReportPage() {
+  const { data: recRes } = useGetRecruitmentReportQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const rec = recRes?.data;
+
   const kpis = (
     <>
       <div className="glass-tile rounded-2xl p-4">
         <span className="text-xs uppercase font-bold text-muted-foreground">Open Requisitions</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">24 Roles</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">6 Priority Positions</p>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {rec?.open_requisitions ?? 0} Roles
+        </div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Active Requisitions</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
         <span className="text-xs uppercase font-bold text-muted-foreground">Active Candidates</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">380 Applicants</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">In Screening & Panel Stages</p>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {rec?.total_applicants ?? 0} Applicants
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-0.5">Pipeline Applicants</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Offer Acceptance Rate</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">88.5%</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Strong Employer Brand</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Interviews Conducted</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {rec?.interviews_conducted ?? 0} Sessions
+        </div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Assessment Telemetry</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Avg Time-to-Hire</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">22 Days</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">-4 Days Faster than Target</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Offers Accepted</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {rec?.offers_accepted ?? 0} Candidates
+        </div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Accepted Offers</p>
       </div>
     </>
   );
 
-  const funnelData = [
-    { stage: "Applied", candidates: 380 },
-    { stage: "Screened", candidates: 190 },
-    { stage: "Technical Interview", candidates: 75 },
-    { stage: "Culture & Executive", candidates: 32 },
-    { stage: "Offer Released", candidates: 18 },
-  ];
-
-  const charts = (
-    <div className="glass-tile space-y-3 rounded-2xl p-5">
-      <h3 className="font-display text-base font-bold text-foreground">Talent Acquisition Candidate Conversion Funnel</h3>
-      <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={funnelData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-            <XAxis type="number" stroke="#888888" fontSize={11} />
-            <YAxis dataKey="stage" type="category" stroke="#888888" fontSize={11} width={120} />
-            <Tooltip contentStyle={{ backgroundColor: "#1e1b4b", borderRadius: "12px", fontSize: "12px" }} />
-            <Bar dataKey="candidates" fill="#6366f1" radius={[0, 6, 6, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-
-  const mockJobs = [
-    { title: "Senior AI Engineer", department: "Product Engineering", applicants: 124, interviews: 12, offerStatus: "2 Offered", status: "Hiring" },
-    { title: "Frontend Architect", department: "Product Engineering", applicants: 98, interviews: 8, offerStatus: "1 Offered", status: "Hiring" },
-    { title: "Financial Operations Manager", department: "Finance Operations", applicants: 45, interviews: 5, offerStatus: "Pending Interview", status: "Hiring" },
+  const tableData = [
+    {
+      metric: "Active Open Job Requisitions",
+      count: `${rec?.open_requisitions ?? 0} Active Requisitions`,
+    },
+    {
+      metric: "Total Applicants in Talent Pipeline",
+      count: `${rec?.total_applicants ?? 0} Candidates`,
+    },
+    {
+      metric: "Interviews Conducted",
+      count: `${rec?.interviews_conducted ?? 0} Sessions`,
+    },
+    {
+      metric: "Offers Accepted by Candidates",
+      count: `${rec?.offers_accepted ?? 0} Accepted`,
+    },
   ];
 
   const columns = [
-    { key: "title", label: "Requisition Title" },
-    { key: "department", label: "Department" },
-    { key: "applicants", label: "Applicants" },
-    { key: "interviews", label: "Interviews Conducted" },
-    { key: "offerStatus", label: "Offer Pipeline" },
-    { key: "status", label: "Status" },
+    { key: "metric", label: "Recruitment Pipeline Metric" },
+    { key: "count", label: "Value" },
   ];
 
   return (
@@ -82,9 +79,8 @@ function RecruitmentReportPage() {
       description="Applicant tracking metrics, candidate funnel conversion rates, offer acceptance velocity, and hiring source analysis."
       categoryBadge="Recruitment Report"
       kpiCards={kpis}
-      chartsSection={charts}
       tableColumns={columns}
-      tableData={mockJobs}
+      tableData={tableData}
     />
   );
 }
