@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Ticket, Plus, Clock, CheckCircle2, AlertCircle, Search, Filter } from "lucide-react";
+import { Ticket, Plus, Clock, CheckCircle2, AlertCircle, Search, Filter, Loader2, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
+import {
+  useGetEmployeeTicketsQuery,
+  useCreateTicketMutation,
+} from "@/services/employeeDashboardApi";
 import {
   Dialog,
   DialogContent,
@@ -16,72 +20,14 @@ export const Route = createFileRoute("/_authenticated/dashboard/helpdesk/")({
   component: HelpdeskIndexPage,
 });
 
-interface SupportTicket {
-  id: string;
-  subject: string;
-  category: string;
-  priority: "Low" | "Medium" | "High" | "Critical";
-  status: "Open" | "In Progress" | "Resolved" | "Closed";
-  requester: string;
-  assignedTo: string;
-  createdAt: string;
-  updatedAt: string;
-  description: string;
-}
-
-const INITIAL_TICKETS: SupportTicket[] = [
-  {
-    id: "TCK-8801",
-    subject: "VPN Access Token Expired for Remote Office",
-    category: "IT Support",
-    priority: "High",
-    status: "In Progress",
-    requester: "Aarav Sharma",
-    assignedTo: "Priya N. (IT Admin)",
-    createdAt: "2026-08-02",
-    updatedAt: "2026-08-02",
-    description: "Cannot connect to corporate subnet via WireGuard VPN since morning.",
-  },
-  {
-    id: "TCK-8802",
-    subject: "Form 16 Tax Proof Clarification for H1 FY26",
-    category: "Payroll & Benefits",
-    priority: "Medium",
-    status: "Open",
-    requester: "Sanya Kapoor",
-    assignedTo: "Finance Operations",
-    createdAt: "2026-08-01",
-    updatedAt: "2026-08-01",
-    description: "Discrepancy in HRA exemption calculation on portal payslip.",
-  },
-  {
-    id: "TCK-8803",
-    subject: "MacBook Pro M3 Max Display Flicker Issue",
-    category: "Hardware & Devices",
-    priority: "Critical",
-    status: "Open",
-    requester: "Rahul Verma",
-    assignedTo: "Hardware Desk",
-    createdAt: "2026-07-31",
-    updatedAt: "2026-08-01",
-    description: "External 4K Monitor drops refresh rate when connected via USB-C dock.",
-  },
-  {
-    id: "TCK-8804",
-    subject: "New Access Badge Request for Sector 62 Office",
-    category: "Facilities & Security",
-    priority: "Low",
-    status: "Resolved",
-    requester: "Priya Patel",
-    assignedTo: "Building Ops",
-    createdAt: "2026-07-28",
-    updatedAt: "2026-07-30",
-    description: "Replacement smartcard badge requested after losing previous card during travel.",
-  },
-];
-
 function HelpdeskIndexPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>(INITIAL_TICKETS);
+  const { data: ticketsRes, isLoading } = useGetEmployeeTicketsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [createTicket, { isLoading: isSubmitting }] = useCreateTicketMutation();
+
+  const tickets = ticketsRes?.data ?? [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
@@ -91,39 +37,45 @@ function HelpdeskIndexPage() {
   const [description, setDescription] = useState("");
 
   const filteredTickets = tickets.filter((t) => {
+    const ticketId = t.ticket_number || t.id || "";
     const matchesSearch =
-      t.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.requester.toLowerCase().includes(searchQuery.toLowerCase());
+      (t.subject || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ticketId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.assigned_to || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === "All" || t.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
-  const handleCreateTicket = (e: React.FormEvent) => {
+  const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject.trim() || !description.trim()) {
       toast.error("Please fill in subject and description.");
       return;
     }
 
-    const newTicket: SupportTicket = {
-      id: `TCK-${Math.floor(8800 + Math.random() * 1000)}`,
-      subject: subject.trim(),
-      category,
-      priority,
-      status: "Open",
-      requester: "Current User",
-      assignedTo: "Unassigned",
-      createdAt: new Date().toISOString().split("T")[0]!,
-      updatedAt: new Date().toISOString().split("T")[0]!,
-      description: description.trim(),
-    };
+    try {
+      const res = await createTicket({
+        subject: subject.trim(),
+        category,
+        priority,
+        description: description.trim(),
+      }).unwrap();
 
-    setTickets([newTicket, ...tickets]);
-    setIsNewTicketOpen(false);
-    setSubject("");
-    setDescription("");
-    toast.success("Ticket Submitted", { description: `Ticket ${newTicket.id} logged successfully.` });
+      if (res.success) {
+        toast.success("Ticket Submitted Successfully", {
+          description: `Ticket ${res.data?.ticket_number || res.data?.id || ""} logged.`,
+        });
+        setIsNewTicketOpen(false);
+        setSubject("");
+        setDescription("");
+      } else {
+        toast.error("Failed to submit ticket", { description: res.message });
+      }
+    } catch (err: any) {
+      toast.error("Error submitting ticket", {
+        description: err?.data?.message || err?.message || "Server error occurred.",
+      });
+    }
   };
 
   const statusColors: Record<string, string> = {
@@ -174,7 +126,7 @@ function HelpdeskIndexPage() {
               <Clock className="size-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">In Progress</p>
+              <p className="text-xs text-muted-foreground">In Progress / Open</p>
               <p className="text-xl font-bold">{tickets.filter((t) => t.status === "In Progress" || t.status === "Open").length}</p>
             </div>
           </div>
@@ -196,8 +148,8 @@ function HelpdeskIndexPage() {
               <AlertCircle className="size-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Avg Response Time</p>
-              <p className="text-xl font-bold">18 min</p>
+              <p className="text-xs text-muted-foreground">Critical Priority</p>
+              <p className="text-xl font-bold">{tickets.filter((t) => t.priority === "Critical" || t.priority === "High").length}</p>
             </div>
           </div>
         </div>
@@ -209,7 +161,7 @@ function HelpdeskIndexPage() {
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search tickets by ID, subject, requester..."
+            placeholder="Search tickets by ID, subject, assigned..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-lg border bg-background pl-9 pr-3 py-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
@@ -232,35 +184,50 @@ function HelpdeskIndexPage() {
       </div>
 
       {/* Ticket List */}
-      <div className="space-y-3">
-        {filteredTickets.map((t) => (
-          <div key={t.id} className="rounded-xl border bg-card p-4 shadow-sm transition-all hover:border-primary/50">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs font-bold text-primary">{t.id}</span>
-                <h3 className="text-sm font-semibold text-foreground">{t.subject}</h3>
+      {isLoading ? (
+        <div className="p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2 border rounded-xl bg-card">
+          <Loader2 className="size-5 animate-spin text-primary" />
+          Loading helpdesk tickets from backend...
+        </div>
+      ) : filteredTickets.length === 0 ? (
+        <div className="rounded-xl border bg-card p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Inbox className="size-8 text-muted-foreground/50" />
+          <p className="font-medium text-foreground text-sm">No Helpdesk Tickets Found</p>
+          <p className="text-[11px] max-w-xs">
+            There are currently no tickets logged. Click "Log New Ticket" above to submit a support request.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredTickets.map((t) => (
+            <div key={t.id} className="rounded-xl border bg-card p-4 shadow-sm transition-all hover:border-primary/50">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs font-bold text-primary">{t.ticket_number || t.id}</span>
+                  <h3 className="text-sm font-semibold text-foreground">{t.subject}</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] ${priorityColors[t.priority] || ""}`}>
+                    {t.priority}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${statusColors[t.status] || ""}`}>
+                    {t.status}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] ${priorityColors[t.priority] || ""}`}>
-                  {t.priority}
-                </span>
-                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${statusColors[t.status] || ""}`}>
-                  {t.status}
-                </span>
+              <p className="text-xs text-muted-foreground mt-2">{t.description}</p>
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 text-[11px] text-muted-foreground">
+                <div>
+                  <span className="font-medium text-foreground">Category:</span> {t.category}
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">Assigned:</span> {t.assigned_to || "Unassigned"} · <span className="font-medium text-foreground">Created:</span> {t.created_at || "N/A"}
+                </div>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">{t.description}</p>
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-3 text-[11px] text-muted-foreground">
-              <div>
-                <span className="font-medium text-foreground">Requester:</span> {t.requester} · <span className="font-medium text-foreground">Category:</span> {t.category}
-              </div>
-              <div>
-                <span className="font-medium text-foreground">Assigned:</span> {t.assignedTo} · <span className="font-medium text-foreground">Updated:</span> {t.updatedAt}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* New Ticket Modal */}
       <Dialog open={isNewTicketOpen} onOpenChange={setIsNewTicketOpen}>
@@ -324,14 +291,17 @@ function HelpdeskIndexPage() {
               <button
                 type="button"
                 onClick={() => setIsNewTicketOpen(false)}
-                className="rounded-lg border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted"
+                disabled={isSubmitting}
+                className="rounded-lg border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
               >
+                {isSubmitting && <Loader2 className="size-3.5 animate-spin" />}
                 Submit Ticket
               </button>
             </DialogFooter>
