@@ -82,8 +82,12 @@ export const authApi = baseApi.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           const token = data.data?.access_token || (data as unknown as LoginData).access_token;
+          const refreshToken = (data.data as any)?.refresh_token || (data as any)?.refresh_token;
           if (token) {
             dispatch(setAccessToken(token));
+          }
+          if (refreshToken && typeof window !== "undefined") {
+            localStorage.setItem("refresh_token", refreshToken);
           }
         } catch {
           // Handled in component
@@ -91,20 +95,32 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
 
-    refresh: builder.mutation<ApiResponse<{ access_token: string }>, void>({
-      query: () => ({
-        url: "/api/v1/auth/refresh",
-        method: "POST",
-      }),
+    refresh: builder.mutation<ApiResponse<{ access_token: string; refresh_token?: string }>, { refresh_token?: string } | void>({
+      query: (body) => {
+        const fallbackToken = typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
+        const payload = body?.refresh_token ? body : fallbackToken ? { refresh_token: fallbackToken } : {};
+        return {
+          url: "/api/v1/auth/refresh",
+          method: "POST",
+          body: payload,
+        };
+      },
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           const token = data.data?.access_token || (data as unknown as { access_token: string }).access_token;
+          const newRefreshToken = data.data?.refresh_token || (data as unknown as { refresh_token?: string }).refresh_token;
           if (token) {
             dispatch(setAccessToken(token));
           }
+          if (newRefreshToken && typeof window !== "undefined") {
+            localStorage.setItem("refresh_token", newRefreshToken);
+          }
         } catch {
           dispatch(logoutAuth());
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("refresh_token");
+          }
         }
       },
     }),
@@ -119,10 +135,14 @@ export const authApi = baseApi.injectEndpoints({
           await queryFulfilled;
         } finally {
           dispatch(logoutAuth());
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("refresh_token");
+          }
           dispatch(baseApi.util.resetApiState());
         }
       },
     }),
+
 
     getMe: builder.query<ApiResponse<UserMeResponse>, void>({
       query: () => "/api/v1/users/me",

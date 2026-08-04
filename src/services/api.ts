@@ -16,9 +16,10 @@ export const API_BASE_URL = (
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include", // required for httpOnly refresh-token cookies
-  prepareHeaders: (headers, { getState }) => {
+  prepareHeaders: (headers, { getState, endpoint }) => {
     const token = (getState() as RootState).auth.accessToken;
-    if (token) {
+    // DO NOT send expired Bearer token on refresh or login endpoints
+    if (token && endpoint !== "refresh" && endpoint !== "login") {
       headers.set("Authorization", `Bearer ${token}`);
     }
     if (!headers.has("Accept")) {
@@ -60,29 +61,50 @@ export const baseQueryWithReauth: BaseQueryFn<
 
     if (url.includes("/auth/refresh") || url.includes("/auth/login")) {
       api.dispatch(logoutAuth());
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("refresh_token");
+      }
       return result;
     }
 
     if (!isRefreshing) {
       isRefreshing = true;
       try {
+        const storedRefreshToken =
+          typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
+
         const refreshResult = await rawBaseQuery(
-          { url: "/api/v1/auth/refresh", method: "POST" },
+          {
+            url: "/api/v1/auth/refresh",
+            method: "POST",
+            body: storedRefreshToken ? { refresh_token: storedRefreshToken } : {},
+          },
           api,
           extraOptions,
         );
 
         const payload = refreshResult.data as
-          | { data?: { access_token?: string }; access_token?: string }
+          | {
+              data?: { access_token?: string; refresh_token?: string };
+              access_token?: string;
+              refresh_token?: string;
+            }
           | undefined;
         const newAccessToken = payload?.data?.access_token ?? payload?.access_token ?? null;
+        const newRefreshToken = payload?.data?.refresh_token ?? payload?.refresh_token ?? null;
 
         if (newAccessToken) {
           api.dispatch(setAccessToken(newAccessToken));
+          if (newRefreshToken && typeof window !== "undefined") {
+            localStorage.setItem("refresh_token", newRefreshToken);
+          }
           onRefreshed(newAccessToken);
           result = await baseQueryWithUploads(args, api, extraOptions);
         } else {
           api.dispatch(logoutAuth());
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("refresh_token");
+          }
           api.dispatch(baseApi.util.resetApiState());
           onRefreshed(null);
         }
@@ -101,6 +123,7 @@ export const baseQueryWithReauth: BaseQueryFn<
 
   return result;
 };
+
 
 /** Network/5xx failures are retried; auth and validation errors are not. */
 const baseQueryWithRetry = retry(baseQueryWithReauth, { maxRetries: 2 });

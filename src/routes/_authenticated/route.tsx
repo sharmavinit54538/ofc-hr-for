@@ -11,7 +11,13 @@ export const Route = createFileRoute("/_authenticated")({
     // 1. If JWT access token is not in memory and app is initializing, attempt session restoration
     if (!state.accessToken && state.isInitializing) {
       try {
-        const refreshPromise = store.dispatch(authApi.endpoints.refresh.initiate());
+        const storedRefreshToken =
+          typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
+        const refreshPromise = store.dispatch(
+          authApi.endpoints.refresh.initiate(
+            storedRefreshToken ? { refresh_token: storedRefreshToken } : undefined
+          )
+        );
         const refreshRes = await refreshPromise.unwrap();
 
         const newAccessToken =
@@ -28,6 +34,7 @@ export const Route = createFileRoute("/_authenticated")({
         store.dispatch(setInitializing(false));
       }
     }
+
 
     // 2. Not authenticated → redirect to login
     if (!state.accessToken) {
