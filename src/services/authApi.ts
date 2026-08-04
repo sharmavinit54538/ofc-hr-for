@@ -6,6 +6,9 @@ import type {
   NewHireItem,
   NewHireCreateInput,
   NewHireUpdateInput,
+  OnboardingDocumentItem,
+  OnboardingDocumentCreateInput,
+  OnboardingDocumentUpdateInput,
 } from "@/types/onboarding";
 
 export interface RegisterRequest {
@@ -306,6 +309,46 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Onboarding" as const, id: "NEW_HIRES_LIST" }],
     }),
+
+    // ── Document Verification Vault ─────────────────────────────────────────
+    listOnboardingDocuments: builder.query<ApiResponse<OnboardingDocumentItem[]>, { status?: string; search?: string } | void>({
+      query: (params) => {
+        const queryParams: Record<string, any> = {};
+        if (params && params["status"]) queryParams["status"] = params["status"];
+        if (params && params["search"]) queryParams["search"] = params["search"];
+        return {
+          url: "/api/v1/hr-admin/onboarding/documents",
+          params: queryParams,
+        };
+      },
+      providesTags: [{ type: "Onboarding" as const, id: "DOCUMENTS_LIST" }],
+    }),
+
+    createOnboardingDocument: builder.mutation<ApiResponse<OnboardingDocumentItem>, OnboardingDocumentCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/hr-admin/onboarding/documents",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "DOCUMENTS_LIST" }],
+    }),
+
+    updateOnboardingDocumentStatus: builder.mutation<ApiResponse<OnboardingDocumentItem>, { id: string; body: OnboardingDocumentUpdateInput }>({
+      query: ({ id, body }) => ({
+        url: `/api/v1/hr-admin/onboarding/documents/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "DOCUMENTS_LIST" }],
+    }),
+
+    deleteOnboardingDocument: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/hr-admin/onboarding/documents/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "DOCUMENTS_LIST" }],
+    }),
   }),
 });
 
@@ -333,4 +376,8 @@ export const {
   useCreateNewHireMutation,
   useUpdateNewHireStatusMutation,
   useDeleteNewHireMutation,
+  useListOnboardingDocumentsQuery,
+  useCreateOnboardingDocumentMutation,
+  useUpdateOnboardingDocumentStatusMutation,
+  useDeleteOnboardingDocumentMutation,
 } = authApi;

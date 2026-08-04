@@ -42,3 +42,26 @@ export interface NewHireUpdateInput {
   status?: string | undefined;
   buddy_name?: string | undefined;
 }
+
+export interface OnboardingDocumentItem {
+  id: string;
+  document_title: string;
+  employee_name: string;
+  employee_email: string;
+  category: string;
+  status: "Verified" | "Pending Review" | "Rejected";
+  match_percentage: number;
+  submitted_date: string;
+}
+
+export interface OnboardingDocumentCreateInput {
+  document_title: string;
+  employee_name: string;
+  employee_email: string;
+  category: string;
+  match_percentage?: number | undefined;
+}
+
+export interface OnboardingDocumentUpdateInput {
+  status: "Verified" | "Rejected";
+}
