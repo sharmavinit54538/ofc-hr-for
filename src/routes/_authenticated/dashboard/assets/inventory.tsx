@@ -25,8 +25,10 @@ import {
   DollarSign,
   MapPin,
   Barcode,
+  QrCode,
 } from "lucide-react";
-import { AssetStatus, AssetCondition } from "@/types/asset";
+import { AssetStatus, AssetCondition, AssetItem } from "@/types/asset";
+import { AssetQrModal } from "@/components/admin/asset-qr-modal";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/inventory")({
   component: AssetInventoryPage,
@@ -38,6 +40,7 @@ function AssetInventoryPage() {
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedQrAsset, setSelectedQrAsset] = useState<AssetItem | null>(null);
 
   // Form states
   const [tagId, setTagId] = useState(`AST-${Math.floor(1000 + Math.random() * 9000)}`);
@@ -304,18 +307,35 @@ function AssetInventoryPage() {
                   <DollarSign className="size-3.5 text-muted-foreground" /> {asset.purchase_cost.toLocaleString()}
                 </span>
 
-                <button
-                  onClick={() => handleDelete(asset.id)}
-                  className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-                  title="Delete Asset"
-                >
-                  <Trash2 className="size-4" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setSelectedQrAsset(asset)}
+                    className="inline-flex items-center gap-1 rounded-xl bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                    title="View & Print Asset QR Code"
+                  >
+                    <QrCode className="size-3.5" /> Scan QR
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(asset.id)}
+                    className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                    title="Delete Asset"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* ── Asset QR Code Modal ── */}
+      <AssetQrModal
+        asset={selectedQrAsset}
+        isOpen={!!selectedQrAsset}
+        onClose={() => setSelectedQrAsset(null)}
+      />
 
       {/* ── Register Asset Modal ── */}
       {isCreateOpen && (

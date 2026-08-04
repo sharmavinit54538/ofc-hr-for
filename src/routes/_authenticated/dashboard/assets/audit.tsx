@@ -12,8 +12,10 @@ import {
   Barcode,
   Search,
   ShieldCheck,
+  QrCode,
 } from "lucide-react";
-import { AssetCondition } from "@/types/asset";
+import { AssetCondition, AssetItem } from "@/types/asset";
+import { AssetQrModal } from "@/components/admin/asset-qr-modal";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/audit")({
   component: AssetAuditPage,
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/assets/audit")({
 
 function AssetAuditPage() {
   const [search, setSearch] = useState("");
+  const [selectedQrAsset, setSelectedQrAsset] = useState<AssetItem | null>(null);
   const { data, isLoading, isError, refetch } = useListAssetsQuery({
     page: 1,
     page_size: 30,
@@ -112,9 +115,18 @@ function AssetAuditPage() {
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
                     <Tag className="size-3" /> {asset.tag_id}
                   </span>
-                  <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500 flex items-center gap-1">
-                    <ShieldCheck className="size-3" /> Condition: {asset.condition}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setSelectedQrAsset(asset)}
+                      className="inline-flex items-center gap-1 rounded-xl bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary hover:bg-primary/20"
+                      title="View Asset QR"
+                    >
+                      <QrCode className="size-3" /> QR Tag
+                    </button>
+                    <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+                      <ShieldCheck className="size-3" /> Condition: {asset.condition}
+                    </span>
+                  </div>
                 </div>
 
                 <h3 className="mt-3 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
@@ -156,6 +168,13 @@ function AssetAuditPage() {
           ))}
         </div>
       )}
+
+      {/* ── Asset QR Code Modal ── */}
+      <AssetQrModal
+        asset={selectedQrAsset}
+        isOpen={!!selectedQrAsset}
+        onClose={() => setSelectedQrAsset(null)}
+      />
     </div>
   );
 }
