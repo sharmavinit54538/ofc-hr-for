@@ -59,7 +59,7 @@ function ReportsLandingPage() {
     { title: "Scheduled Reports", value: "14", sub: "Automated Engines", icon: Calendar, color: "text-sky-500", bg: "bg-sky-500/10" },
     { title: "Generated Today", value: "182", sub: "Live Telemetry", icon: Clock, color: "text-emerald-500", bg: "bg-emerald-500/10" },
     { title: "Pending Reports", value: "3", sub: "Processing Queue", icon: Sparkles, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { title: "Exported Reports", value: "420", sub: "PDF / Excel / CSV", icon: Download, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { title: "Exported Reports", value: "420", sub: "Executive Exports", icon: Download, color: "text-purple-500", bg: "bg-purple-500/10" },
     { title: "Favorite Reports", value: `${favoriteReports.length}`, sub: "Quick Bookmarks", icon: Star, color: "text-rose-500", bg: "bg-rose-500/10" },
   ];
 

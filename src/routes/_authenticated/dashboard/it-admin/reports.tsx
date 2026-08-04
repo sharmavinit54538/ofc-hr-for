@@ -37,7 +37,7 @@ function ItAdminReportsPage() {
               onClick={() => toast.success(`Exporting ${r.title}`)}
               className="glass-tile w-full inline-flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold hover:bg-secondary"
             >
-              <Download className="size-3.5" /> Export Report ({r.format})
+              <Download className="size-3.5" /> Export Report
             </button>
           </div>
         ))}
