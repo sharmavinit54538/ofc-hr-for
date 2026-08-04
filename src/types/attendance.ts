@@ -71,3 +71,32 @@ export interface GeofenceZoneCreateInput {
   radius_meters?: number | undefined;
   address?: string | undefined;
 }
+
+export interface OvertimeClaimItem {
+  id: string;
+  user_id: string;
+  employee_name: string;
+  employee_email?: string;
+  department?: string;
+  title: string;
+  date: string;
+  hours: number;
+  rate_multiplier: number;
+  reason?: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  approver_name?: string;
+}
+
+export interface OvertimeClaimCreateInput {
+  user_id: string;
+  title: string;
+  date: string;
+  hours: number;
+  rate_multiplier?: number | undefined;
+  reason?: string | undefined;
+}
+
+export interface OvertimeClaimUpdateInput {
+  status: "APPROVED" | "REJECTED";
+  approver_name?: string | undefined;
+}
