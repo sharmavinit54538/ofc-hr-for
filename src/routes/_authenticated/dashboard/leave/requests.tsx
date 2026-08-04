@@ -43,10 +43,13 @@ function LeaveRequestsPage() {
   const [reason, setReason] = useState("");
 
   // API Hooks
-  const { data: requestsRes, isLoading, isError, refetch } = useListLeaveRequestsQuery({
-    status: statusFilter || undefined,
-    search: search || undefined,
-  });
+  const queryArgs: { status?: string; search?: string } = {};
+  if (statusFilter) queryArgs.status = statusFilter;
+  if (search) queryArgs.search = search;
+
+  const { data: requestsRes, isLoading, isError, refetch } = useListLeaveRequestsQuery(
+    Object.keys(queryArgs).length > 0 ? queryArgs : undefined
+  );
   const { data: statsRes } = useGetLeaveStatsQuery();
   const { data: employeesRes } = useListEmployeesQuery();
 

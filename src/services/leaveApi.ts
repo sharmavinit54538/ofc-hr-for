@@ -11,12 +11,12 @@ export const leaveApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     listLeaveRequests: builder.query<ApiResponse<LeaveRequestItem[]>, { status?: string; search?: string } | void>({
       query: (params) => {
-        const queryParams: Record<string, string> = {};
-        if (params?.status) queryParams.status = params.status;
-        if (params?.search) queryParams.search = params.search;
+        const queryParams: Record<string, any> = {};
+        if (params && params["status"]) queryParams["status"] = params["status"];
+        if (params && params["search"]) queryParams["search"] = params["search"];
         return {
           url: "/api/v1/leave/requests",
-          params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
+          params: queryParams,
         };
       },
       providesTags: [{ type: "Leave" as const, id: "REQUESTS_LIST" }],
