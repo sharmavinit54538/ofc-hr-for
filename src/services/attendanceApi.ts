@@ -7,6 +7,8 @@ import type {
   ManualPunchInput,
   ShiftPatternItem,
   ShiftPatternCreateInput,
+  GeofenceZoneItem,
+  GeofenceZoneCreateInput,
 } from "@/types/attendance";
 
 export const attendanceApi = baseApi.injectEndpoints({
@@ -64,6 +66,29 @@ export const attendanceApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Attendance" as const, id: "SHIFTS_LIST" }],
     }),
+
+    // ── Geofences ──────────────────────────────────────────────────────────
+    listGeofences: builder.query<ApiResponse<GeofenceZoneItem[]>, void>({
+      query: () => "/api/v1/attendance/geofence",
+      providesTags: [{ type: "Attendance" as const, id: "GEOFENCES_LIST" }],
+    }),
+
+    createGeofence: builder.mutation<ApiResponse<GeofenceZoneItem>, GeofenceZoneCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/attendance/geofence",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Attendance" as const, id: "GEOFENCES_LIST" }],
+    }),
+
+    deleteGeofence: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/attendance/geofence/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Attendance" as const, id: "GEOFENCES_LIST" }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -75,4 +100,7 @@ export const {
   useListShiftsQuery,
   useCreateShiftMutation,
   useDeleteShiftMutation,
+  useListGeofencesQuery,
+  useCreateGeofenceMutation,
+  useDeleteGeofenceMutation,
 } = attendanceApi;

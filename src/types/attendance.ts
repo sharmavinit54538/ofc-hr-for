@@ -53,3 +53,21 @@ export interface ShiftPatternCreateInput {
   grace_minutes?: number | undefined;
   description?: string | undefined;
 }
+
+export interface GeofenceZoneItem {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  radius_meters: number;
+  address?: string;
+  is_active: boolean;
+}
+
+export interface GeofenceZoneCreateInput {
+  name: string;
+  latitude: number;
+  longitude: number;
+  radius_meters?: number | undefined;
+  address?: string | undefined;
+}
