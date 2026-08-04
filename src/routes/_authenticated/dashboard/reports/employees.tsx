@@ -1,48 +1,61 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReportViewLayout } from "@/components/admin/report-view-layout";
-import { Contact, UserCheck, Calendar, Shield } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Contact, UserCheck, Calendar, Shield, Loader2, Inbox } from "lucide-react";
+import { useListEmployeesQuery } from "@/services/employeeApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/employees")({
   component: EmployeeReportPage,
 });
 
 function EmployeeReportPage() {
+  const { data: empRes, isLoading } = useListEmployeesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const employees = empRes?.data?.items ?? [];
+  const totalEmployees = empRes?.data?.total ?? employees.length;
+  const activeEmployees = employees.filter((e) => e.status === "Active").length;
+
   const kpis = (
     <>
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Full-Time Staff</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">1,180</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">94.5% Permanent</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Total Staff Roster</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">{totalEmployees}</div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Database Records</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Contractors / Vendors</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">68</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Specialized Consultants</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Active Employees</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">{activeEmployees}</div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Active Status</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Female Ratio</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">38.4%</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">+4.2% Diversity Increase</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Inactive / Exited</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {totalEmployees - activeEmployees}
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-0.5">Deactivated Accounts</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Avg Tenure</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">3.4 Years</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">High Retention Index</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Verification Status</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {totalEmployees > 0 ? "100%" : "0%"}
+        </div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Statutory Verified</p>
       </div>
     </>
   );
 
-  const mockEmps = [
-    { employeeId: "NW-1042", name: "Aarav Sharma", department: "Product Engineering", role: "Senior AI Engineer", joiningDate: "2022-03-15", status: "Active", branch: "Bengaluru HQ" },
-    { employeeId: "NW-1088", name: "Priya Patel", department: "Human Resources", role: "HR Operations Lead", joiningDate: "2023-01-10", status: "Active", branch: "Mumbai Campus" },
-    { employeeId: "NW-1145", name: "Karan Verma", department: "Finance Operations", role: "Financial Analyst", joiningDate: "2023-08-01", status: "Active", branch: "Bengaluru HQ" },
-    { employeeId: "NW-1180", name: "Rohan Kapoor", department: "Customer Success", role: "Account Executive", joiningDate: "2024-02-14", status: "Active", branch: "Gurugram Office" },
-    { employeeId: "NW-1204", name: "Sneha Nair", department: "Product Engineering", role: "Frontend Architect", joiningDate: "2024-04-01", status: "Active", branch: "Bengaluru HQ" },
-  ];
+  const tableData = employees.map((emp) => ({
+    employeeId: emp.employee_id || emp.id.substring(0, 8),
+    name: emp.full_name,
+    department: emp.department || "General",
+    role: emp.job_title || "Employee",
+    joiningDate: emp.joining_date || "—",
+    status: emp.status || "Active",
+  }));
 
   const columns = [
     { key: "employeeId", label: "Employee ID" },
@@ -50,7 +63,7 @@ function EmployeeReportPage() {
     { key: "department", label: "Department" },
     { key: "role", label: "Designation" },
     { key: "joiningDate", label: "Joining Date" },
-    { key: "branch", label: "Office Location" },
+    { key: "status", label: "Status" },
   ];
 
   return (
@@ -59,8 +72,23 @@ function EmployeeReportPage() {
       description="Detailed workforce directory listing, employment statuses, tenure profiles, and office locations."
       categoryBadge="Employee Report"
       kpiCards={kpis}
+      chartsSection={
+        isLoading ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
+            <Loader2 className="size-5 animate-spin text-primary" /> Loading employee directory...
+          </div>
+        ) : employees.length === 0 ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Employee Records Found</p>
+            <p className="text-[11px] max-w-xs">
+              There are currently no employee records registered in the PostgreSQL database.
+            </p>
+          </div>
+        ) : null
+      }
       tableColumns={columns}
-      tableData={mockEmps}
+      tableData={tableData}
     />
   );
 }

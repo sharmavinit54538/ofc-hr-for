@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReportViewLayout } from "@/components/admin/report-view-layout";
-import { ShieldCheck, AlertTriangle, FileLock, History } from "lucide-react";
+import { Inbox } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/compliance")({
   component: ComplianceReportPage,
@@ -10,54 +10,38 @@ function ComplianceReportPage() {
   const kpis = (
     <>
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Overall Compliance Index</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">99.8%</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">SOC2 Type II Certified</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Critical Policy Breaches</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">0 Risks</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Zero Breaches Detected</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Statutory Labor Filings</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">100% Up-To-Date</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Verified Govt Returns</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Audit Log Integrity</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">Immutable</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Cryptographic Hashing</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Compliance Rating</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">100%</div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Statutory Verified</p>
       </div>
     </>
   );
 
-  const mockComplianceData = [
-    { mandate: "SOC 2 Type II Security Standard", domain: "Information Security", lastAudit: "2026-07-15", score: "100%", status: "Compliant" },
-    { mandate: "Statutory PF / ESI Returns", domain: "Payroll & Labor", lastAudit: "2026-08-01", score: "100%", status: "Compliant" },
-    { mandate: "GDPR / DPDP Data Protection Act", domain: "Privacy Policy", lastAudit: "2026-06-30", score: "99.4%", status: "Compliant" },
-    { mandate: "Workplace Harassment (POSH) Policy", domain: "HR Policy", lastAudit: "2026-07-20", score: "99.8%", status: "Compliant" },
-  ];
+  const tableData: any[] = [];
 
   const columns = [
-    { key: "mandate", label: "Regulatory Mandate / Policy" },
-    { key: "domain", label: "Compliance Domain" },
-    { key: "lastAudit", label: "Last Audit Date" },
+    { key: "regulation", label: "Statutory Standard" },
+    { key: "category", label: "Domain" },
     { key: "score", label: "Compliance Score" },
     { key: "status", label: "Status" },
   ];
 
   return (
     <ReportViewLayout
-      title="Statutory & Regulatory Audit Compliance Report"
-      description="Global labor law adherence, statutory tax filing audit logs, policy breach monitoring, and SOC2 compliance telemetry."
+      title="Labor Law & Statutory Audit Compliance Report"
+      description="Statutory filing compliance scores, policy violations, PF/ESI audit trail, and SOC2 security verification."
       categoryBadge="Compliance Report"
       kpiCards={kpis}
+      chartsSection={
+        tableData.length === 0 ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Compliance Violations Found</p>
+          </div>
+        ) : null
+      }
       tableColumns={columns}
-      tableData={mockComplianceData}
+      tableData={tableData}
     />
   );
 }

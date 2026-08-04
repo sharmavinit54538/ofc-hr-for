@@ -1,63 +1,47 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReportViewLayout } from "@/components/admin/report-view-layout";
-import { History, Shield, Lock, FileLock } from "lucide-react";
+import { Loader2, Inbox } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/audit")({
-  component: AuditLogsReportPage,
+  component: AuditReportPage,
 });
 
-function AuditLogsReportPage() {
+function AuditReportPage() {
   const kpis = (
     <>
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Total Audit Events</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">142,800 Logs</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Immutable Ledger</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Admin Actions Today</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">480 Events</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">100% Authorized</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Security Violations</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">0 Alerts</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">SOC2 Compliant</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Log Retention Policy</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">7 Years</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Encrypted AWS S3 Glacier</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Admin Actions Logged</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">0 Logs</div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Audit Trail Active</p>
       </div>
     </>
   );
 
-  const mockAuditLogs = [
-    { timestamp: "2026-08-02 10:14:22", actor: "Aarav Mehta (HR Admin)", action: "UPDATE_EMPLOYEE_ROLE", target: "NW-1042 (Aarav S.)", ipAddress: "14.99.120.4", status: "Success" },
-    { timestamp: "2026-08-02 09:45:10", actor: "Priya N. (IT Admin)", action: "ASSIGN_ASSET_HARDWARE", target: "AST-8841 (MacBook)", ipAddress: "106.51.88.14", status: "Success" },
-    { timestamp: "2026-08-02 08:30:00", actor: "System Automated Engine", action: "PAYROLL_TDS_CALCULATION", target: "Aug 2026 Batch", ipAddress: "127.0.0.1", status: "Success" },
-  ];
+  const tableData: any[] = [];
 
   const columns = [
-    { key: "timestamp", label: "Event Timestamp" },
-    { key: "actor", label: "User / Actor" },
-    { key: "action", label: "System Operation" },
-    { key: "target", label: "Target Entity" },
-    { key: "ipAddress", label: "IP Address" },
-    { key: "status", label: "Result" },
+    { key: "timestamp", label: "Timestamp" },
+    { key: "actor", label: "Performed By" },
+    { key: "action", label: "Action Description" },
+    { key: "target", label: "Target Resource" },
   ];
 
   return (
     <ReportViewLayout
-      title="System Security & Access Audit Log Report"
-      description="Immutable administrative action history, role-based permission changes, data modification logs, and security compliance verification."
-      categoryBadge="Audit Logs Report"
+      title="System Security Audit Log Report"
+      description="Immutable admin action history, data access events, role modification logs, and SOC2 audit compliance."
+      categoryBadge="Audit Report"
       kpiCards={kpis}
+      chartsSection={
+        tableData.length === 0 ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Security Audit Logs Found</p>
+          </div>
+        ) : null
+      }
       tableColumns={columns}
-      tableData={mockAuditLogs}
+      tableData={tableData}
     />
   );
 }

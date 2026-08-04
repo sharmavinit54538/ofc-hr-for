@@ -1,64 +1,47 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReportViewLayout } from "@/components/admin/report-view-layout";
-import { Package, UserCheck, Wrench, AlertTriangle } from "lucide-react";
+import { Loader2, Inbox } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/assets")({
-  component: AssetReportPage,
+  component: AssetsReportPage,
 });
 
-function AssetReportPage() {
+function AssetsReportPage() {
   const kpis = (
     <>
       <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Total Managed Assets</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">1,420 Items</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Valuation: $1.42M</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Assigned to Staff</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">940 Items</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">66.2% Utilization</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Under Repair / RMA</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">48 Items</div>
-        <p className="text-[10px] text-amber-400 font-semibold mt-0.5">Servicing Active</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Reported Lost / Stolen</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">6 Items</div>
-        <p className="text-[10px] text-rose-400 font-semibold mt-0.5">Under Security Audit</p>
+        <span className="text-xs uppercase font-bold text-muted-foreground">Total Company Assets</span>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">0 Items</div>
+        <p className="text-[10px] text-muted-foreground mt-0.5">Asset Inventory</p>
       </div>
     </>
   );
 
-  const mockAssetSummary = [
-    { category: "Laptop", total: 640, assigned: 520, available: 112, maintenance: 8, lost: 0 },
-    { category: "Desktop & Workstations", total: 120, assigned: 98, available: 20, maintenance: 2, lost: 0 },
-    { category: "Display Monitors", total: 480, assigned: 410, available: 65, maintenance: 5, lost: 0 },
-    { category: "Mobile Phones & Tablets", total: 127, assigned: 113, available: 10, maintenance: 3, lost: 1 },
-  ];
+  const tableData: any[] = [];
 
   const columns = [
+    { key: "assetTag", label: "Asset Tag" },
     { key: "category", label: "Asset Category" },
-    { key: "total", label: "Total Inventory" },
-    { key: "assigned", label: "Assigned" },
-    { key: "available", label: "Available" },
-    { key: "maintenance", label: "In Maintenance" },
-    { key: "lost", label: "Lost / Missing" },
+    { key: "assignedTo", label: "Assigned User" },
+    { key: "status", label: "Status" },
   ];
 
   return (
     <ReportViewLayout
-      title="Hardware Asset Allocation & Valuation Report"
-      description="Enterprise hardware inventory breakdown, device utilization rates, active maintenance tickets, and lost equipment audits."
+      title="Hardware Inventory & Asset Valuation Report"
+      description="IT asset inventory distribution, hardware allocations, depreciation schedules, and lost item audit logs."
       categoryBadge="Asset Report"
       kpiCards={kpis}
+      chartsSection={
+        tableData.length === 0 ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Asset Inventory Records Found</p>
+          </div>
+        ) : null
+      }
       tableColumns={columns}
-      tableData={mockAssetSummary}
+      tableData={tableData}
     />
   );
 }

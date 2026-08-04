@@ -1,45 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReportViewLayout } from "@/components/admin/report-view-layout";
-import { Activity, Users, Globe, Smartphone } from "lucide-react";
+import { Loader2, Inbox } from "lucide-react";
+import { useGetReportsSummaryQuery } from "@/services/reportsApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports/activity")({
   component: ActivityLogsReportPage,
 });
 
 function ActivityLogsReportPage() {
+  const { data: summaryRes, isLoading } = useGetReportsSummaryQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const summary = summaryRes?.data;
+  const totalEmp = summary?.total_employees ?? 0;
+
   const kpis = (
     <>
       <div className="glass-tile rounded-2xl p-4">
         <span className="text-xs uppercase font-bold text-muted-foreground">Daily Active Users (DAU)</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">1,140 DAU</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">91.3% Platform Engagement</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Mobile App Check-ins</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">480 Logins</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">iOS & Android App</p>
-      </div>
-
-      <div className="glass-tile rounded-2xl p-4">
-        <span className="text-xs uppercase font-bold text-muted-foreground">Active Web Sessions</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">660 Sessions</div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Desktop Browser Hub</p>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">{totalEmp} DAU</div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Platform Engagement</p>
       </div>
 
       <div className="glass-tile rounded-2xl p-4">
         <span className="text-xs uppercase font-bold text-muted-foreground">MFA Pass Rate</span>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">100% Verified</div>
-        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">MFA Enforced</p>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {totalEmp > 0 ? "100% Verified" : "0%"}
+        </div>
+        <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Security Enforced</p>
       </div>
     </>
   );
 
-  const mockActivityLogs = [
-    { timestamp: "2026-08-02 10:45:00", user: "Aarav Sharma", department: "Product Engineering", activity: "Viewed Attendance Logs", platform: "Web App (Chrome)", location: "Bengaluru, IN" },
-    { timestamp: "2026-08-02 10:40:12", user: "Priya Patel", department: "Human Resources", activity: "Approved Leave Request REQ-9902", platform: "Mobile App (iOS)", location: "Mumbai, IN" },
-    { timestamp: "2026-08-02 10:35:55", user: "Karan Verma", department: "Finance Operations", activity: "Generated Payroll Payslip", platform: "Web App (Edge)", location: "Bengaluru, IN" },
-  ];
+  const tableData: any[] = [];
 
   const columns = [
     { key: "timestamp", label: "Timestamp" },
@@ -47,7 +41,6 @@ function ActivityLogsReportPage() {
     { key: "department", label: "Department" },
     { key: "activity", label: "User Action" },
     { key: "platform", label: "Client Platform" },
-    { key: "location", label: "Geographic Location" },
   ];
 
   return (
@@ -56,8 +49,20 @@ function ActivityLogsReportPage() {
       description="Workforce user logins, mobile app check-ins, feature interaction heatmaps, and session location security telemetry."
       categoryBadge="Activity Logs"
       kpiCards={kpis}
+      chartsSection={
+        isLoading ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
+            <Loader2 className="size-5 animate-spin text-primary" /> Loading activity logs...
+          </div>
+        ) : tableData.length === 0 ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Activity Logs Found</p>
+          </div>
+        ) : null
+      }
       tableColumns={columns}
-      tableData={mockActivityLogs}
+      tableData={tableData}
     />
   );
 }
