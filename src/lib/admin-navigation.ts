@@ -783,7 +783,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         description: "Official company notices, policy updates, and executive broadcasts",
         href: "/dashboard/communication/announcements",
         icon: Megaphone,
-        stats: "14 Active",
+        stats: "0 Active",
         statusBadge: "Company Wide",
       },
       {
@@ -792,7 +792,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         description: "Internal newsletter, department highlights, and CEO town hall notes",
         href: "/dashboard/communication/news",
         icon: Newspaper,
-        stats: "Weekly Digest",
+        stats: "Digest",
         statusBadge: "Published",
       },
       {
@@ -810,7 +810,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         description: "Workforce pulse surveys, engagement scores, and feedback collection",
         href: "/dashboard/communication/surveys",
         icon: MessageSquare,
-        stats: "84% Response",
+        stats: "0% Response",
         statusBadge: "Active",
       },
       {
@@ -819,7 +819,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         description: "Quick 1-click workforce polls, voting results, and sentiment tracking",
         href: "/dashboard/communication/polls",
         icon: Target,
-        stats: "3 Live Polls",
+        stats: "0 Live Polls",
         statusBadge: "Voting Open",
       },
       {
@@ -828,7 +828,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         description: "Pre-approved email, SMS, and broadcast layout templates",
         href: "/dashboard/communication/templates",
         icon: FileText,
-        stats: "24 Templates",
+        stats: "0 Templates",
         statusBadge: "Standardized",
       },
       {
@@ -837,7 +837,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         description: "Message dispatch logs, read receipts, and delivery success metrics",
         href: "/dashboard/communication/history",
         icon: History,
-        stats: "99.4% Delivered",
+        stats: "0 Delivered",
         statusBadge: "Sent Logs",
       },
     ],
