@@ -94,11 +94,15 @@ export const attendanceApi = baseApi.injectEndpoints({
     }),
 
     // ── Overtime Claims ────────────────────────────────────────────────────
-    listOvertimes: builder.query<ApiResponse<OvertimeClaimItem[]>, { status?: string | undefined } | void>({
-      query: (params) => ({
-        url: "/api/v1/attendance/overtime",
-        params: params?.status ? { status: params.status } : undefined,
-      }),
+    listOvertimes: builder.query<ApiResponse<OvertimeClaimItem[]>, { status?: string } | void>({
+      query: (params) => {
+        const queryParams: Record<string, string> = {};
+        if (params && params.status) queryParams.status = params.status;
+        return {
+          url: "/api/v1/attendance/overtime",
+          params: queryParams,
+        };
+      },
       providesTags: [{ type: "Attendance" as const, id: "OVERTIMES_LIST" }],
     }),
 
