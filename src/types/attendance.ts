@@ -30,3 +30,26 @@ export interface ManualPunchInput {
   status?: string | undefined;
   work_mode?: string | undefined;
 }
+
+export interface ShiftPatternItem {
+  id: string;
+  name: string;
+  code: string;
+  start_time: string;
+  end_time: string;
+  working_days: string;
+  grace_minutes: number;
+  assigned_count: number;
+  is_active: boolean;
+  description?: string;
+}
+
+export interface ShiftPatternCreateInput {
+  name: string;
+  code: string;
+  start_time: string;
+  end_time: string;
+  working_days: string;
+  grace_minutes?: number | undefined;
+  description?: string | undefined;
+}

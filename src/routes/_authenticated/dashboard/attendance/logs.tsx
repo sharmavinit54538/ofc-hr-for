@@ -6,7 +6,7 @@ import {
   useGetAttendanceStatsQuery,
   useCreateManualPunchLogMutation,
 } from "@/services/attendanceApi";
-import { useListEmployeesQuery } from "@/services/employeesApi";
+import { useListEmployeesQuery } from "@/services/employeeApi";
 import { toast } from "sonner";
 import {
   Clock,
@@ -330,7 +330,7 @@ function AttendanceLogsPage() {
                   className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                 >
                   <option value="">Select Employee...</option>
-                  {employees.map((emp) => (
+                  {employees.map((emp: any) => (
                     <option key={emp.id} value={emp.user_id || emp.id}>
                       {emp.first_name} {emp.last_name} ({emp.department_name || "Employee"})
                     </option>

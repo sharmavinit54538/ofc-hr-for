@@ -5,6 +5,8 @@ import type {
   AttendanceLogItem,
   AttendanceStatsData,
   ManualPunchInput,
+  ShiftPatternItem,
+  ShiftPatternCreateInput,
 } from "@/types/attendance";
 
 export const attendanceApi = baseApi.injectEndpoints({
@@ -39,6 +41,29 @@ export const attendanceApi = baseApi.injectEndpoints({
         { type: "Attendance" as const, id: "STATS" },
       ],
     }),
+
+    // ── Shifts ─────────────────────────────────────────────────────────────
+    listShifts: builder.query<ApiResponse<ShiftPatternItem[]>, void>({
+      query: () => "/api/v1/attendance/shifts",
+      providesTags: [{ type: "Attendance" as const, id: "SHIFTS_LIST" }],
+    }),
+
+    createShift: builder.mutation<ApiResponse<ShiftPatternItem>, ShiftPatternCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/attendance/shifts",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Attendance" as const, id: "SHIFTS_LIST" }],
+    }),
+
+    deleteShift: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/attendance/shifts/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Attendance" as const, id: "SHIFTS_LIST" }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -47,4 +72,7 @@ export const {
   useListAttendanceLogsQuery,
   useGetAttendanceStatsQuery,
   useCreateManualPunchLogMutation,
+  useListShiftsQuery,
+  useCreateShiftMutation,
+  useDeleteShiftMutation,
 } = attendanceApi;
