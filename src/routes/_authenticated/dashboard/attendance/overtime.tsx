@@ -39,9 +39,9 @@ function AttendanceOvertimePage() {
   const [reason, setReason] = useState("");
 
   // API Hooks
-  const { data: claimsRes, isLoading, isError, refetch } = useListOvertimesQuery({
-    status: statusFilter || undefined,
-  });
+  const { data: claimsRes, isLoading, isError, refetch } = useListOvertimesQuery(
+    statusFilter ? { status: statusFilter } : undefined
+  );
 
   const { data: employeesRes } = useListEmployeesQuery();
   const [createOvertime, { isLoading: isSubmitting }] = useCreateOvertimeMutation();
