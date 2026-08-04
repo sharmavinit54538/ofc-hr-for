@@ -6,6 +6,7 @@ import {
   TrendingUp,
   ShieldCheck,
   Loader2,
+  Inbox,
 } from "lucide-react";
 import { useGetReportsSummaryQuery } from "@/services/reportsApi";
 
@@ -59,13 +60,15 @@ function ExecutiveReportPage() {
           <span>Compliance Index</span>
           <ShieldCheck className="size-4 text-purple-500" />
         </div>
-        <div className="font-display text-2xl font-bold text-foreground mt-2">100%</div>
+        <div className="font-display text-2xl font-bold text-foreground mt-2">
+          {totalEmp > 0 ? "100%" : "0%"}
+        </div>
         <p className="text-[10px] text-emerald-400 font-semibold mt-0.5">Statutory Verified</p>
       </div>
     </>
   );
 
-  const tableData = [
+  const tableData = totalEmp > 0 ? [
     {
       metric: "Total Organization Headcount",
       value: `${totalEmp} Active Staff`,
@@ -78,7 +81,7 @@ function ExecutiveReportPage() {
       metric: "Monthly Payroll Budget Commitment",
       value: `$${payrollSpend.toLocaleString()}`,
     },
-  ];
+  ] : [];
 
   const columns = [
     { key: "metric", label: "Executive Metric" },
@@ -93,8 +96,16 @@ function ExecutiveReportPage() {
       kpiCards={kpis}
       chartsSection={
         isLoading ? (
-          <div className="p-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
             <Loader2 className="size-5 animate-spin text-primary" /> Loading executive telemetry...
+          </div>
+        ) : totalEmp === 0 ? (
+          <div className="glass-tile rounded-2xl p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Live Executive Data Available</p>
+            <p className="text-[11px] max-w-xs">
+              Add employee records and department divisions to calculate live executive metrics.
+            </p>
           </div>
         ) : null
       }
