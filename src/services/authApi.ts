@@ -3,6 +3,9 @@ import { setAccessToken, setUser, logoutAuth } from "@/features/auth/authSlice";
 import type {
   OnboardingWorkflowItem,
   OnboardingWorkflowCreateInput,
+  NewHireItem,
+  NewHireCreateInput,
+  NewHireUpdateInput,
 } from "@/types/onboarding";
 
 export interface RegisterRequest {
@@ -264,6 +267,45 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Onboarding" as const, id: "WORKFLOWS_LIST" }],
     }),
+
+    // ── Incoming New Hires ──────────────────────────────────────────────────
+    listNewHires: builder.query<ApiResponse<NewHireItem[]>, { search?: string } | void>({
+      query: (params) => {
+        const queryParams: Record<string, any> = {};
+        if (params && params["search"]) queryParams["search"] = params["search"];
+        return {
+          url: "/api/v1/hr-admin/onboarding/new-hires",
+          params: queryParams,
+        };
+      },
+      providesTags: [{ type: "Onboarding" as const, id: "NEW_HIRES_LIST" }],
+    }),
+
+    createNewHire: builder.mutation<ApiResponse<NewHireItem>, NewHireCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/hr-admin/onboarding/new-hires",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "NEW_HIRES_LIST" }],
+    }),
+
+    updateNewHireStatus: builder.mutation<ApiResponse<NewHireItem>, { id: string; body: NewHireUpdateInput }>({
+      query: ({ id, body }) => ({
+        url: `/api/v1/hr-admin/onboarding/new-hires/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "NEW_HIRES_LIST" }],
+    }),
+
+    deleteNewHire: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/hr-admin/onboarding/new-hires/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "NEW_HIRES_LIST" }],
+    }),
   }),
 });
 
@@ -287,4 +329,8 @@ export const {
   useListOnboardingWorkflowsQuery,
   useCreateOnboardingWorkflowMutation,
   useDeleteOnboardingWorkflowMutation,
+  useListNewHiresQuery,
+  useCreateNewHireMutation,
+  useUpdateNewHireStatusMutation,
+  useDeleteNewHireMutation,
 } = authApi;

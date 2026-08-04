@@ -15,3 +15,30 @@ export interface OnboardingWorkflowCreateInput {
   auto_trigger?: string | undefined;
   description?: string | undefined;
 }
+
+export interface NewHireItem {
+  id: string;
+  name: string;
+  email: string;
+  role_title: string;
+  department: string;
+  start_date: string;
+  progress_percent: number;
+  status: string;
+  buddy_name?: string;
+}
+
+export interface NewHireCreateInput {
+  name: string;
+  email: string;
+  role_title: string;
+  department: string;
+  start_date: string;
+  buddy_name?: string | undefined;
+}
+
+export interface NewHireUpdateInput {
+  progress_percent?: number | undefined;
+  status?: string | undefined;
+  buddy_name?: string | undefined;
+}
