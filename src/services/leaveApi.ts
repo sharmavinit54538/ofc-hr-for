@@ -5,6 +5,8 @@ import type {
   LeaveRequestCreateInput,
   LeaveRequestUpdateInput,
   LeaveStatsData,
+  LeaveApprovalRuleItem,
+  LeaveApprovalRuleCreateInput,
 } from "@/types/leave";
 
 export const leaveApi = baseApi.injectEndpoints({
@@ -61,6 +63,29 @@ export const leaveApi = baseApi.injectEndpoints({
         { type: "Leave" as const, id: "STATS" },
       ],
     }),
+
+    // ── Approval Rules ─────────────────────────────────────────────────────
+    listLeaveApprovalRules: builder.query<ApiResponse<LeaveApprovalRuleItem[]>, void>({
+      query: () => "/api/v1/leave/approvals/rules",
+      providesTags: [{ type: "Leave" as const, id: "RULES_LIST" }],
+    }),
+
+    createLeaveApprovalRule: builder.mutation<ApiResponse<LeaveApprovalRuleItem>, LeaveApprovalRuleCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/leave/approvals/rules",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Leave" as const, id: "RULES_LIST" }],
+    }),
+
+    deleteLeaveApprovalRule: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/leave/approvals/rules/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Leave" as const, id: "RULES_LIST" }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -71,4 +96,7 @@ export const {
   useCreateLeaveRequestMutation,
   useUpdateLeaveRequestStatusMutation,
   useDeleteLeaveRequestMutation,
+  useListLeaveApprovalRulesQuery,
+  useCreateLeaveApprovalRuleMutation,
+  useDeleteLeaveApprovalRuleMutation,
 } = leaveApi;

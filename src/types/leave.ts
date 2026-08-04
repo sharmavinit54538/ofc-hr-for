@@ -34,3 +34,23 @@ export interface LeaveStatsData {
   rejected_count: number;
   total_pto_days: number;
 }
+
+export interface LeaveApprovalRuleItem {
+  id: string;
+  rule_name: string;
+  approval_levels: number;
+  auto_approve_days: number;
+  escalation_hours: number;
+  applies_to: string;
+  is_active: boolean;
+  description?: string;
+}
+
+export interface LeaveApprovalRuleCreateInput {
+  rule_name: string;
+  approval_levels?: number | undefined;
+  auto_approve_days?: number | undefined;
+  escalation_hours?: number | undefined;
+  applies_to?: string | undefined;
+  description?: string | undefined;
+}
