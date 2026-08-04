@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_POLICIES } from "@/lib/policies/mock-data";
+import { Loader2, Inbox } from "lucide-react";
+import { useGetPoliciesByCategoryQuery } from "@/services/policyApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/policies/hr")({
   component: HrPoliciesPage,
 });
 
 function HrPoliciesPage() {
-  const policies = MOCK_POLICIES.filter((p) => p.category === "HR");
+  const { data: policyRes, isLoading } = useGetPoliciesByCategoryQuery("HR", {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const policies = policyRes?.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -17,14 +22,27 @@ function HrPoliciesPage() {
         breadcrumbs={[{ label: "Policy Center", href: "/dashboard/policies" }, { label: "HR Policies" }]}
         backHref="/dashboard/policies"
       />
-      <div className="grid gap-4 sm:grid-cols-2">
-        {policies.map((p) => (
-          <div key={p.id} className="glass-tile space-y-2 rounded-2xl p-5">
-            <h3 className="font-display text-base font-bold text-foreground">{p.title}</h3>
-            <p className="text-xs text-muted-foreground">{p.summary}</p>
-          </div>
-        ))}
-      </div>
+
+      {isLoading ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Loader2 className="size-5 animate-spin text-primary" />
+          Loading HR policies...
+        </div>
+      ) : policies.length === 0 ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Inbox className="size-8 text-muted-foreground/50" />
+          <p className="font-medium text-foreground text-sm">No HR Policies Published</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {policies.map((p) => (
+            <div key={p.id} className="glass-tile space-y-2 rounded-2xl p-5">
+              <h3 className="font-display text-base font-bold text-foreground">{p.title}</h3>
+              <p className="text-xs text-muted-foreground">{p.summary}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

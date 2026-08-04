@@ -1,11 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/admin/page-header";
+import { Loader2, Inbox } from "lucide-react";
+import { useGetPoliciesByCategoryQuery } from "@/services/policyApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/policies/attendance")({
   component: AttendancePoliciesPage,
 });
 
 function AttendancePoliciesPage() {
+  const { data: policyRes, isLoading } = useGetPoliciesByCategoryQuery("Attendance", {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const policies = policyRes?.data ?? [];
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -14,7 +22,27 @@ function AttendancePoliciesPage() {
         breadcrumbs={[{ label: "Policy Center", href: "/dashboard/policies" }, { label: "Attendance Policies" }]}
         backHref="/dashboard/policies"
       />
-      <div className="glass-tile rounded-2xl p-6 text-xs text-muted-foreground">4 Active Attendance & Shift Guidelines Published.</div>
+
+      {isLoading ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Loader2 className="size-5 animate-spin text-primary" />
+          Loading Attendance policies...
+        </div>
+      ) : policies.length === 0 ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Inbox className="size-8 text-muted-foreground/50" />
+          <p className="font-medium text-foreground text-sm">No Attendance Policies Published</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {policies.map((p) => (
+            <div key={p.id} className="glass-tile space-y-2 rounded-2xl p-5">
+              <h3 className="font-display text-base font-bold text-foreground">{p.title}</h3>
+              <p className="text-xs text-muted-foreground">{p.summary}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
