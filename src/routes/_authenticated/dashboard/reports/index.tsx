@@ -205,8 +205,7 @@ function ReportsLandingPage() {
               className="glass-tile group flex flex-col justify-between rounded-xl p-4 transition-all hover:border-primary/40 hover:shadow-glow"
             >
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold text-muted-foreground">{r.exportFormat}</span>
+                <div className="flex items-center justify-end">
                   <button
                     type="button"
                     onClick={(e) => {
