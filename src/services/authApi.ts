@@ -1,5 +1,9 @@
 import { baseApi } from "@/services/api";
 import { setAccessToken, setUser, logoutAuth } from "@/features/auth/authSlice";
+import type {
+  OnboardingWorkflowItem,
+  OnboardingWorkflowCreateInput,
+} from "@/types/onboarding";
 
 export interface RegisterRequest {
   email: string;
@@ -224,6 +228,8 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["User"],
     }),
 
+
+
     createOrganizationUser: builder.mutation<
       ApiResponse<UserMeResponse>,
       { email: string; password: string; full_name: string; role?: string }
@@ -234,6 +240,29 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
       invalidatesTags: ["User"],
+    }),
+
+    // ── Onboarding Workflows ────────────────────────────────────────────────
+    listOnboardingWorkflows: builder.query<ApiResponse<OnboardingWorkflowItem[]>, void>({
+      query: () => "/api/v1/hr-admin/onboarding/workflows",
+      providesTags: [{ type: "Onboarding" as const, id: "WORKFLOWS_LIST" }],
+    }),
+
+    createOnboardingWorkflow: builder.mutation<ApiResponse<OnboardingWorkflowItem>, OnboardingWorkflowCreateInput>({
+      query: (body) => ({
+        url: "/api/v1/hr-admin/onboarding/workflows",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "WORKFLOWS_LIST" }],
+    }),
+
+    deleteOnboardingWorkflow: builder.mutation<ApiResponse<{ id: string }>, string>({
+      query: (id) => ({
+        url: `/api/v1/hr-admin/onboarding/workflows/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Onboarding" as const, id: "WORKFLOWS_LIST" }],
     }),
   }),
 });
@@ -255,4 +284,7 @@ export const {
   useLazyGetOnboardingDataQuery,
   useSaveOnboardingStepMutation,
   useCompleteOnboardingMutation,
+  useListOnboardingWorkflowsQuery,
+  useCreateOnboardingWorkflowMutation,
+  useDeleteOnboardingWorkflowMutation,
 } = authApi;
