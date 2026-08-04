@@ -30,9 +30,9 @@ function ExportCenterPage() {
       r.category.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const handleDownloadFile = (title: string, format: string) => {
+  const handleDownloadFile = (title: string) => {
     toast.success(`Exporting ${title}`, {
-      description: `File packaged as ${format} archive and downloading.`,
+      description: `Report package generated and downloading.`,
     });
   };
 
@@ -40,7 +40,7 @@ function ExportCenterPage() {
     <div className="space-y-6">
       <PageHeader
         title="Central Export & Archive Center"
-        description="Download packaged executive digests, raw Excel data sheets, and CSV dumps across all enterprise modules."
+        description="Download packaged executive digests and data archives across all enterprise modules."
         breadcrumbs={[
           { label: "Reports", href: "/dashboard/reports" },
           { label: "Export Center" },
@@ -63,8 +63,8 @@ function ExportCenterPage() {
 
         <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Data Format Engines</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">Excel & CSV</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Export Engine</p>
+            <p className="font-display text-2xl font-bold text-foreground mt-1">Automated Exporter</p>
           </div>
           <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
             <FileSpreadsheet className="size-5" />
@@ -74,7 +74,7 @@ function ExportCenterPage() {
         <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Executive Digests</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">PDF Engine</p>
+            <p className="font-display text-2xl font-bold text-foreground mt-1">Data Archives</p>
           </div>
           <div className="flex size-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500">
             <FileText className="size-5" />
@@ -118,7 +118,7 @@ function ExportCenterPage() {
                 <tr>
                   <th className="px-5 py-3.5 font-bold">Report Title</th>
                   <th className="px-5 py-3.5 font-bold">Category</th>
-                  <th className="px-5 py-3.5 font-bold text-right">Instant Download Options</th>
+                  <th className="px-5 py-3.5 font-bold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -131,26 +131,12 @@ function ExportCenterPage() {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleDownloadFile(report.title, "PDF")}
-                          className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
-                        >
-                          PDF
-                        </button>
-                        <button
-                          onClick={() => handleDownloadFile(report.title, "Excel")}
-                          className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-                        >
-                          Excel
-                        </button>
-                        <button
-                          onClick={() => handleDownloadFile(report.title, "CSV")}
-                          className="rounded-lg bg-sky-500/10 px-2.5 py-1 text-[11px] font-bold text-sky-400 border border-sky-500/20 hover:bg-sky-500/20"
-                        >
-                          CSV
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleDownloadFile(report.title)}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1 text-xs font-bold text-primary border border-primary/20 hover:bg-primary/20"
+                      >
+                        <Download className="size-3.5" /> Download Report
+                      </button>
                     </td>
                   </tr>
                 ))}
