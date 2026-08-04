@@ -164,10 +164,19 @@ import { Route as AuthenticatedDashboardPoliciesLeaveRouteImport } from './route
 import { Route as AuthenticatedDashboardPoliciesPayrollRouteImport } from './routes/_authenticated/dashboard/policies/payroll'
 import { Route as AuthenticatedDashboardPoliciesSecurityRouteImport } from './routes/_authenticated/dashboard/policies/security'
 import { Route as AuthenticatedDashboardRecruitmentIndexRouteImport } from './routes/_authenticated/dashboard/recruitment/index'
+import { Route as AuthenticatedDashboardRecruitmentAnalyticsRouteImport } from './routes/_authenticated/dashboard/recruitment/analytics'
+import { Route as AuthenticatedDashboardRecruitmentAutomationRouteImport } from './routes/_authenticated/dashboard/recruitment/automation'
 import { Route as AuthenticatedDashboardRecruitmentCandidatesRouteImport } from './routes/_authenticated/dashboard/recruitment/candidates'
+import { Route as AuthenticatedDashboardRecruitmentCopilotRouteImport } from './routes/_authenticated/dashboard/recruitment/copilot'
+import { Route as AuthenticatedDashboardRecruitmentCrmRouteImport } from './routes/_authenticated/dashboard/recruitment/crm'
 import { Route as AuthenticatedDashboardRecruitmentInterviewsRouteImport } from './routes/_authenticated/dashboard/recruitment/interviews'
 import { Route as AuthenticatedDashboardRecruitmentJobsRouteImport } from './routes/_authenticated/dashboard/recruitment/jobs'
 import { Route as AuthenticatedDashboardRecruitmentOffersRouteImport } from './routes/_authenticated/dashboard/recruitment/offers'
+import { Route as AuthenticatedDashboardRecruitmentOnboardingRouteImport } from './routes/_authenticated/dashboard/recruitment/onboarding'
+import { Route as AuthenticatedDashboardRecruitmentPipelineRouteImport } from './routes/_authenticated/dashboard/recruitment/pipeline'
+import { Route as AuthenticatedDashboardRecruitmentRequisitionsRouteImport } from './routes/_authenticated/dashboard/recruitment/requisitions'
+import { Route as AuthenticatedDashboardRecruitmentTalentPoolRouteImport } from './routes/_authenticated/dashboard/recruitment/talent-pool'
+import { Route as AuthenticatedDashboardRecruitmentTemplatesRouteImport } from './routes/_authenticated/dashboard/recruitment/templates'
 import { Route as AuthenticatedDashboardReportsIndexRouteImport } from './routes/_authenticated/dashboard/reports/index'
 import { Route as AuthenticatedDashboardReportsActivityRouteImport } from './routes/_authenticated/dashboard/reports/activity'
 import { Route as AuthenticatedDashboardReportsAiWorkforceRouteImport } from './routes/_authenticated/dashboard/reports/ai-workforce'
@@ -1128,10 +1137,34 @@ const AuthenticatedDashboardRecruitmentIndexRoute =
     path: '/recruitment/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardRecruitmentAnalyticsRoute =
+  AuthenticatedDashboardRecruitmentAnalyticsRouteImport.update({
+    id: '/recruitment/analytics',
+    path: '/recruitment/analytics',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentAutomationRoute =
+  AuthenticatedDashboardRecruitmentAutomationRouteImport.update({
+    id: '/recruitment/automation',
+    path: '/recruitment/automation',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardRecruitmentCandidatesRoute =
   AuthenticatedDashboardRecruitmentCandidatesRouteImport.update({
     id: '/recruitment/candidates',
     path: '/recruitment/candidates',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentCopilotRoute =
+  AuthenticatedDashboardRecruitmentCopilotRouteImport.update({
+    id: '/recruitment/copilot',
+    path: '/recruitment/copilot',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentCrmRoute =
+  AuthenticatedDashboardRecruitmentCrmRouteImport.update({
+    id: '/recruitment/crm',
+    path: '/recruitment/crm',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentInterviewsRoute =
@@ -1150,6 +1183,36 @@ const AuthenticatedDashboardRecruitmentOffersRoute =
   AuthenticatedDashboardRecruitmentOffersRouteImport.update({
     id: '/recruitment/offers',
     path: '/recruitment/offers',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentOnboardingRoute =
+  AuthenticatedDashboardRecruitmentOnboardingRouteImport.update({
+    id: '/recruitment/onboarding',
+    path: '/recruitment/onboarding',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentPipelineRoute =
+  AuthenticatedDashboardRecruitmentPipelineRouteImport.update({
+    id: '/recruitment/pipeline',
+    path: '/recruitment/pipeline',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentRequisitionsRoute =
+  AuthenticatedDashboardRecruitmentRequisitionsRouteImport.update({
+    id: '/recruitment/requisitions',
+    path: '/recruitment/requisitions',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentTalentPoolRoute =
+  AuthenticatedDashboardRecruitmentTalentPoolRouteImport.update({
+    id: '/recruitment/talent-pool',
+    path: '/recruitment/talent-pool',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentTemplatesRoute =
+  AuthenticatedDashboardRecruitmentTemplatesRouteImport.update({
+    id: '/recruitment/templates',
+    path: '/recruitment/templates',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardReportsIndexRoute =
@@ -1545,10 +1608,19 @@ export interface FileRoutesByFullPath {
   '/dashboard/policies/leave': typeof AuthenticatedDashboardPoliciesLeaveRoute
   '/dashboard/policies/payroll': typeof AuthenticatedDashboardPoliciesPayrollRoute
   '/dashboard/policies/security': typeof AuthenticatedDashboardPoliciesSecurityRoute
+  '/dashboard/recruitment/analytics': typeof AuthenticatedDashboardRecruitmentAnalyticsRoute
+  '/dashboard/recruitment/automation': typeof AuthenticatedDashboardRecruitmentAutomationRoute
   '/dashboard/recruitment/candidates': typeof AuthenticatedDashboardRecruitmentCandidatesRoute
+  '/dashboard/recruitment/copilot': typeof AuthenticatedDashboardRecruitmentCopilotRoute
+  '/dashboard/recruitment/crm': typeof AuthenticatedDashboardRecruitmentCrmRoute
   '/dashboard/recruitment/interviews': typeof AuthenticatedDashboardRecruitmentInterviewsRoute
   '/dashboard/recruitment/jobs': typeof AuthenticatedDashboardRecruitmentJobsRoute
   '/dashboard/recruitment/offers': typeof AuthenticatedDashboardRecruitmentOffersRoute
+  '/dashboard/recruitment/onboarding': typeof AuthenticatedDashboardRecruitmentOnboardingRoute
+  '/dashboard/recruitment/pipeline': typeof AuthenticatedDashboardRecruitmentPipelineRoute
+  '/dashboard/recruitment/requisitions': typeof AuthenticatedDashboardRecruitmentRequisitionsRoute
+  '/dashboard/recruitment/talent-pool': typeof AuthenticatedDashboardRecruitmentTalentPoolRoute
+  '/dashboard/recruitment/templates': typeof AuthenticatedDashboardRecruitmentTemplatesRoute
   '/dashboard/reports/activity': typeof AuthenticatedDashboardReportsActivityRoute
   '/dashboard/reports/ai-workforce': typeof AuthenticatedDashboardReportsAiWorkforceRoute
   '/dashboard/reports/assets': typeof AuthenticatedDashboardReportsAssetsRoute
@@ -1742,10 +1814,19 @@ export interface FileRoutesByTo {
   '/dashboard/policies/leave': typeof AuthenticatedDashboardPoliciesLeaveRoute
   '/dashboard/policies/payroll': typeof AuthenticatedDashboardPoliciesPayrollRoute
   '/dashboard/policies/security': typeof AuthenticatedDashboardPoliciesSecurityRoute
+  '/dashboard/recruitment/analytics': typeof AuthenticatedDashboardRecruitmentAnalyticsRoute
+  '/dashboard/recruitment/automation': typeof AuthenticatedDashboardRecruitmentAutomationRoute
   '/dashboard/recruitment/candidates': typeof AuthenticatedDashboardRecruitmentCandidatesRoute
+  '/dashboard/recruitment/copilot': typeof AuthenticatedDashboardRecruitmentCopilotRoute
+  '/dashboard/recruitment/crm': typeof AuthenticatedDashboardRecruitmentCrmRoute
   '/dashboard/recruitment/interviews': typeof AuthenticatedDashboardRecruitmentInterviewsRoute
   '/dashboard/recruitment/jobs': typeof AuthenticatedDashboardRecruitmentJobsRoute
   '/dashboard/recruitment/offers': typeof AuthenticatedDashboardRecruitmentOffersRoute
+  '/dashboard/recruitment/onboarding': typeof AuthenticatedDashboardRecruitmentOnboardingRoute
+  '/dashboard/recruitment/pipeline': typeof AuthenticatedDashboardRecruitmentPipelineRoute
+  '/dashboard/recruitment/requisitions': typeof AuthenticatedDashboardRecruitmentRequisitionsRoute
+  '/dashboard/recruitment/talent-pool': typeof AuthenticatedDashboardRecruitmentTalentPoolRoute
+  '/dashboard/recruitment/templates': typeof AuthenticatedDashboardRecruitmentTemplatesRoute
   '/dashboard/reports/activity': typeof AuthenticatedDashboardReportsActivityRoute
   '/dashboard/reports/ai-workforce': typeof AuthenticatedDashboardReportsAiWorkforceRoute
   '/dashboard/reports/assets': typeof AuthenticatedDashboardReportsAssetsRoute
@@ -1947,10 +2028,19 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/policies/leave': typeof AuthenticatedDashboardPoliciesLeaveRoute
   '/_authenticated/dashboard/policies/payroll': typeof AuthenticatedDashboardPoliciesPayrollRoute
   '/_authenticated/dashboard/policies/security': typeof AuthenticatedDashboardPoliciesSecurityRoute
+  '/_authenticated/dashboard/recruitment/analytics': typeof AuthenticatedDashboardRecruitmentAnalyticsRoute
+  '/_authenticated/dashboard/recruitment/automation': typeof AuthenticatedDashboardRecruitmentAutomationRoute
   '/_authenticated/dashboard/recruitment/candidates': typeof AuthenticatedDashboardRecruitmentCandidatesRoute
+  '/_authenticated/dashboard/recruitment/copilot': typeof AuthenticatedDashboardRecruitmentCopilotRoute
+  '/_authenticated/dashboard/recruitment/crm': typeof AuthenticatedDashboardRecruitmentCrmRoute
   '/_authenticated/dashboard/recruitment/interviews': typeof AuthenticatedDashboardRecruitmentInterviewsRoute
   '/_authenticated/dashboard/recruitment/jobs': typeof AuthenticatedDashboardRecruitmentJobsRoute
   '/_authenticated/dashboard/recruitment/offers': typeof AuthenticatedDashboardRecruitmentOffersRoute
+  '/_authenticated/dashboard/recruitment/onboarding': typeof AuthenticatedDashboardRecruitmentOnboardingRoute
+  '/_authenticated/dashboard/recruitment/pipeline': typeof AuthenticatedDashboardRecruitmentPipelineRoute
+  '/_authenticated/dashboard/recruitment/requisitions': typeof AuthenticatedDashboardRecruitmentRequisitionsRoute
+  '/_authenticated/dashboard/recruitment/talent-pool': typeof AuthenticatedDashboardRecruitmentTalentPoolRoute
+  '/_authenticated/dashboard/recruitment/templates': typeof AuthenticatedDashboardRecruitmentTemplatesRoute
   '/_authenticated/dashboard/reports/activity': typeof AuthenticatedDashboardReportsActivityRoute
   '/_authenticated/dashboard/reports/ai-workforce': typeof AuthenticatedDashboardReportsAiWorkforceRoute
   '/_authenticated/dashboard/reports/assets': typeof AuthenticatedDashboardReportsAssetsRoute
@@ -2152,10 +2242,19 @@ export interface FileRouteTypes {
     | '/dashboard/policies/leave'
     | '/dashboard/policies/payroll'
     | '/dashboard/policies/security'
+    | '/dashboard/recruitment/analytics'
+    | '/dashboard/recruitment/automation'
     | '/dashboard/recruitment/candidates'
+    | '/dashboard/recruitment/copilot'
+    | '/dashboard/recruitment/crm'
     | '/dashboard/recruitment/interviews'
     | '/dashboard/recruitment/jobs'
     | '/dashboard/recruitment/offers'
+    | '/dashboard/recruitment/onboarding'
+    | '/dashboard/recruitment/pipeline'
+    | '/dashboard/recruitment/requisitions'
+    | '/dashboard/recruitment/talent-pool'
+    | '/dashboard/recruitment/templates'
     | '/dashboard/reports/activity'
     | '/dashboard/reports/ai-workforce'
     | '/dashboard/reports/assets'
@@ -2349,10 +2448,19 @@ export interface FileRouteTypes {
     | '/dashboard/policies/leave'
     | '/dashboard/policies/payroll'
     | '/dashboard/policies/security'
+    | '/dashboard/recruitment/analytics'
+    | '/dashboard/recruitment/automation'
     | '/dashboard/recruitment/candidates'
+    | '/dashboard/recruitment/copilot'
+    | '/dashboard/recruitment/crm'
     | '/dashboard/recruitment/interviews'
     | '/dashboard/recruitment/jobs'
     | '/dashboard/recruitment/offers'
+    | '/dashboard/recruitment/onboarding'
+    | '/dashboard/recruitment/pipeline'
+    | '/dashboard/recruitment/requisitions'
+    | '/dashboard/recruitment/talent-pool'
+    | '/dashboard/recruitment/templates'
     | '/dashboard/reports/activity'
     | '/dashboard/reports/ai-workforce'
     | '/dashboard/reports/assets'
@@ -2553,10 +2661,19 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/policies/leave'
     | '/_authenticated/dashboard/policies/payroll'
     | '/_authenticated/dashboard/policies/security'
+    | '/_authenticated/dashboard/recruitment/analytics'
+    | '/_authenticated/dashboard/recruitment/automation'
     | '/_authenticated/dashboard/recruitment/candidates'
+    | '/_authenticated/dashboard/recruitment/copilot'
+    | '/_authenticated/dashboard/recruitment/crm'
     | '/_authenticated/dashboard/recruitment/interviews'
     | '/_authenticated/dashboard/recruitment/jobs'
     | '/_authenticated/dashboard/recruitment/offers'
+    | '/_authenticated/dashboard/recruitment/onboarding'
+    | '/_authenticated/dashboard/recruitment/pipeline'
+    | '/_authenticated/dashboard/recruitment/requisitions'
+    | '/_authenticated/dashboard/recruitment/talent-pool'
+    | '/_authenticated/dashboard/recruitment/templates'
     | '/_authenticated/dashboard/reports/activity'
     | '/_authenticated/dashboard/reports/ai-workforce'
     | '/_authenticated/dashboard/reports/assets'
@@ -3725,11 +3842,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/recruitment/analytics': {
+      id: '/_authenticated/dashboard/recruitment/analytics'
+      path: '/recruitment/analytics'
+      fullPath: '/dashboard/recruitment/analytics'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/automation': {
+      id: '/_authenticated/dashboard/recruitment/automation'
+      path: '/recruitment/automation'
+      fullPath: '/dashboard/recruitment/automation'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentAutomationRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/recruitment/candidates': {
       id: '/_authenticated/dashboard/recruitment/candidates'
       path: '/recruitment/candidates'
       fullPath: '/dashboard/recruitment/candidates'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentCandidatesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/copilot': {
+      id: '/_authenticated/dashboard/recruitment/copilot'
+      path: '/recruitment/copilot'
+      fullPath: '/dashboard/recruitment/copilot'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentCopilotRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/crm': {
+      id: '/_authenticated/dashboard/recruitment/crm'
+      path: '/recruitment/crm'
+      fullPath: '/dashboard/recruitment/crm'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentCrmRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/recruitment/interviews': {
@@ -3751,6 +3896,41 @@ declare module '@tanstack/react-router' {
       path: '/recruitment/offers'
       fullPath: '/dashboard/recruitment/offers'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentOffersRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/onboarding': {
+      id: '/_authenticated/dashboard/recruitment/onboarding'
+      path: '/recruitment/onboarding'
+      fullPath: '/dashboard/recruitment/onboarding'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentOnboardingRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/pipeline': {
+      id: '/_authenticated/dashboard/recruitment/pipeline'
+      path: '/recruitment/pipeline'
+      fullPath: '/dashboard/recruitment/pipeline'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentPipelineRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/requisitions': {
+      id: '/_authenticated/dashboard/recruitment/requisitions'
+      path: '/recruitment/requisitions'
+      fullPath: '/dashboard/recruitment/requisitions'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentRequisitionsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/talent-pool': {
+      id: '/_authenticated/dashboard/recruitment/talent-pool'
+      path: '/recruitment/talent-pool'
+      fullPath: '/dashboard/recruitment/talent-pool'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentTalentPoolRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment/templates': {
+      id: '/_authenticated/dashboard/recruitment/templates'
+      path: '/recruitment/templates'
+      fullPath: '/dashboard/recruitment/templates'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentTemplatesRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/reports/': {
@@ -4336,10 +4516,19 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardPoliciesLeaveRoute: typeof AuthenticatedDashboardPoliciesLeaveRoute
   AuthenticatedDashboardPoliciesPayrollRoute: typeof AuthenticatedDashboardPoliciesPayrollRoute
   AuthenticatedDashboardPoliciesSecurityRoute: typeof AuthenticatedDashboardPoliciesSecurityRoute
+  AuthenticatedDashboardRecruitmentAnalyticsRoute: typeof AuthenticatedDashboardRecruitmentAnalyticsRoute
+  AuthenticatedDashboardRecruitmentAutomationRoute: typeof AuthenticatedDashboardRecruitmentAutomationRoute
   AuthenticatedDashboardRecruitmentCandidatesRoute: typeof AuthenticatedDashboardRecruitmentCandidatesRoute
+  AuthenticatedDashboardRecruitmentCopilotRoute: typeof AuthenticatedDashboardRecruitmentCopilotRoute
+  AuthenticatedDashboardRecruitmentCrmRoute: typeof AuthenticatedDashboardRecruitmentCrmRoute
   AuthenticatedDashboardRecruitmentInterviewsRoute: typeof AuthenticatedDashboardRecruitmentInterviewsRoute
   AuthenticatedDashboardRecruitmentJobsRoute: typeof AuthenticatedDashboardRecruitmentJobsRoute
   AuthenticatedDashboardRecruitmentOffersRoute: typeof AuthenticatedDashboardRecruitmentOffersRoute
+  AuthenticatedDashboardRecruitmentOnboardingRoute: typeof AuthenticatedDashboardRecruitmentOnboardingRoute
+  AuthenticatedDashboardRecruitmentPipelineRoute: typeof AuthenticatedDashboardRecruitmentPipelineRoute
+  AuthenticatedDashboardRecruitmentRequisitionsRoute: typeof AuthenticatedDashboardRecruitmentRequisitionsRoute
+  AuthenticatedDashboardRecruitmentTalentPoolRoute: typeof AuthenticatedDashboardRecruitmentTalentPoolRoute
+  AuthenticatedDashboardRecruitmentTemplatesRoute: typeof AuthenticatedDashboardRecruitmentTemplatesRoute
   AuthenticatedDashboardReportsActivityRoute: typeof AuthenticatedDashboardReportsActivityRoute
   AuthenticatedDashboardReportsAiWorkforceRoute: typeof AuthenticatedDashboardReportsAiWorkforceRoute
   AuthenticatedDashboardReportsAssetsRoute: typeof AuthenticatedDashboardReportsAssetsRoute
@@ -4562,14 +4751,32 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardPoliciesPayrollRoute,
     AuthenticatedDashboardPoliciesSecurityRoute:
       AuthenticatedDashboardPoliciesSecurityRoute,
+    AuthenticatedDashboardRecruitmentAnalyticsRoute:
+      AuthenticatedDashboardRecruitmentAnalyticsRoute,
+    AuthenticatedDashboardRecruitmentAutomationRoute:
+      AuthenticatedDashboardRecruitmentAutomationRoute,
     AuthenticatedDashboardRecruitmentCandidatesRoute:
       AuthenticatedDashboardRecruitmentCandidatesRoute,
+    AuthenticatedDashboardRecruitmentCopilotRoute:
+      AuthenticatedDashboardRecruitmentCopilotRoute,
+    AuthenticatedDashboardRecruitmentCrmRoute:
+      AuthenticatedDashboardRecruitmentCrmRoute,
     AuthenticatedDashboardRecruitmentInterviewsRoute:
       AuthenticatedDashboardRecruitmentInterviewsRoute,
     AuthenticatedDashboardRecruitmentJobsRoute:
       AuthenticatedDashboardRecruitmentJobsRoute,
     AuthenticatedDashboardRecruitmentOffersRoute:
       AuthenticatedDashboardRecruitmentOffersRoute,
+    AuthenticatedDashboardRecruitmentOnboardingRoute:
+      AuthenticatedDashboardRecruitmentOnboardingRoute,
+    AuthenticatedDashboardRecruitmentPipelineRoute:
+      AuthenticatedDashboardRecruitmentPipelineRoute,
+    AuthenticatedDashboardRecruitmentRequisitionsRoute:
+      AuthenticatedDashboardRecruitmentRequisitionsRoute,
+    AuthenticatedDashboardRecruitmentTalentPoolRoute:
+      AuthenticatedDashboardRecruitmentTalentPoolRoute,
+    AuthenticatedDashboardRecruitmentTemplatesRoute:
+      AuthenticatedDashboardRecruitmentTemplatesRoute,
     AuthenticatedDashboardReportsActivityRoute:
       AuthenticatedDashboardReportsActivityRoute,
     AuthenticatedDashboardReportsAiWorkforceRoute:

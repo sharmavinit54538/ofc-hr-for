@@ -1056,7 +1056,7 @@ function EmployeesPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Aarav Sharma"
+                    placeholder="e.g. John Doe"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
@@ -1070,7 +1070,7 @@ function EmployeesPage() {
                   <input
                     type="email"
                     required
-                    placeholder="aarav.sharma@northwind.com"
+                    placeholder="john.doe@company.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"

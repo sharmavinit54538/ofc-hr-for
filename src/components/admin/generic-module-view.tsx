@@ -6,6 +6,7 @@ import {
   LayoutGrid,
   List,
   Inbox,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
@@ -18,8 +19,11 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
   items,
   showActions = false,
   showToolbar = true,
+  isLoading = false,
+  isEmpty: explicitIsEmpty,
+  onCreate,
 }: {
-  href: string;
+  href?: string;
   parentHref: string;
   parentLabel: string;
   title: string;
@@ -30,10 +34,13 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
     subtitle: string;
     status: string;
     date: string;
-    metric?: string;
+    metric?: string | undefined;
   }[];
   showActions?: boolean;
   showToolbar?: boolean;
+  isLoading?: boolean;
+  isEmpty?: boolean;
+  onCreate?: () => void;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
@@ -53,9 +60,13 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
   };
 
   const handleCreate = () => {
-    toast.info("Create Record", {
-      description: `Creating new entry in ${title}.`,
-    });
+    if (onCreate) {
+      onCreate();
+    } else {
+      toast.info("Create Record", {
+        description: `Creating new entry in ${title}.`,
+      });
+    }
   };
 
   // Real-time Search Filtering with memoization
@@ -152,8 +163,35 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
         </div>
       )}
 
-      {/* ── Empty State ────────────────────────────────────────── */}
-      {filteredItems.length === 0 ? (
+      {/* ── Main Content Area ──────────────────────────────────── */}
+      {isLoading ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <Loader2 className="size-8 animate-spin text-primary" />
+          <p className="mt-3 text-xs font-semibold text-muted-foreground">
+            Loading {title.toLowerCase()}...
+          </p>
+        </div>
+      ) : explicitIsEmpty || items.length === 0 ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+            <Inbox className="size-6" />
+          </div>
+          <h3 className="mt-4 font-display text-base font-bold text-foreground">
+            No {title.toLowerCase()} yet
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            There are no {title.toLowerCase()} recorded in the system.
+          </p>
+          {showActions && (
+            <button
+              onClick={handleCreate}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
+            >
+              <Plus className="size-4" /> Create New
+            </button>
+          )}
+        </div>
+      ) : filteredItems.length === 0 ? (
         <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
           <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
             <Inbox className="size-6" />

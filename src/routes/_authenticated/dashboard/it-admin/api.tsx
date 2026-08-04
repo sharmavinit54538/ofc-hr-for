@@ -27,38 +27,48 @@ function ItAdminApiPage() {
       />
 
       <div className="glass-tile overflow-hidden rounded-2xl border border-border">
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3.5 font-bold">Key Name</th>
-                <th className="px-5 py-3.5 font-bold">Token Prefix</th>
-                <th className="px-5 py-3.5 font-bold">Environment</th>
-                <th className="px-5 py-3.5 font-bold">Last Used</th>
-                <th className="px-5 py-3.5 font-bold text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {MOCK_API_KEYS.map((k) => (
-                <tr key={k.id} className="transition-colors hover:bg-secondary/40">
-                  <td className="px-5 py-4 font-bold text-foreground">{k.name}</td>
-                  <td className="px-5 py-4 font-mono text-primary">{k.keyPrefix}</td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                      {k.environment}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-muted-foreground">{k.lastUsed}</td>
-                  <td className="px-5 py-4 text-right">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">
-                      <CheckCircle2 className="size-3" /> {k.status}
-                    </span>
-                  </td>
+        {MOCK_API_KEYS.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 text-center space-y-3">
+            <Key className="size-10 text-muted-foreground/60" />
+            <h3 className="font-display text-base font-bold text-foreground">No API Keys Generated</h3>
+            <p className="text-xs text-muted-foreground max-w-sm">
+              Click "Generate API Key" above to create an enterprise API token.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
+                <tr>
+                  <th className="px-5 py-3.5 font-bold">Key Name</th>
+                  <th className="px-5 py-3.5 font-bold">Token Prefix</th>
+                  <th className="px-5 py-3.5 font-bold">Environment</th>
+                  <th className="px-5 py-3.5 font-bold">Last Used</th>
+                  <th className="px-5 py-3.5 font-bold text-right">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {MOCK_API_KEYS.map((k) => (
+                  <tr key={k.id} className="transition-colors hover:bg-secondary/40">
+                    <td className="px-5 py-4 font-bold text-foreground">{k.name}</td>
+                    <td className="px-5 py-4 font-mono text-primary">{k.keyPrefix}</td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                        {k.environment}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-muted-foreground">{k.lastUsed}</td>
+                    <td className="px-5 py-4 text-right">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">
+                        <CheckCircle2 className="size-3" /> {k.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

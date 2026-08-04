@@ -1,319 +1,326 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  Wrench,
-  AlertTriangle,
-  Plus,
-  Clock,
-  CheckCircle2,
-  DollarSign,
-  Search,
-  Hammer,
-} from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_MAINTENANCE, AssetMaintenanceRecord, AssetCategory } from "@/lib/assets/mock-data";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  useListMaintenancesQuery,
+  useScheduleMaintenanceMutation,
+  useUpdateMaintenanceMutation,
+  useDeleteMaintenanceMutation,
+  useListAssetsQuery,
+} from "@/services/assetsApi";
+import { toast } from "sonner";
+import {
+  Plus,
+  Inbox,
+  AlertTriangle,
+  RefreshCw,
+  Wrench,
+  CheckCircle,
+  Trash2,
+  Calendar,
+  DollarSign,
+} from "lucide-react";
+import { MaintenanceStatus } from "@/types/asset";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/maintenance")({
-  component: MaintenancePage,
+  component: AssetMaintenancePage,
 });
 
-function MaintenancePage() {
-  const [tickets, setTickets] = useState<AssetMaintenanceRecord[]>(MOCK_MAINTENANCE);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function AssetMaintenancePage() {
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [selectedAssetId, setSelectedAssetId] = useState("");
+  const [maintenanceType, setMaintenanceType] = useState("Routine AMC Checkup");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState<number>(150);
+  const [scheduledDate, setScheduledDate] = useState(new Date().toISOString().slice(0, 10));
 
-  const [formData, setFormData] = useState({
-    assetId: "AST-8845",
-    assetName: 'iPad Pro 12.9" M2',
-    category: "Tablet" as AssetCategory,
-    assignedTo: "Ananya Deshmukh",
-    issueDescription: "Battery overheating and rapid drain under load.",
-    maintenanceType: "Battery Replacement" as AssetMaintenanceRecord["maintenanceType"],
-    vendor: "Apple Enterprise Direct",
-    estCompletion: "2026-08-08",
-    cost: 120,
-  });
+  const { data, isLoading, isError, refetch } = useListMaintenancesQuery({ page: 1, page_size: 20 });
+  const { data: assetsData } = useListAssetsQuery();
 
-  const filtered = tickets.filter(
-    (t) =>
-      t.ticketId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.assetName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.assetId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.vendor.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const [scheduleMaint, { isLoading: isScheduling }] = useScheduleMaintenanceMutation();
+  const [updateMaint] = useUpdateMaintenanceMutation();
+  const [deleteMaint] = useDeleteMaintenanceMutation();
 
-  const handleCreateTicket = (e: React.FormEvent) => {
+  const maintenances = data?.data?.items ?? [];
+  const assets = assetsData?.data?.items ?? [];
+
+  const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newTicket: AssetMaintenanceRecord = {
-      id: `mnt_${Date.now()}`,
-      ticketId: `MNT-${Math.floor(4404 + Math.random() * 100)}`,
-      assetId: formData.assetId,
-      assetName: formData.assetName,
-      category: formData.category,
-      assignedTo: formData.assignedTo,
-      issueDescription: formData.issueDescription,
-      maintenanceType: formData.maintenanceType,
-      vendor: formData.vendor,
-      reportedDate: new Date().toISOString().split("T")[0]!,
-      estCompletion: formData.estCompletion,
-      cost: Number(formData.cost) || 0,
-      status: "In Diagnostics",
-    };
+    if (!selectedAssetId || !maintenanceType) {
+      toast.error("Please select an asset and specify the maintenance type.");
+      return;
+    }
 
-    setTickets([newTicket, ...tickets]);
-    setIsModalOpen(false);
-    toast.success("Maintenance Ticket Logged", {
-      description: `Ticket ${newTicket.ticketId} assigned to ${formData.vendor}.`,
-    });
+    try {
+      await scheduleMaint({
+        asset_id: selectedAssetId,
+        maintenance_type: maintenanceType,
+        description,
+        cost,
+        scheduled_date: scheduledDate,
+      }).unwrap();
+
+      toast.success("Maintenance work order scheduled successfully.");
+      setIsScheduleOpen(false);
+      setSelectedAssetId("");
+      setDescription("");
+    } catch {
+      toast.error("Failed to schedule maintenance.");
+    }
   };
 
-  const handleCompleteTicket = (id: string) => {
-    setTickets(
-      tickets.map((t) => (t.id === id ? { ...t, status: "Completed" as const } : t)),
-    );
-    toast.success("Maintenance Resolved", {
-      description: "Asset repaired, verified, and re-enabled in active inventory.",
-    });
+  const handleCompleteToggle = async (id: string, currentStatus: MaintenanceStatus) => {
+    const nextStatus: MaintenanceStatus = currentStatus === "COMPLETED" ? "SCHEDULED" : "COMPLETED";
+    try {
+      await updateMaint({ id, body: { status: nextStatus } }).unwrap();
+      toast.success(`Maintenance status changed to ${nextStatus}.`);
+    } catch {
+      toast.error("Failed to update maintenance status.");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this maintenance log?")) return;
+    try {
+      await deleteMaint(id).unwrap();
+      toast.success("Maintenance log deleted.");
+    } catch {
+      toast.error("Failed to delete maintenance log.");
+    }
+  };
+
+  const getStatusBadge = (status: MaintenanceStatus) => {
+    switch (status) {
+      case "COMPLETED":
+        return <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">Completed</span>;
+      case "IN_PROGRESS":
+        return <span className="rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 text-[10px] font-bold text-amber-500">In Repair</span>;
+      default:
+        return <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 text-[10px] font-bold text-blue-500">Scheduled</span>;
+    }
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Asset Maintenance & Servicing"
-        description="Track hardware repair tickets, warranty claims, vendor RMAs, and servicing cost telemetry."
+        title="Asset Repair & Maintenance"
+        description="Schedule routine servicing, track repair costs, AMC agreements, and work orders."
         breadcrumbs={[
-          { label: "Asset Management", href: "/dashboard/assets" },
-          { label: "Maintenance & Repair" },
+          { label: "Assets", href: "/dashboard/assets" },
+          { label: "Maintenance" },
         ]}
-        backHref="/dashboard/assets"
-        backLabel="Back to Asset Management"
         actions={
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsScheduleOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
           >
-            <Plus className="size-4" /> Log Repair Ticket
+            <Plus className="size-4" /> Schedule Maintenance
           </button>
         }
       />
 
-      {/* KPI */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active Servicing Tickets</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">
-              {tickets.filter((t) => t.status !== "Completed").length}
-            </p>
-          </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
-            <Wrench className="size-5" />
-          </div>
+      {/* ── Content Area ── */}
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-tile h-36 animate-pulse rounded-2xl p-5" />
+          ))}
         </div>
-
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Warranty Claims</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">4</p>
-          </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500">
-            <Hammer className="size-5" />
-          </div>
+      ) : isError ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <AlertTriangle className="size-8 text-destructive" />
+          <h3 className="mt-3 font-display text-base font-bold text-foreground">
+            Failed to load maintenance schedules
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            An error occurred while fetching maintenance records from PostgreSQL.
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <RefreshCw className="size-4" /> Retry
+          </button>
         </div>
-
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Completed (This Month)</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">12</p>
+      ) : maintenances.length === 0 ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+            <Inbox className="size-6" />
           </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-            <CheckCircle2 className="size-5" />
-          </div>
+          <h3 className="mt-4 font-display text-base font-bold text-foreground">
+            No maintenance records found
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            No active or historical repair logs exist in PostgreSQL.
+          </p>
+          <button
+            onClick={() => setIsScheduleOpen(true)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <Plus className="size-4" /> Schedule Work Order
+          </button>
         </div>
-
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Est. Maintenance Spend</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">$1,850</p>
-          </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
-            <DollarSign className="size-5" />
-          </div>
-        </div>
-      </div>
-
-      {/* Filter */}
-      <div className="glass-tile flex items-center justify-between rounded-2xl p-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search ticket ID, asset name, vendor..."
-            className="w-full rounded-xl border border-input bg-card/60 py-2 pl-9 pr-4 text-xs outline-none focus:border-ring"
-          />
-        </div>
-        <span className="text-xs font-semibold text-muted-foreground">
-          {filtered.length} Repair Records
-        </span>
-      </div>
-
-      {/* Table */}
-      <div className="glass-tile overflow-hidden rounded-2xl border border-border">
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3.5 font-bold">Ticket ID</th>
-                <th className="px-5 py-3.5 font-bold">Asset Name</th>
-                <th className="px-5 py-3.5 font-bold">Type</th>
-                <th className="px-5 py-3.5 font-bold">Service Vendor</th>
-                <th className="px-5 py-3.5 font-bold">Reported Date</th>
-                <th className="px-5 py-3.5 font-bold">Est. ETA</th>
-                <th className="px-5 py-3.5 font-bold">Status</th>
-                <th className="px-5 py-3.5 font-bold text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {filtered.map((t) => (
-                <tr key={t.id} className="transition-colors hover:bg-secondary/40">
-                  <td className="px-5 py-4 font-mono font-bold text-primary">{t.ticketId}</td>
-                  <td className="px-5 py-4">
-                    <p className="font-bold text-foreground">{t.assetName}</p>
-                    <p className="font-mono text-[11px] text-muted-foreground">{t.assetId}</p>
-                  </td>
-                  <td className="px-5 py-4 text-muted-foreground">{t.maintenanceType}</td>
-                  <td className="px-5 py-4 font-semibold text-foreground">{t.vendor}</td>
-                  <td className="px-5 py-4 font-mono text-muted-foreground">{t.reportedDate}</td>
-                  <td className="px-5 py-4 font-mono text-muted-foreground">{t.estCompletion}</td>
-                  <td className="px-5 py-4">
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                        t.status === "Completed"
-                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-                          : t.status === "Repairing"
-                          ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
-                          : "border-sky-500/20 bg-sky-500/10 text-sky-400"
-                      }`}
-                    >
-                      {t.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    {t.status !== "Completed" ? (
-                      <button
-                        onClick={() => handleCompleteTicket(t.id)}
-                        className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-[11px] font-bold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-                      >
-                        Mark Fixed
-                      </button>
-                    ) : (
-                      <span className="text-[11px] font-medium text-muted-foreground">Resolved</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold">Log Repair & Maintenance Ticket</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Schedule repair or warranty dispatch with authorized vendor.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleCreateTicket} className="mt-4 space-y-3 text-xs">
-            <div className="grid gap-3 sm:grid-cols-2">
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {maintenances.map((maint) => (
+            <div
+              key={maint.id}
+              className="glass-tile group flex flex-col justify-between rounded-2xl p-5 border border-border transition-all duration-300 hover-lift hover:border-primary/40"
+            >
               <div>
-                <label className="block font-semibold text-muted-foreground mb-1">Asset ID</label>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                    <Wrench className="size-3" /> Tag: {maint.asset_tag || "N/A"}
+                  </span>
+                  {getStatusBadge(maint.status)}
+                </div>
+
+                <h3 className="mt-3 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  {maint.maintenance_type}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Asset: <span className="text-foreground font-semibold">{maint.asset_name || "Hardware"}</span>
+                </p>
+
+                {maint.description && (
+                  <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
+                    {maint.description}
+                  </p>
+                )}
+
+                <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                  <p className="flex items-center gap-1">
+                    <Calendar className="size-3" /> Scheduled: {maint.scheduled_date}
+                  </p>
+                  <p className="flex items-center gap-0.5 text-foreground font-semibold">
+                    <DollarSign className="size-3.5 text-muted-foreground" /> Cost: ${maint.cost.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-between text-xs">
+                <button
+                  onClick={() => handleCompleteToggle(maint.id, maint.status)}
+                  className="rounded-lg border border-input px-2.5 py-1 text-[11px] font-semibold text-foreground hover:bg-secondary flex items-center gap-1"
+                >
+                  <CheckCircle className="size-3 text-emerald-500" />
+                  {maint.status === "COMPLETED" ? "Reopen Servicing" : "Mark Completed"}
+                </button>
+
+                <button
+                  onClick={() => handleDelete(maint.id)}
+                  className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Delete Maintenance"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Schedule Modal ── */}
+      {isScheduleOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="glass-tile w-full max-w-md rounded-2xl p-6 border border-border">
+            <h3 className="text-base font-bold font-display text-foreground mb-4">
+              Schedule Asset Maintenance
+            </h3>
+            <form onSubmit={handleScheduleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Target Asset
+                </label>
+                <select
+                  value={selectedAssetId}
+                  onChange={(e) => setSelectedAssetId(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                >
+                  <option value="">Select Asset...</option>
+                  {assets.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} ({a.tag_id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Maintenance Type
+                </label>
                 <input
                   type="text"
                   required
-                  value={formData.assetId}
-                  onChange={(e) => setFormData({ ...formData, assetId: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
+                  value={maintenanceType}
+                  onChange={(e) => setMaintenanceType(e.target.value)}
+                  placeholder="e.g. Battery Replacement / AMC Servicing"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Estimated Cost ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={cost}
+                    onChange={(e) => setCost(Number(e.target.value))}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Scheduled Date
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-muted-foreground mb-1">Asset Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.assetName}
-                  onChange={(e) => setFormData({ ...formData, assetName: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Issue Description</label>
-              <textarea
-                rows={2}
-                required
-                value={formData.issueDescription}
-                onChange={(e) => setFormData({ ...formData, issueDescription: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none resize-none"
-              />
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className="block font-semibold text-muted-foreground mb-1">Service Vendor</label>
-                <input
-                  type="text"
-                  value={formData.vendor}
-                  onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Issue Description & Scope
+                </label>
+                <textarea
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe hardware issue or vendor AMC task..."
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold text-muted-foreground mb-1">Estimated Cost ($)</label>
-                <input
-                  type="number"
-                  value={formData.cost}
-                  onChange={(e) => setFormData({ ...formData, cost: Number(e.target.value) })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-                />
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsScheduleOpen(false)}
+                  className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isScheduling}
+                  className="rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
+                >
+                  {isScheduling ? "Scheduling..." : "Schedule Maintenance"}
+                </button>
               </div>
-            </div>
-
-            <DialogFooter className="mt-5 flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-gradient-brand px-5 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
-              >
-                Dispatch Ticket
-              </button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

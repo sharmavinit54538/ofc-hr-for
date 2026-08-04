@@ -10,8 +10,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/attendance/overt
       title="Overtime Claims & Approvals"
       description="Extra hours calculation, manager approvals, and payroll sync."
       items={[
-        { id: "1", title: "Weekend Deployment Overtime", subtitle: "Applicant: Sanya Kapoor · 6.5 Hours", status: "Pending Manager Approval", date: "Claimed Aug 1", metric: "1.5x Rate" },
-        { id: "2", title: "Quarterly Audit Overtime", subtitle: "Applicant: Rahul Verma · 4.0 Hours", status: "Approved", date: "Approved Yesterday", metric: "1.5x Rate" },
+        { id: "1", title: "Weekend Deployment Overtime", subtitle: "Applicant: Employee #101 · 6.5 Hours", status: "Pending Manager Approval", date: "Claimed Aug 1", metric: "1.5x Rate" },
+        { id: "2", title: "Quarterly Audit Overtime", subtitle: "Applicant: Employee #102 · 4.0 Hours", status: "Approved", date: "Approved Yesterday", metric: "1.5x Rate" },
       ]}
     />
   ),

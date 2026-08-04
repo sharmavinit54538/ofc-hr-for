@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useAppDispatch } from "@/app/hooks";
+import { setAccessToken } from "@/features/auth/authSlice";
+import { getLandingRoute } from "@/lib/auth/roles";
+import type { Role } from "@/lib/auth/types";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -13,128 +16,142 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallbackPage() {
   const navigate = useNavigate();
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const [statusText, setStatusText] = useState("Verifying Google authentication with Supabase...");
+  const processedRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
-    console.log("[OAuth Callback] Initiating post-redirect authentication handler...");
 
-    async function processAuthCallback() {
+    async function handleExchange(supabaseAccessToken: string) {
+      if (processedRef.current) return;
+      processedRef.current = true;
+
       try {
-        // 1. First inspect current session from Supabase client
-        console.log("[OAuth Callback] Calling supabase.auth.getSession()...");
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (isMounted) setStatusText("Exchanging session with backend...");
+        const apiBase = (import.meta.env["VITE_API_BASE_URL"] as string | undefined) || "http://localhost:8000";
 
-        if (sessionError) {
-          console.error("[OAuth Callback] getSession error:", sessionError);
-          throw sessionError;
-        }
-
-        if (session) {
-          console.log("[OAuth Callback] Valid session detected for user:", session.user.email);
-          toast.success("Signed in successfully", {
-            description: `Welcome ${session.user.email || "back to OFC HR"}`,
-          });
-          if (isMounted) {
-            navigate({ to: "/dashboard" });
-          }
-          return;
-        }
-
-        // 2. Check if authorization code is present in URL search params (PKCE flow)
-        const searchParams = new URLSearchParams(window.location.search);
-        const code = searchParams.get("code");
-
-        if (code) {
-          console.log("[OAuth Callback] PKCE code found in query parameters. Exchanging code for session...");
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          
-          if (exchangeError) {
-            console.error("[OAuth Callback] exchangeCodeForSession error:", exchangeError);
-            throw exchangeError;
-          }
-
-          if (data?.session) {
-            console.log("[OAuth Callback] Code exchanged successfully. User:", data.session.user.email);
-            toast.success("Signed in successfully", {
-              description: `Welcome ${data.session.user.email}`,
-            });
-            if (isMounted) {
-              navigate({ to: "/dashboard" });
-            }
-            return;
-          }
-        }
-
-        // 3. Listen for onAuthStateChange events (handles hash fragments #access_token=...)
-        console.log("[OAuth Callback] Listening for auth state changes via onAuthStateChange...");
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-          console.log(`[OAuth Callback] Auth state change event [${event}]:`, currentSession?.user?.email);
-          
-          if (currentSession && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-            toast.success("Signed in successfully", {
-              description: `Welcome ${currentSession.user.email || ""}`,
-            });
-            authListener.subscription.unsubscribe();
-            if (isMounted) {
-              navigate({ to: "/dashboard" });
-            }
-          }
+        const res = await fetch(`${apiBase}/api/v1/sso/google/exchange`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ access_token: supabaseAccessToken }),
         });
 
-        // 4. Timeout safety check: fallback if no session acquired after 6s
-        setTimeout(async () => {
-          const { data: { session: fallbackSession } } = await supabase.auth.getSession();
-          if (fallbackSession && isMounted) {
-            console.log("[OAuth Callback] Fallback check found valid session:", fallbackSession.user.email);
-            navigate({ to: "/dashboard" });
-          } else if (isMounted && !errorMsg) {
-            console.warn("[OAuth Callback] Session retrieval timed out.");
-            setErrorMsg("Authentication session could not be retrieved. Please try signing in again.");
-          }
-        }, 6000);
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData?.detail || errData?.message || `HTTP ${res.status}`);
+        }
 
-      } catch (err: any) {
-        console.error("[OAuth Callback] Exception in processAuthCallback:", err);
+        const json = await res.json();
+        const tokenData = json?.data;
+        const accessToken = tokenData?.access_token;
+        const refreshToken = tokenData?.refresh_token;
+        const role = (tokenData?.role as Role) || "HR_ADMIN";
+
+        if (!accessToken) {
+          throw new Error("Backend did not return an access token");
+        }
+
+        // Store access token in Redux
+        dispatch(setAccessToken(accessToken));
+
+        // Store refresh token in localStorage if present
+        if (refreshToken && typeof window !== "undefined") {
+          localStorage.setItem("refresh_token", refreshToken);
+        }
+
+        // Redirect to role-appropriate dashboard route
+        const destination = getLandingRoute(role);
         if (isMounted) {
-          const message = err?.message || "An unexpected error occurred during Google authentication.";
-          setErrorMsg(message);
-          toast.error("Authentication Failed", { description: message });
+          navigate({ to: destination as any });
+        }
+      } catch (err) {
+        console.error("[OAuth Callback] Backend exchange failed:", err);
+        if (isMounted) {
+          navigate({ to: "/auth/login", search: { error: "sso_failed" } as any });
         }
       }
     }
 
-    processAuthCallback();
+    async function initAuthFlow() {
+      try {
+        // 1. Check existing session from Supabase
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+
+        if (session?.access_token) {
+          await handleExchange(session.access_token);
+          return;
+        }
+
+        // 2. Check for PKCE authorization code in URL query params
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get("code");
+        const hasHash = window.location.hash.includes("access_token");
+
+        if (code) {
+          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) throw exchangeError;
+          if (data?.session?.access_token) {
+            await handleExchange(data.session.access_token);
+            return;
+          }
+        }
+
+        // 3. Listen for onAuthStateChange events (SIGNED_IN / INITIAL_SESSION)
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+          if (currentSession?.access_token && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+            authListener.subscription.unsubscribe();
+            await handleExchange(currentSession.access_token);
+          }
+        });
+
+        // 4. Edge case check: direct landing without code/hash/session
+        if (!code && !hasHash) {
+          setTimeout(async () => {
+            const { data: { session: checkSession } } = await supabase.auth.getSession();
+            if (checkSession?.access_token) {
+              await handleExchange(checkSession.access_token);
+            } else if (isMounted && !processedRef.current) {
+              navigate({ to: "/auth/login" });
+            }
+          }, 1500);
+        } else {
+          // Timeout fallback
+          setTimeout(async () => {
+            const { data: { session: checkSession } } = await supabase.auth.getSession();
+            if (checkSession?.access_token) {
+              await handleExchange(checkSession.access_token);
+            } else if (isMounted && !processedRef.current) {
+              navigate({ to: "/auth/login", search: { error: "sso_failed" } as any });
+            }
+          }, 6000);
+        }
+
+      } catch (err) {
+        console.error("[OAuth Callback] Auth initialization error:", err);
+        if (isMounted && !processedRef.current) {
+          navigate({ to: "/auth/login", search: { error: "sso_failed" } as any });
+        }
+      }
+    }
+
+    initAuthFlow();
 
     return () => {
       isMounted = false;
     };
-  }, [navigate]);
-
-  if (errorMsg) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
-        <div className="p-6 bg-card border border-destructive/30 rounded-2xl max-w-md w-full shadow-lg text-center space-y-4">
-          <h2 className="text-lg font-bold text-destructive">Authentication Error</h2>
-          <p className="text-xs text-muted-foreground">{errorMsg}</p>
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/auth/login" })}
-            className="w-full py-2.5 px-4 text-xs font-semibold text-primary-foreground bg-primary rounded-xl hover:bg-primary/90 transition-all"
-          >
-            Return to Sign in
-          </button>
-        </div>
-      </div>
-    );
-  }
+  }, [dispatch, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
       <div className="flex flex-col items-center gap-3 text-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <h2 className="text-base font-semibold text-foreground">Completing Sign in...</h2>
-        <p className="text-xs text-muted-foreground">Verifying Google authentication with Supabase...</p>
+        <p className="text-xs text-muted-foreground">{statusText}</p>
       </div>
     </div>
   );

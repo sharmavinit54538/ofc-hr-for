@@ -1,19 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GenericSubModuleView } from "@/components/admin/generic-module-view";
+import { useListCandidatesQuery } from "@/services/recruitmentApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/recruitment/candidates")({
-  component: () => (
+  component: RecruitmentCandidatesPage,
+});
+
+function RecruitmentCandidatesPage() {
+  const { data, isLoading } = useListCandidatesQuery({ page: 1, page_size: 50 });
+
+  const items = (data?.data?.items ?? []).map((candidate) => ({
+    id: candidate.id,
+    title: candidate.full_name,
+    subtitle: `Applied for ${candidate.job_title ?? "—"}`,
+    status: candidate.stage,
+    date: candidate.applied_at ? `Applied ${candidate.applied_at}` : "—",
+    metric: candidate.screening_score ? `Score: ${candidate.screening_score}/100` : undefined,
+  }));
+
+  return (
     <GenericSubModuleView
-      href="/dashboard/recruitment/candidates"
       parentHref="/dashboard/recruitment"
       parentLabel="Recruitment"
-      title="Candidate Pipeline"
-      description="Talent pool database, resume scorecards, and candidate status tracking."
-      items={[
-        { id: "1", title: "Rohan Malhotra", subtitle: "Applied for Senior Staff AI Engineer", status: "Interview Stage", date: "Applied Yesterday", metric: "Score: 94/100" },
-        { id: "2", title: "Kavita Rao", subtitle: "Applied for HR Business Partner", status: "Offer Sent", date: "Applied 4 days ago", metric: "Score: 98/100" },
-        { id: "3", title: "David Chen", subtitle: "Applied for DevOps Tech Lead", status: "Screening", date: "Applied 2 days ago", metric: "Score: 88/100" },
-      ]}
+      title="Candidates"
+      description="Talent pool database, candidate stage tracking, and screening scorecards."
+      items={items}
+      isLoading={isLoading}
+      showActions
     />
-  ),
-});
+  );
+}

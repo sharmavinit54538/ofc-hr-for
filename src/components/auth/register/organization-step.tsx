@@ -48,7 +48,7 @@ export function OrganizationStep({
     <form onSubmit={handleSubmit(onNext)} className="space-y-5" noValidate>
       <AuthInput
         label="Company name"
-        placeholder="Northwind Industries"
+        placeholder="Acme Corp"
         autoComplete="organization"
         icon={<Building2 className="size-4" />}
         error={errors.companyName?.message}
@@ -84,7 +84,7 @@ export function OrganizationStep({
 
       <AuthInput
         label="Website"
-        placeholder="https://northwind.com"
+        placeholder="https://example.com"
         autoComplete="url"
         icon={<Globe className="size-4" />}
         error={errors.website?.message}

@@ -37,12 +37,12 @@ function EmployeeProfilePage() {
   const location = profile?.work_location || profile?.city || storeUser?.location || "Bengaluru HQ — Tower B";
   const jobTitle = profile?.job_title || storeUser?.jobTitle || "Software Engineer";
   const department = profile?.department || storeUser?.department || "Engineering";
-  const reportingManager = profile?.reporting_manager || "Sanya Kapoor (VP Engineering)";
+  const reportingManager = profile?.reporting_manager || "Not Assigned";
   const employmentType = profile?.employment_type || "Full-Time";
-  const joiningDate = profile?.joining_date || "Jan 15, 2025";
-  const emergencyName = profile?.emergency_contact_name || "Meera Verma";
-  const emergencyRel = profile?.emergency_relationship || "Spouse";
-  const emergencyPhone = profile?.emergency_phone || "+91 99000 12345";
+  const joiningDate = profile?.joining_date || "—";
+  const emergencyName = profile?.emergency_contact_name || "—";
+  const emergencyRel = profile?.emergency_relationship || "—";
+  const emergencyPhone = profile?.emergency_phone || "—";
 
   const personalInfo = [
     { label: "Full Name", value: fullName, icon: User },

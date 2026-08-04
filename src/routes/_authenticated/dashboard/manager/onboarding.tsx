@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Rocket } from "lucide-react";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_TEAM_ONBOARDING } from "@/lib/manager/mock-data";
 
 export const Route = createFileRoute("/_authenticated/dashboard/manager/onboarding")({
   component: ManagerOnboardingPage,
 });
 
 function ManagerOnboardingPage() {
+  const onboardingItems: any[] = [];
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -17,7 +18,7 @@ function ManagerOnboardingPage() {
         backHref="/dashboard/manager"
       />
 
-      {MOCK_TEAM_ONBOARDING.length === 0 ? (
+      {onboardingItems.length === 0 ? (
         <div className="glass-tile flex flex-col items-center justify-center p-12 text-center rounded-2xl space-y-3">
           <Rocket className="size-10 text-muted-foreground/60" />
           <h3 className="font-display text-base font-bold text-foreground">No New Hire Onboarding Active</h3>
@@ -27,7 +28,7 @@ function ManagerOnboardingPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {MOCK_TEAM_ONBOARDING.map((item) => (
+          {onboardingItems.map((item) => (
             <div key={item.id} className="glass-tile rounded-2xl p-5 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
                 <div>

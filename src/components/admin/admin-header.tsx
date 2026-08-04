@@ -47,7 +47,7 @@ export const AdminHeader = memo(function AdminHeader({
         >
           <ShieldCheck className="size-3.5" />
           <span className="truncate max-w-[140px] md:max-w-none">
-            {organization?.name ?? "Northwind Industries"}
+            {organization?.name ?? "Enterprise HQ"}
           </span>
         </Link>
 

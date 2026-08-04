@@ -1,304 +1,206 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { PageHeader } from "@/components/admin/page-header";
+import {
+  useListAssignmentsQuery,
+  useReturnAssetMutation,
+} from "@/services/assetsApi";
+import { toast } from "sonner";
 import {
   RotateCcw,
-  CheckCircle2,
+  Inbox,
   AlertTriangle,
-  Search,
-  ShieldCheck,
-  PackageCheck,
   RefreshCw,
+  Package,
+  User,
+  Calendar,
+  CheckCircle2,
 } from "lucide-react";
-import { toast } from "sonner";
-import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_ASSETS } from "@/lib/assets/mock-data";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/return")({
   component: AssetReturnPage,
 });
 
-interface ReturnItem {
-  id: string;
-  assetId: string;
-  assetName: string;
-  assignedTo: string;
-  department: string;
-  returnReason: "Resignation / Offboarding" | "Device Upgrade" | "Repair / Replacement";
-  condition: "Pristine" | "Fair" | "Minor Damage" | "Damaged";
-  dataWipe: "Verified & Wiped" | "Pending Data Wipe";
-  returnDate: string;
-}
-
 function AssetReturnPage() {
-  const [returnLogs, setReturnLogs] = useState<ReturnItem[]>([
-    {
-      id: "ret-1",
-      assetId: "AST-8822",
-      assetName: 'MacBook Pro 14" M2 Pro',
-      assignedTo: "Karan Singh",
-      department: "Product Engineering",
-      returnReason: "Resignation / Offboarding",
-      condition: "Pristine",
-      dataWipe: "Verified & Wiped",
-      returnDate: "2026-07-28",
-    },
-    {
-      id: "ret-2",
-      assetId: "AST-8819",
-      assetName: "Dell Latitude 5530",
-      assignedTo: "Neha Sharma",
-      department: "Human Resources",
-      returnReason: "Device Upgrade",
-      condition: "Fair",
-      dataWipe: "Pending Data Wipe",
-      returnDate: "2026-08-01",
-    },
-  ]);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [returnCondition, setReturnCondition] = useState("Good");
+  const [notes, setNotes] = useState("");
 
-  const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    assetId: "AST-8841",
-    condition: "Pristine" as ReturnItem["condition"],
-    reason: "Resignation / Offboarding" as ReturnItem["returnReason"],
-    notes: "",
-  });
+  const { data, isLoading, isError, refetch } = useListAssignmentsQuery({ page: 1, page_size: 20 });
+  const [returnAsset, { isLoading: isReturning }] = useReturnAssetMutation();
 
-  const handleCheckinSubmit = (e: React.FormEvent) => {
+  const assignments = data?.data?.items ?? [];
+  const activeAssignments = assignments.filter((a) => a.status === "ACTIVE");
+
+  const handleReturnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const targetAsset = MOCK_ASSETS.find((a) => a.assetId === formData.assetId) ?? MOCK_ASSETS[0]!;
+    if (!selectedAssetId) {
+      toast.error("Please select an assigned asset to check in.");
+      return;
+    }
 
-    const newReturn: ReturnItem = {
-      id: `ret_${Date.now()}`,
-      assetId: targetAsset.assetId,
-      assetName: targetAsset.name,
-      assignedTo: targetAsset.assignedTo || "Employee",
-      department: targetAsset.department,
-      returnReason: formData.reason,
-      condition: formData.condition,
-      dataWipe: "Pending Data Wipe",
-      returnDate: new Date().toISOString().split("T")[0]!,
-    };
+    try {
+      await returnAsset({
+        asset_id: selectedAssetId,
+        return_date: new Date().toISOString().slice(0, 10),
+        return_condition: returnCondition,
+        notes,
+      }).unwrap();
 
-    setReturnLogs([newReturn, ...returnLogs]);
-    setIsCheckinModalOpen(false);
-    toast.success("Asset Check-in Completed", {
-      description: `${targetAsset.assetId} checked into storage. Data wipe scheduled.`,
-    });
-  };
-
-  const handleRunDataWipe = (id: string) => {
-    setReturnLogs(
-      returnLogs.map((item) =>
-        item.id === id ? { ...item, dataWipe: "Verified & Wiped" as const } : item,
-      ),
-    );
-    toast.success("Remote Data Wipe Complete", {
-      description: "Cryptographic disk wipe verified & certificate generated.",
-    });
+      toast.success("Asset check-in processed and returned to stock.");
+      setSelectedAssetId(null);
+      setNotes("");
+    } catch (err: any) {
+      toast.error(err?.data?.detail || "Failed to return asset.");
+    }
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Asset Return & Offboarding Check-in"
-        description="Receive returned employee hardware, log device physical state, enforce security data wiping, and return assets to available inventory."
+        title="Asset Check-in & Return"
+        description="Process returned equipment from departing or transitioning employees, log condition scorecards, and restock available inventory."
         breadcrumbs={[
-          { label: "Asset Management", href: "/dashboard/assets" },
-          { label: "Return Asset" },
+          { label: "Assets", href: "/dashboard/assets" },
+          { label: "Check-in & Return" },
         ]}
-        backHref="/dashboard/assets"
-        backLabel="Back to Asset Management"
-        actions={
-          <button
-            onClick={() => setIsCheckinModalOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
-          >
-            <RotateCcw className="size-4" /> Process Device Return
-          </button>
-        }
       />
 
-      {/* KPI Banner */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Returns Processed (This Month)</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">18</p>
-          </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
-            <PackageCheck className="size-5" />
-          </div>
+      {/* ── Content Area ── */}
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-tile h-36 animate-pulse rounded-2xl p-5" />
+          ))}
         </div>
-
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pending Security Data Wipes</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">
-              {returnLogs.filter((r) => r.dataWipe.includes("Pending")).length}
-            </p>
-          </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
-            <RefreshCw className="size-5" />
-          </div>
+      ) : isError ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <AlertTriangle className="size-8 text-destructive" />
+          <h3 className="mt-3 font-display text-base font-bold text-foreground">
+            Failed to load active assignments
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            An error occurred while fetching check-in items from PostgreSQL.
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <RefreshCw className="size-4" /> Retry
+          </button>
         </div>
-
-        <div className="glass-tile rounded-2xl p-5 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Offboarding Hardware Pending</p>
-            <p className="font-display text-2xl font-bold text-foreground mt-1">3</p>
+      ) : activeAssignments.length === 0 ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+            <Inbox className="size-6" />
           </div>
-          <div className="flex size-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500">
-            <AlertTriangle className="size-5" />
-          </div>
+          <h3 className="mt-4 font-display text-base font-bold text-foreground">
+            No active deployments requiring check-in
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            All company assets are currently unassigned or available in inventory stock.
+          </p>
         </div>
-      </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {activeAssignments.map((assign) => (
+            <div
+              key={assign.id}
+              className="glass-tile group flex flex-col justify-between rounded-2xl p-5 border border-border transition-all duration-300 hover-lift hover:border-primary/40"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                    <Package className="size-3" /> Tag: {assign.asset_tag || "N/A"}
+                  </span>
+                  <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">
+                    Active Deployment
+                  </span>
+                </div>
 
-      {/* Returns Table */}
-      <div className="glass-tile overflow-hidden rounded-2xl border border-border">
-        <div className="p-4 border-b border-border/60 font-display text-sm font-bold text-foreground">
-          Recent Equipment Returns Log
-        </div>
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3.5 font-bold">Asset ID</th>
-                <th className="px-5 py-3.5 font-bold">Asset Name</th>
-                <th className="px-5 py-3.5 font-bold">Returned By</th>
-                <th className="px-5 py-3.5 font-bold">Reason</th>
-                <th className="px-5 py-3.5 font-bold">Condition</th>
-                <th className="px-5 py-3.5 font-bold">Security Wipe</th>
-                <th className="px-5 py-3.5 font-bold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {returnLogs.map((item) => (
-                <tr key={item.id} className="transition-colors hover:bg-secondary/40">
-                  <td className="px-5 py-4 font-mono font-bold text-primary">{item.assetId}</td>
-                  <td className="px-5 py-4 font-bold text-foreground">{item.assetName}</td>
-                  <td className="px-5 py-4">
-                    <p className="font-semibold text-foreground">{item.assignedTo}</p>
-                    <p className="text-[11px] text-muted-foreground">{item.department}</p>
-                  </td>
-                  <td className="px-5 py-4 text-muted-foreground">{item.returnReason}</td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold text-foreground border border-border/60">
-                      {item.condition}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    {item.dataWipe.includes("Verified") ? (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
-                        <ShieldCheck className="size-3" /> Wiped & Certified
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-400">
-                        <RefreshCw className="size-3 animate-spin" /> Pending Wipe
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    {item.dataWipe.includes("Pending") && (
-                      <button
-                        onClick={() => handleRunDataWipe(item.id)}
-                        className="rounded-lg bg-indigo-500/10 px-3 py-1.5 text-[11px] font-bold text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20"
-                      >
-                        Execute Wipe
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                <h3 className="mt-3 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  {assign.asset_name || "Asset"}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <User className="size-3.5 text-muted-foreground/70" /> Holder:{" "}
+                  <span className="text-foreground font-semibold">{assign.employee_name || "Employee"}</span>
+                </p>
 
-      {/* Return Modal */}
-      <Dialog open={isCheckinModalOpen} onOpenChange={setIsCheckinModalOpen}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold">Process Equipment Return</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Inspect device, record return cause, and restock hardware.
-            </DialogDescription>
-          </DialogHeader>
+                <p className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
+                  <Calendar className="size-3" /> Assigned: {assign.assigned_date}
+                </p>
+              </div>
 
-          <form onSubmit={handleCheckinSubmit} className="mt-4 space-y-4 text-xs">
-            <div>
-              <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Select Returned Asset
-              </label>
-              <select
-                value={formData.assetId}
-                onChange={(e) => setFormData({ ...formData, assetId: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none cursor-pointer"
-              >
-                {MOCK_ASSETS.filter((a) => a.status === "Assigned").map((a) => (
-                  <option key={a.id} value={a.assetId} className="bg-card text-foreground">
-                    {a.assetId} - {a.name} ({a.assignedTo})
-                  </option>
-                ))}
-              </select>
+              <div className="mt-4 border-t border-border/60 pt-3 flex justify-end">
+                <button
+                  onClick={() => setSelectedAssetId(assign.asset_id)}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow"
+                >
+                  <RotateCcw className="size-3.5" /> Check-in Asset
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div>
-              <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Return Reason
-              </label>
-              <select
-                value={formData.reason}
-                onChange={(e) => setFormData({ ...formData, reason: e.target.value as any })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none cursor-pointer"
-              >
-                <option value="Resignation / Offboarding">Resignation / Offboarding</option>
-                <option value="Device Upgrade">Device Upgrade</option>
-                <option value="Repair / Replacement">Repair / Replacement</option>
-              </select>
-            </div>
+      {/* ── Return Check-in Modal ── */}
+      {selectedAssetId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="glass-tile w-full max-w-md rounded-2xl p-6 border border-border">
+            <h3 className="text-base font-bold font-display text-foreground mb-4">
+              Process Asset Return
+            </h3>
+            <form onSubmit={handleReturnSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Return Condition
+                </label>
+                <select
+                  value={returnCondition}
+                  onChange={(e) => setReturnCondition(e.target.value)}
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                >
+                  <option value="Pristine">Pristine / Like New</option>
+                  <option value="Good">Good Condition</option>
+                  <option value="Fair">Fair / Minor Wear</option>
+                  <option value="Damaged">Damaged (Requires Maintenance)</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Physical Inspection Condition
-              </label>
-              <select
-                value={formData.condition}
-                onChange={(e) => setFormData({ ...formData, condition: e.target.value as any })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none cursor-pointer"
-              >
-                <option value="Pristine">Pristine / Like New</option>
-                <option value="Fair">Fair / Minor Scratches</option>
-                <option value="Minor Damage">Minor Damage</option>
-                <option value="Damaged">Damaged / Non-functional</option>
-              </select>
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Inspection Notes & Comments
+                </label>
+                <textarea
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Note scratches, missing accessories, or required repair work..."
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                />
+              </div>
 
-            <DialogFooter className="mt-6 flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsCheckinModalOpen(false)}
-                className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-gradient-brand px-5 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
-              >
-                Check-in & Restock
-              </button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedAssetId(null)}
+                  className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isReturning}
+                  className="rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
+                >
+                  {isReturning ? "Processing..." : "Complete Check-in"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

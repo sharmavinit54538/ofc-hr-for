@@ -40,7 +40,7 @@ function SessionExpiredPage() {
         <dl className="glass-soft space-y-3 rounded-2xl p-4 text-sm">
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted-foreground">Signed in as</dt>
-            <dd className="truncate font-semibold">aarav.mehta@ofc-hr.com</dd>
+            <dd className="truncate font-semibold">user@company.com</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted-foreground">Last activity</dt>

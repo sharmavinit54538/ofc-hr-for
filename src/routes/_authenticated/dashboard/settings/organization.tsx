@@ -26,19 +26,19 @@ export const Route = createFileRoute("/_authenticated/dashboard/settings/organiz
 function OrganizationSettingsPage() {
   const [formData, setFormData] = useState({
     // Primary HR Administrator Detailed Profile
-    hrAdminName: "Aarav Mehta",
-    hrAdminEmpId: "EMP-2021-001",
+    hrAdminName: "HR Administrator",
+    hrAdminEmpId: "EMP-001",
     hrAdminTitle: "Chief HR Administrator & Chief People Officer (CPO)",
     hrAdminDept: "Global HR Operations & Enterprise Governance",
-    hrAdminEmail: "aarav.mehta@northwind.com",
-    hrAdminPhone: "+91 98765 43210",
+    hrAdminEmail: "hr.admin@company.com",
+    hrAdminPhone: "+91 98765 00000",
     hrAdminExt: "Ext: 101",
-    hrAdminEmergencyPhone: "+91 98765 99999",
-    hrAdminOfficeLocation: "HQ Campus - Tower A, 5th Floor, Executive Suite 502",
+    hrAdminEmergencyPhone: "+91 98765 00001",
+    hrAdminOfficeLocation: "HQ Campus - Executive Suite",
     hrAdminAuthLevel: "Tier-1 Super Administrator (Unlimited Approvals)",
 
     // Company Identity & Statutory
-    companyName: typeof window !== "undefined" && localStorage.getItem("ofc_company_name") ? localStorage.getItem("ofc_company_name")! : "Northwind Industries Inc.",
+    companyName: typeof window !== "undefined" && localStorage.getItem("ofc_company_name") ? localStorage.getItem("ofc_company_name")! : "Enterprise HR Inc.",
     displayName: "OFC HR Enterprise",
     cinNumber: "L72900KA2021PTC148209",
     gstinNumber: "29AABCN1234R1ZP",
@@ -54,13 +54,13 @@ function OrganizationSettingsPage() {
     operationalAddress: "Global Tech Park, Tower B, Phase 2, Electronic City, Bengaluru, Karnataka 560100, India",
 
     // Digital Presence & Socials
-    websiteUrl: "https://northwind.ofchr.io",
+    websiteUrl: "https://example.com",
     linkedinUrl: "https://linkedin.com/company/ofchr-enterprise",
     twitterHandle: "@OFC_HR_Official",
 
     // Technical & Localization
-    primaryDomain: "northwind.ofchr.io",
-    supportEmail: "admin-support@northwind.com",
+    primaryDomain: "app.ofchr.io",
+    supportEmail: "support@company.com",
     timezone: "UTC+05:30 (Asia/Kolkata)",
     currency: "USD ($) / INR (₹)",
   });
@@ -84,7 +84,7 @@ function OrganizationSettingsPage() {
 
   const handleSignatureUpload = () => {
     toast.success("HR Admin Signature Uploaded", {
-      description: "Authorized digital signature seal updated for Aarav Mehta.",
+      description: "Authorized digital signature seal updated.",
     });
   };
 

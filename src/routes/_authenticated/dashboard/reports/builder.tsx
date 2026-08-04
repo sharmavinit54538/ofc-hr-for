@@ -97,9 +97,8 @@ function CustomReportBuilderPage() {
   };
 
   const mockPreviewData = [
-    { "Employee ID": "NW-1042", "Full Name": "Aarav Sharma", Department: "Product Engineering", Designation: "Senior AI Engineer", "Office Location": "Bengaluru HQ", "Joining Date": "2022-03-15", "Employment Status": "Active", "Gross Base Pay": "$12,500", "TDS Tax Deducted": "$1,850", "Leave Balance Days": "14", "Performance Rating": "4.8", "Assigned Laptop SN": "C02G4109MD6R" },
-    { "Employee ID": "NW-1088", "Full Name": "Priya Patel", Department: "Human Resources", Designation: "HR Operations Lead", "Office Location": "Mumbai Campus", "Joining Date": "2023-01-10", "Employment Status": "Active", "Gross Base Pay": "$8,500", "TDS Tax Deducted": "$1,100", "Leave Balance Days": "12", "Performance Rating": "4.5", "Assigned Laptop SN": "CN-09K821" },
-    { "Employee ID": "NW-1145", "Full Name": "Karan Verma", Department: "Finance Operations", Designation: "Financial Analyst", "Office Location": "Bengaluru HQ", "Joining Date": "2023-08-01", "Employment Status": "Active", "Gross Base Pay": "$9,200", "TDS Tax Deducted": "$1,250", "Leave Balance Days": "18", "Performance Rating": "4.0", "Assigned Laptop SN": "RFID-8820" },
+    { "Employee ID": "EMP-1001", "Full Name": "Employee Sample 1", Department: "Product Engineering", Designation: "Senior Engineer", "Office Location": "HQ", "Joining Date": "2023-01-15", "Employment Status": "Active", "Gross Base Pay": "—", "TDS Tax Deducted": "—", "Leave Balance Days": "14", "Performance Rating": "4.8", "Assigned Laptop SN": "SN-001" },
+    { "Employee ID": "EMP-1002", "Full Name": "Employee Sample 2", Department: "Human Resources", Designation: "HR Specialist", "Office Location": "Branch", "Joining Date": "2023-05-10", "Employment Status": "Active", "Gross Base Pay": "—", "TDS Tax Deducted": "—", "Leave Balance Days": "12", "Performance Rating": "4.5", "Assigned Laptop SN": "SN-002" },
   ];
 
   return (

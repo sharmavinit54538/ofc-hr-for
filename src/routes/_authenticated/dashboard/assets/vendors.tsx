@@ -1,267 +1,297 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  Store,
-  Plus,
-  Star,
-  Phone,
-  Mail,
-  ShieldCheck,
-  Calendar,
-  Building2,
-  Search,
-} from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_VENDORS, VendorRecord } from "@/lib/assets/mock-data";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  useListAssetVendorsQuery,
+  useCreateAssetVendorMutation,
+  useUpdateAssetVendorMutation,
+  useDeleteAssetVendorMutation,
+} from "@/services/assetsApi";
+import { toast } from "sonner";
+import {
+  Plus,
+  Inbox,
+  AlertTriangle,
+  RefreshCw,
+  Building2,
+  Mail,
+  Phone,
+  User,
+  Trash2,
+  MapPin,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/vendors")({
-  component: VendorsPage,
+  component: AssetVendorsPage,
 });
 
-function VendorsPage() {
-  const [vendors, setVendors] = useState<VendorRecord[]>(MOCK_VENDORS);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function AssetVendorsPage() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [address, setAddress] = useState("");
 
-  const [formData, setFormData] = useState({
-    name: "",
-    categoryProvided: "Hardware Laptops & Display Monitors",
-    contactPerson: "",
-    phone: "+91 80 4000 0000",
-    email: "",
-    contractEndDate: "2028-12-31",
-  });
+  const { data, isLoading, isError, refetch } = useListAssetVendorsQuery();
+  const [createVendor, { isLoading: isCreating }] = useCreateAssetVendorMutation();
+  const [deleteVendor] = useDeleteAssetVendorMutation();
 
-  const filtered = vendors.filter(
-    (v) =>
-      v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.categoryProvided.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const vendors = data?.data ?? [];
 
-  const handleAddVendor = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.contactPerson.trim()) {
-      toast.error("Please enter vendor name and contact person.");
+    if (!name) {
+      toast.error("Please enter a vendor company name.");
       return;
     }
 
-    const newV: VendorRecord = {
-      id: `vnd_${Date.now()}`,
-      name: formData.name.trim(),
-      categoryProvided: formData.categoryProvided,
-      rating: 4.8,
-      activeWarranties: 50,
-      contactPerson: formData.contactPerson,
-      phone: formData.phone,
-      email: formData.email,
-      status: "Active",
-      contractEndDate: formData.contractEndDate,
-    };
+    try {
+      await createVendor({
+        name,
+        email,
+        phone,
+        contact_person: contactPerson,
+        address,
+      }).unwrap();
 
-    setVendors([newV, ...vendors]);
-    setIsModalOpen(false);
-    toast.success("Vendor Partner Registered", {
-      description: `${newV.name} added to approved procurement directory.`,
-    });
+      toast.success("Vendor profile registered successfully.");
+      setIsCreateOpen(false);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setContactPerson("");
+    } catch {
+      toast.error("Failed to register vendor.");
+    }
+  };
 
-    setFormData({
-      name: "",
-      categoryProvided: "Hardware Laptops & Display Monitors",
-      contactPerson: "",
-      phone: "+91 80 4000 0000",
-      email: "",
-      contractEndDate: "2028-12-31",
-    });
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this vendor?")) return;
+    try {
+      await deleteVendor(id).unwrap();
+      toast.success("Vendor deleted.");
+    } catch {
+      toast.error("Failed to delete vendor.");
+    }
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Vendors & Hardware Procurement Partners"
-        description="Directory of approved hardware OEMs, authorized resellers, warranty SLA contracts, and supply chain contacts."
+        title="Hardware & Software Vendors"
+        description="Directory of approved hardware distributors, software publishers, repair centers, and OEM suppliers."
         breadcrumbs={[
-          { label: "Asset Management", href: "/dashboard/assets" },
+          { label: "Assets", href: "/dashboard/assets" },
           { label: "Vendors & Suppliers" },
         ]}
-        backHref="/dashboard/assets"
-        backLabel="Back to Asset Management"
         actions={
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsCreateOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
           >
-            <Plus className="size-4" /> Add Vendor Partner
+            <Plus className="size-4" /> Add Vendor
           </button>
         }
       />
 
-      {/* Toolbar */}
-      <div className="glass-tile flex items-center justify-between rounded-2xl p-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search vendor name, equipment category, contact..."
-            className="w-full rounded-xl border border-input bg-card/60 py-2 pl-9 pr-4 text-xs outline-none focus:border-ring"
-          />
+      {/* ── Content Area ── */}
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-tile h-36 animate-pulse rounded-2xl p-5" />
+          ))}
         </div>
-        <span className="text-xs font-semibold text-muted-foreground">
-          {filtered.length} Active Partners
-        </span>
-      </div>
-
-      {/* Vendor Cards Grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
-        {filtered.map((vendor) => (
-          <div key={vendor.id} className="glass-tile space-y-4 rounded-2xl p-5 transition-all hover-lift">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground font-display font-bold shadow-glow">
-                  {vendor.name.charAt(0)}
-                </div>
-                <div>
-                  <h3 className="font-display text-base font-bold text-foreground">{vendor.name}</h3>
-                  <p className="text-xs text-muted-foreground">{vendor.categoryProvided}</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-400">
-                <Star className="size-3 fill-amber-400 text-amber-400" /> {vendor.rating} SLA
-              </span>
-            </div>
-
-            <div className="grid gap-2 rounded-xl border border-border/50 bg-card/40 p-3 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Building2 className="size-3.5 text-primary" /> Key Contact:
-                </span>
-                <span className="font-bold text-foreground">{vendor.contactPerson}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Phone className="size-3.5 text-primary" /> Phone:
-                </span>
-                <span className="font-semibold text-foreground">{vendor.phone}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Mail className="size-3.5 text-primary" /> Email:
-                </span>
-                <span className="font-semibold text-primary">{vendor.email}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs pt-1 border-t border-border/40">
-              <span className="text-muted-foreground">
-                Warranties Active: <strong className="text-foreground">{vendor.activeWarranties} items</strong>
-              </span>
-              <span className="font-mono text-[11px] text-muted-foreground">
-                Contract End: {vendor.contractEndDate}
-              </span>
-            </div>
+      ) : isError ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <AlertTriangle className="size-8 text-destructive" />
+          <h3 className="mt-3 font-display text-base font-bold text-foreground">
+            Failed to load vendors
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            An error occurred while fetching vendor profiles from PostgreSQL.
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <RefreshCw className="size-4" /> Retry
+          </button>
+        </div>
+      ) : vendors.length === 0 ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+            <Inbox className="size-6" />
           </div>
-        ))}
-      </div>
-
-      {/* Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold">Register Vendor Partner</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Add authorized equipment OEM or corporate reseller to procurement index.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleAddVendor} className="mt-4 space-y-3 text-xs">
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Company / Vendor Name</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Lenovo Corporate India"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Equipment Category Provided</label>
-              <input
-                type="text"
-                required
-                value={formData.categoryProvided}
-                onChange={(e) => setFormData({ ...formData, categoryProvided: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-              />
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
+          <h3 className="mt-4 font-display text-base font-bold text-foreground">
+            No vendors registered
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            No vendor profiles exist in PostgreSQL. Add your first hardware supplier.
+          </p>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <Plus className="size-4" /> Add Vendor
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {vendors.map((ven) => (
+            <div
+              key={ven.id}
+              className="glass-tile group flex flex-col justify-between rounded-2xl p-5 border border-border transition-all duration-300 hover-lift hover:border-primary/40"
+            >
               <div>
-                <label className="block font-semibold text-muted-foreground mb-1">Account Manager</label>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                    <Building2 className="size-5" />
+                  </div>
+                  <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">
+                    Approved Supplier
+                  </span>
+                </div>
+
+                <h3 className="mt-3 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  {ven.name}
+                </h3>
+
+                {ven.contact_person && (
+                  <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                    <User className="size-3.5 text-muted-foreground/70" /> Contact: {ven.contact_person}
+                  </p>
+                )}
+
+                <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                  {ven.email && (
+                    <p className="flex items-center gap-1.5">
+                      <Mail className="size-3.5 text-muted-foreground/70" /> {ven.email}
+                    </p>
+                  )}
+                  {ven.phone && (
+                    <p className="flex items-center gap-1.5">
+                      <Phone className="size-3.5 text-muted-foreground/70" /> {ven.phone}
+                    </p>
+                  )}
+                  {ven.address && (
+                    <p className="flex items-center gap-1.5">
+                      <MapPin className="size-3.5 text-muted-foreground/70" /> {ven.address}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-border/60 pt-3 flex justify-end">
+                <button
+                  onClick={() => handleDelete(ven.id)}
+                  className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Delete Vendor"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Add Vendor Modal ── */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="glass-tile w-full max-w-md rounded-2xl p-6 border border-border">
+            <h3 className="text-base font-bold font-display text-foreground mb-4">
+              Add Vendor Profile
+            </h3>
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Vendor Company Name
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ramesh Chandra"
-                  value={formData.contactPerson}
-                  onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Apple Enterprise Solutions"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="sales@vendor.com"
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+1 (800) 555-0199"
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Primary Contact Person
+                </label>
+                <input
+                  type="text"
+                  value={contactPerson}
+                  onChange={(e) => setContactPerson(e.target.value)}
+                  placeholder="e.g. Sarah Jenkins (Account Executive)"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-muted-foreground mb-1">Phone</label>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Office / Warehouse Address
+                </label>
                 <input
                   type="text"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="100 Infinite Loop, Cupertino, CA"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Corporate Email</label>
-              <input
-                type="email"
-                required
-                placeholder="enterprise@vendor.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-              />
-            </div>
-
-            <DialogFooter className="mt-5 flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-gradient-brand px-5 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
-              >
-                Register Partner
-              </button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreating}
+                  className="rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
+                >
+                  {isCreating ? "Saving..." : "Add Vendor"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

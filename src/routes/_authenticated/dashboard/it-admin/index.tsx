@@ -31,10 +31,10 @@ function ItAdminDashboardHome() {
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1.5">
             <h1 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl lg:text-3xl leading-snug py-0.5">
-              Welcome back, {user?.fullName ?? "Priya Nair"}
+              Welcome back, {user?.fullName ?? "IT Administrator"}
             </h1>
             <p className="max-w-xl text-xs text-muted-foreground leading-relaxed sm:text-sm">
-              {user?.jobTitle ?? "Head of IT & Identity"} · Information Technology & Cyber Security · Northwind Industries
+              {user?.jobTitle ?? "Head of IT & Identity"} · Information Technology & Cyber Security
             </p>
           </div>
           <Link
@@ -116,24 +116,32 @@ function ItAdminDashboardHome() {
                 Manage SSO <ArrowRight className="size-3" />
               </Link>
             </div>
-            <div className="space-y-3">
-              {MOCK_SSO_PROVIDERS.map((sso) => (
-                <div key={sso.id} className="flex items-center justify-between rounded-xl border border-border/50 bg-card/40 p-3.5 text-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary font-bold">
-                      <Globe className="size-4" />
+            {MOCK_SSO_PROVIDERS.length === 0 ? (
+              <div className="py-8 text-center text-xs text-muted-foreground space-y-1">
+                <Globe className="size-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="font-medium text-foreground">No SSO Providers Configured</p>
+                <p className="text-[11px]">Configure SAML 2.0 or OIDC integration in SSO Management.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {MOCK_SSO_PROVIDERS.map((sso) => (
+                  <div key={sso.id} className="flex items-center justify-between rounded-xl border border-border/50 bg-card/40 p-3.5 text-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary font-bold">
+                        <Globe className="size-4" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground">{sso.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{sso.protocol} · {sso.usersCount} Assigned Users</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-foreground">{sso.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{sso.protocol} · {sso.usersCount} Assigned Users</p>
-                    </div>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">
+                      <CheckCircle2 className="size-3" /> {sso.status}
+                    </span>
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">
-                    <CheckCircle2 className="size-3" /> {sso.status}
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -144,18 +152,26 @@ function ItAdminDashboardHome() {
             <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2 mb-4">
               <Database className="size-4 text-emerald-500" /> Database Backup Snapshots
             </h3>
-            <div className="space-y-3">
-              {MOCK_BACKUP_SNAPSHOTS.map((bk) => (
-                <div key={bk.id} className="rounded-xl border border-border/50 bg-card/40 p-3 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-primary">{bk.size}</span>
-                    <span className="text-[10px] text-emerald-500 font-bold">{bk.status}</span>
+            {MOCK_BACKUP_SNAPSHOTS.length === 0 ? (
+              <div className="py-8 text-center text-xs text-muted-foreground space-y-1">
+                <Database className="size-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="font-medium text-foreground">No Snapshots Found</p>
+                <p className="text-[11px]">Trigger a snapshot in Backup & Recovery.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {MOCK_BACKUP_SNAPSHOTS.map((bk) => (
+                  <div key={bk.id} className="rounded-xl border border-border/50 bg-card/40 p-3 text-xs space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-primary">{bk.size}</span>
+                      <span className="text-[10px] text-emerald-500 font-bold">{bk.status}</span>
+                    </div>
+                    <p className="font-mono text-[11px] text-foreground truncate">{bk.snapshotName}</p>
+                    <p className="text-[10px] text-muted-foreground">{bk.createdAt}</p>
                   </div>
-                  <p className="font-mono text-[11px] text-foreground truncate">{bk.snapshotName}</p>
-                  <p className="text-[10px] text-muted-foreground">{bk.createdAt}</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

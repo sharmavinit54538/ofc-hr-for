@@ -1,20 +1,39 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GenericSubModuleView } from "@/components/admin/generic-module-view";
+import { useListJobsQuery } from "@/services/recruitmentApi";
+import { CreateJobDialog } from "@/components/recruitment/create-job-dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/recruitment/jobs")({
-  component: () => (
-    <GenericSubModuleView
-      href="/dashboard/recruitment/jobs"
-      parentHref="/dashboard/recruitment"
-      parentLabel="Recruitment"
-      title="Job Requisitions"
-      description="Active job openings, applicant pipelines, and hiring manager assignments."
-      items={[
-        { id: "1", title: "Senior Staff AI Engineer", subtitle: "Product Engineering · Full-time", status: "18 Applicants", date: "Posted 3 days ago", metric: "$140k - $180k" },
-        { id: "2", title: "HR Business Partner", subtitle: "Human Resources · Full-time", status: "42 Applicants", date: "Posted 1 week ago", metric: "$95k - $120k" },
-        { id: "3", title: "DevOps Tech Lead", subtitle: "IT & Security · Remote", status: "24 Applicants", date: "Posted 2 weeks ago", metric: "$130k - $160k" },
-        { id: "4", title: "Product Marketing Manager", subtitle: "Growth · Full-time", status: "56 Applicants", date: "Posted 5 days ago", metric: "$110k - $135k" },
-      ]}
-    />
-  ),
+  component: RecruitmentJobsPage,
 });
+
+function RecruitmentJobsPage() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const { data, isLoading } = useListJobsQuery({ page: 1, page_size: 50 });
+
+  const items = (data?.data?.items ?? []).map((job) => ({
+    id: job.id,
+    title: job.title,
+    subtitle: `${job.department ?? "—"} · ${job.employment_type ?? "—"}`,
+    status: `${job.applicant_count ?? 0} Applicants`,
+    date: job.posted_at ? `Posted ${job.posted_at}` : "—",
+    metric: job.salary_min && job.salary_max ? `$${job.salary_min} - $${job.salary_max}` : undefined,
+  }));
+
+  return (
+    <>
+      <GenericSubModuleView
+        parentHref="/dashboard/recruitment"
+        parentLabel="Recruitment"
+        title="Job Requisitions"
+        description="Active job openings, applicant pipelines, and hiring manager assignments."
+        items={items}
+        isLoading={isLoading}
+        showActions
+        onCreate={() => setIsCreateOpen(true)}
+      />
+      <CreateJobDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+    </>
+  );
+}

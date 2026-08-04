@@ -1,234 +1,242 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  FolderTree,
-  Plus,
-  Laptop,
-  Monitor,
-  Tv,
-  Smartphone,
-  Tablet,
-  Printer,
-  Fingerprint,
-  CreditCard,
-  Key,
-  Headphones,
-  Keyboard,
-  Mouse,
-  Armchair,
-  Box,
-  CheckCircle2,
-  Clock,
-  SlidersHorizontal,
-} from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_CATEGORIES, AssetCategoryInfo } from "@/lib/assets/mock-data";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  useListAssetCategoriesQuery,
+  useCreateAssetCategoryMutation,
+  useUpdateAssetCategoryMutation,
+  useDeleteAssetCategoryMutation,
+} from "@/services/assetsApi";
+import { toast } from "sonner";
+import {
+  Plus,
+  Inbox,
+  AlertTriangle,
+  RefreshCw,
+  FolderTree,
+  Tag,
+  Trash2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/categories")({
-  component: CategoriesPage,
+  component: AssetCategoriesPage,
 });
 
-const ICON_MAP: Record<string, any> = {
-  Laptop: Laptop,
-  Desktop: Monitor,
-  Monitor: Tv,
-  "Mobile Phone": Smartphone,
-  Tablet: Tablet,
-  Printer: Printer,
-  "Biometric Device": Fingerprint,
-  "ID Card": CreditCard,
-  "Access Card": Key,
-  Headset: Headphones,
-  Keyboard: Keyboard,
-  Mouse: Mouse,
-  "Office Furniture": Armchair,
-  Other: Box,
-};
+function AssetCategoriesPage() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
+  const [description, setDescription] = useState("");
 
-function CategoriesPage() {
-  const [categories, setCategories] = useState<AssetCategoryInfo[]>(MOCK_CATEGORIES);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data, isLoading, isError, refetch } = useListAssetCategoriesQuery();
+  const [createCategory, { isLoading: isCreating }] = useCreateAssetCategoryMutation();
+  const [deleteCategory] = useDeleteAssetCategoryMutation();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    depreciationYears: 3,
-    description: "",
-  });
+  const categories = data?.data ?? [];
 
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      toast.error("Please enter a category name.");
+    if (!name || !code) {
+      toast.error("Please fill in category name and code.");
       return;
     }
 
-    const newCat: AssetCategoryInfo = {
-      name: formData.name as any,
-      totalCount: 0,
-      assignedCount: 0,
-      availableCount: 0,
-      depreciationYears: Number(formData.depreciationYears) || 3,
-      iconName: "Box",
-      description: formData.description || "Custom category classification",
-    };
+    try {
+      await createCategory({ name, code, description }).unwrap();
+      toast.success("Asset category created successfully.");
+      setIsCreateOpen(false);
+      setName("");
+      setCode("");
+      setDescription("");
+    } catch {
+      toast.error("Failed to create asset category.");
+    }
+  };
 
-    setCategories([...categories, newCat]);
-    setIsModalOpen(false);
-    toast.success("Category Created", {
-      description: `${newCat.name} classification added to asset taxonomy.`,
-    });
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+    try {
+      await deleteCategory(id).unwrap();
+      toast.success("Category deleted.");
+    } catch {
+      toast.error("Failed to delete category.");
+    }
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Asset Categories & Taxonomies"
-        description="Standardized hardware classification rules, depreciation schedules, and inventory volume breakdown across all 14 enterprise device types."
+        title="Asset Categories"
+        description="Classify hardware, software licenses, office furniture, and mobile equipment."
         breadcrumbs={[
-          { label: "Asset Management", href: "/dashboard/assets" },
+          { label: "Assets", href: "/dashboard/assets" },
           { label: "Categories" },
         ]}
-        backHref="/dashboard/assets"
-        backLabel="Back to Asset Management"
         actions={
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsCreateOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
           >
-            <Plus className="size-4" /> Add Category Policy
+            <Plus className="size-4" /> Add Category
           </button>
         }
       />
 
-      {/* Grid of all 14 Categories */}
-      <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {categories.map((cat) => {
-          const IconComponent = ICON_MAP[cat.name] || Box;
-          const utilization = cat.totalCount > 0 ? Math.round((cat.assignedCount / cat.totalCount) * 100) : 0;
-
-          return (
-            <div key={cat.name} className="glass-tile space-y-4 rounded-2xl p-5 flex flex-col justify-between transition-all hover-lift">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-brand text-primary-foreground shadow-glow">
-                    <IconComponent className="size-5" />
+      {/* ── Content Area ── */}
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-tile h-32 animate-pulse rounded-2xl p-5" />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <AlertTriangle className="size-8 text-destructive" />
+          <h3 className="mt-3 font-display text-base font-bold text-foreground">
+            Failed to load asset categories
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            An error occurred while fetching categories from PostgreSQL.
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <RefreshCw className="size-4" /> Retry
+          </button>
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+            <Inbox className="size-6" />
+          </div>
+          <h3 className="mt-4 font-display text-base font-bold text-foreground">
+            No asset categories defined
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            No categories exist in PostgreSQL. Add your first category.
+          </p>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <Plus className="size-4" /> Add Category
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {categories.map((cat) => (
+            <div
+              key={cat.id}
+              className="glass-tile group flex flex-col justify-between rounded-2xl p-5 border border-border transition-all duration-300 hover-lift hover:border-primary/40"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                    <FolderTree className="size-5" />
                   </div>
-                  <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground border border-border/60">
-                    {cat.depreciationYears} Yr Lifespan
+                  <span className="rounded-full bg-secondary border border-border px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground">
+                    Code: {cat.code}
                   </span>
                 </div>
 
-                <div>
-                  <h3 className="font-display text-base font-bold text-foreground">{cat.name}</h3>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">{cat.description}</p>
-                </div>
+                <h3 className="mt-3 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  {cat.name}
+                </h3>
+
+                {cat.description && (
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                    {cat.description}
+                  </p>
+                )}
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-border/40 text-xs">
-                <div className="flex items-center justify-between font-semibold">
-                  <span className="text-muted-foreground">Total Assets:</span>
-                  <span className="text-foreground font-bold">{cat.totalCount}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Assigned / Available:</span>
-                  <span className="text-foreground">
-                    <strong className="text-emerald-400">{cat.assignedCount}</strong> / {cat.availableCount}
-                  </span>
-                </div>
-
-                {/* Progress bar */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono">
-                    <span>Utilization</span>
-                    <span>{utilization}%</span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                    <div
-                      className="h-full bg-gradient-brand transition-all duration-300"
-                      style={{ width: `${utilization}%` }}
-                    />
-                  </div>
-                </div>
+              <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-between text-xs">
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Tag className="size-3" /> Active Category
+                </span>
+                <button
+                  onClick={() => handleDelete(cat.id)}
+                  className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Delete Category"
+                >
+                  <Trash2 className="size-4" />
+                </button>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold">Configure Category Policy</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Define a new asset taxonomy class and financial depreciation lifecycle.
-            </DialogDescription>
-          </DialogHeader>
+      {/* ── Add Category Modal ── */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="glass-tile w-full max-w-md rounded-2xl p-6 border border-border">
+            <h3 className="text-base font-bold font-display text-foreground mb-4">
+              Add Asset Category
+            </h3>
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Category Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Laptops & Computers"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                />
+              </div>
 
-          <form onSubmit={handleAddCategory} className="mt-4 space-y-3 text-xs">
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Category Name</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. VR Headset / Server Rack"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Category Code
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="e.g. LAP"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                />
+              </div>
 
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Depreciation Lifespan (Years)</label>
-              <input
-                type="number"
-                min={1}
-                max={10}
-                value={formData.depreciationYears}
-                onChange={(e) => setFormData({ ...formData, depreciationYears: Number(e.target.value) })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Hardware category guidelines..."
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                />
+              </div>
 
-            <div>
-              <label className="block font-semibold text-muted-foreground mb-1">Category Scope / Description</label>
-              <textarea
-                rows={2}
-                placeholder="Brief description of device class..."
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none resize-none"
-              />
-            </div>
-
-            <DialogFooter className="mt-5 flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-gradient-brand px-5 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
-              >
-                Save Category Policy
-              </button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreating}
+                  className="rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
+                >
+                  {isCreating ? "Saving..." : "Add Category"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,14 +3,26 @@ import { useState } from "react";
 import { Palmtree, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_TEAM_LEAVES, type TeamLeaveApproval } from "@/lib/manager/mock-data";
+
+export interface TeamLeaveApproval {
+  id: string;
+  employeeName: string;
+  employeeId: string;
+  type: string;
+  from: string;
+  to: string;
+  days: number;
+  reason: string;
+  status: "Pending" | "Approved" | "Rejected";
+  appliedDate: string;
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard/manager/leave")({
   component: ManagerLeavePage,
 });
 
 function ManagerLeavePage() {
-  const [leaves, setLeaves] = useState<TeamLeaveApproval[]>(MOCK_TEAM_LEAVES);
+  const [leaves, setLeaves] = useState<TeamLeaveApproval[]>([]);
 
   const handleApprove = (id: string, name: string) => {
     setLeaves(leaves.map((l) => (l.id === id ? { ...l, status: "Approved" } : l)));

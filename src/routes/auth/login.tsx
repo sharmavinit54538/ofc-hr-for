@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Mail } from "lucide-react";
@@ -45,6 +46,15 @@ function LoginPage() {
   const navigate = useNavigate();
   const [loginMutation, { isLoading }] = useLoginMutation();
   const [triggerGetMe] = useLazyGetMeQuery();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("error") === "sso_failed") {
+      toast.error("Google SSO Failed", {
+        description: "Could not complete sign in with Google SSO. Please try again or use password authentication.",
+      });
+    }
+  }, []);
 
   const {
     register,

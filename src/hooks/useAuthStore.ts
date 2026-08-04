@@ -41,7 +41,7 @@ function getStoredCompanyName(): string {
     const saved = localStorage.getItem("ofc_company_name");
     if (saved && saved.trim()) return saved.trim();
   }
-  return "Northwind Industries";
+  return "Enterprise HQ";
 }
 
 function getDerivedState() {

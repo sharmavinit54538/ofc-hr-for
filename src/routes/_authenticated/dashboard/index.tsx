@@ -30,7 +30,7 @@ function MainDashboardOverviewPage() {
 
   const meData = meRes?.data;
   const userName = storeUser?.fullName || meData?.full_name || storeUser?.email || meData?.email || "User";
-  const orgName = organization?.name || "Northwind Industries";
+  const orgName = organization?.name || "Enterprise HQ";
 
   const totalEmployeesCount = employeesRes?.data?.total ?? employeesRes?.data?.items?.length ?? 0;
   const totalDeptsCount = departmentsRes?.data?.length ?? 0;

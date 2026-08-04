@@ -139,12 +139,12 @@ export const AdminSidebar = memo(function AdminSidebar({
         >
           <div className="flex min-w-0 items-center gap-2.5">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-brand font-display text-xs font-bold text-primary-foreground shadow-glow">
-              {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "A"}
+              {user?.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
             </div>
             {!collapsed && (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-bold leading-tight text-foreground">
-                  {user?.fullName ?? "Aarav Mehta"}
+                  {user?.fullName ?? "User"}
                 </p>
                 <p className="truncate text-[11px] font-medium text-muted-foreground/90 mt-0.5">
                   {user?.role === "HR_ADMIN"

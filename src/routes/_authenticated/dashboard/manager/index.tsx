@@ -13,12 +13,20 @@ import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useListEmployeesQuery } from "@/services/employeeApi";
-import {
-  MOCK_TEAM_LEAVES,
-  MOCK_TEAM_GOALS,
-  MOCK_TEAM_ONBOARDING,
-  type TeamLeaveApproval,
-} from "@/lib/manager/mock-data";
+import { useListGoalsQuery } from "@/services/performanceApi";
+
+export interface TeamLeaveApproval {
+  id: string;
+  employeeName: string;
+  employeeId: string;
+  type: string;
+  from: string;
+  to: string;
+  days: number;
+  reason: string;
+  status: "Pending" | "Approved" | "Rejected";
+  appliedDate: string;
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard/manager/")({
   component: ManagerDashboardHome,
@@ -27,7 +35,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/manager/")({
 function ManagerDashboardHome() {
   const user = useAuthStore((s) => s.user);
   const { data: employeesRes, isLoading: isLoadingEmps } = useListEmployeesQuery({ page: 1, page_size: 100 });
-  const [leaves, setLeaves] = useState<TeamLeaveApproval[]>(MOCK_TEAM_LEAVES);
+  const { data: goalsRes } = useListGoalsQuery();
+  const goals = goalsRes?.data?.items ?? [];
+  const [leaves, setLeaves] = useState<TeamLeaveApproval[]>([]);
 
   const pendingLeaves = useMemo(() => leaves.filter((l) => l.status === "Pending"), [leaves]);
 
@@ -188,7 +198,7 @@ function ManagerDashboardHome() {
                 View Performance <ArrowRight className="size-3" />
               </Link>
             </div>
-            {MOCK_TEAM_GOALS.length === 0 ? (
+            {goals.length === 0 ? (
               <div className="py-8 text-center text-xs text-muted-foreground space-y-2">
                 <Target className="size-8 text-muted-foreground/40 mx-auto" />
                 <p className="font-medium text-foreground">No Team Goals Configured</p>
@@ -196,20 +206,17 @@ function ManagerDashboardHome() {
               </div>
             ) : (
               <div className="space-y-3">
-                {MOCK_TEAM_GOALS.map((goal) => (
+                {goals.map((goal) => (
                   <div key={goal.id} className="rounded-xl border border-border/50 bg-card/40 p-3.5 text-xs space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="font-bold text-foreground">{goal.title}</p>
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                        goal.status === "Ahead" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
-                        goal.status === "On Track" ? "bg-sky-500/10 text-sky-500 border border-sky-500/20" : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                      }`}>
+                      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold bg-sky-500/10 text-sky-500 border border-sky-500/20">
                         {goal.status}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span>Assignee: <strong className="text-foreground">{goal.assignee}</strong></span>
-                      <span>Due: {goal.dueDate}</span>
+                      <span>Type: <strong className="text-foreground">{goal.goal_type}</strong></span>
+                      <span>Target: {goal.target_date || "—"}</span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
                       <div className="h-full bg-gradient-brand" style={{ width: `${goal.progress}%` }} />
@@ -266,26 +273,9 @@ function ManagerDashboardHome() {
             <h3 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
               <Sparkles className="size-4 text-purple-500" /> New Hire Onboarding
             </h3>
-            {MOCK_TEAM_ONBOARDING.length === 0 ? (
-              <div className="py-6 text-center text-xs text-muted-foreground">
-                No active new hire onboarding pipelines.
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {MOCK_TEAM_ONBOARDING.map((item) => (
-                  <div key={item.id} className="rounded-xl border border-border/50 bg-card/40 p-3 text-xs space-y-2">
-                    <div className="flex items-center justify-between font-bold text-foreground">
-                      <span>{item.newHire}</span>
-                      <span className="text-primary font-mono">{item.progress}%</span>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground">{item.role} · Buddy: {item.buddy}</p>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full bg-gradient-brand" style={{ width: `${item.progress}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="py-6 text-center text-xs text-muted-foreground">
+              No active new hire onboarding pipelines.
+            </div>
           </div>
         </div>
       </div>

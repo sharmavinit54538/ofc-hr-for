@@ -1,719 +1,458 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { PageHeader } from "@/components/admin/page-header";
+import {
+  useListAssetsQuery,
+  useCreateAssetMutation,
+  useUpdateAssetMutation,
+  useDeleteAssetMutation,
+  useListAssetCategoriesQuery,
+  useListAssetVendorsQuery,
+  useExportAssetsReportMutation,
+} from "@/services/assetsApi";
+import { toast } from "sonner";
 import {
   Plus,
   Search,
-  Filter,
   Download,
-  MoreHorizontal,
-  Eye,
-  Pencil,
-  Trash2,
-  Package,
-  User,
-  Building2,
-  Calendar,
-  ShieldCheck,
+  Inbox,
   AlertTriangle,
-  RotateCcw,
-  UserCheck,
-  CheckCircle2,
-  Wrench,
-  XCircle,
+  RefreshCw,
+  Package,
+  Trash2,
+  Filter,
+  Tag,
+  DollarSign,
+  MapPin,
+  Barcode,
 } from "lucide-react";
-import { toast } from "sonner";
-import { PageHeader } from "@/components/admin/page-header";
-import {
-  MOCK_ASSETS,
-  AssetRecord,
-  AssetCategory,
-  AssetStatus,
-} from "@/lib/assets/mock-data";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { AssetStatus, AssetCondition } from "@/types/asset";
 
 export const Route = createFileRoute("/_authenticated/dashboard/assets/inventory")({
-  component: InventoryPage,
+  component: AssetInventoryPage,
 });
 
-const ALL_CATEGORIES: (AssetCategory | "All Categories")[] = [
-  "All Categories",
-  "Laptop",
-  "Desktop",
-  "Monitor",
-  "Mobile Phone",
-  "Tablet",
-  "Printer",
-  "Biometric Device",
-  "ID Card",
-  "Access Card",
-  "Headset",
-  "Keyboard",
-  "Mouse",
-  "Office Furniture",
-  "Other",
-];
+function AssetInventoryPage() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-const ALL_STATUSES: (AssetStatus | "All Statuses")[] = [
-  "All Statuses",
-  "Available",
-  "Assigned",
-  "Maintenance",
-  "Lost",
-  "Retired",
-];
+  // Form states
+  const [tagId, setTagId] = useState(`AST-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [name, setName] = useState("");
+  const [serialNumber, setSerialNumber] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [vendorId, setVendorId] = useState("");
+  const [purchaseCost, setPurchaseCost] = useState<number>(1200);
+  const [department, setDepartment] = useState("Product Engineering");
+  const [location, setLocation] = useState("HQ");
 
-function InventoryPage() {
-  const [assets, setAssets] = useState<AssetRecord[]>(MOCK_ASSETS);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<AssetCategory | "All Categories">("All Categories");
-  const [selectedStatus, setSelectedStatus] = useState<AssetStatus | "All Statuses">("All Statuses");
-
-  // Modals
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [viewingAsset, setViewingAsset] = useState<AssetRecord | null>(null);
-  const [editingAsset, setEditingAsset] = useState<AssetRecord | null>(null);
-  const [deletingAsset, setDeletingAsset] = useState<AssetRecord | null>(null);
-
-  // Form State for Add
-  const [formData, setFormData] = useState({
-    name: "",
-    category: "Laptop" as AssetCategory,
-    assignedTo: "Unassigned",
-    department: "Product Engineering",
-    status: "Available" as AssetStatus,
-    purchaseDate: new Date().toISOString().split("T")[0],
-    warranty: "Active (3 Years)",
-    serialNumber: "",
-    purchaseCost: 1200,
-    location: "Bengaluru HQ - IT Stock Room",
-    vendor: "Apple Enterprise Direct",
+  // API Hooks
+  const { data, isLoading, isError, refetch } = useListAssetsQuery({
+    page,
+    page_size: 15,
+    search: search || undefined,
+    status: statusFilter || undefined,
+    category_id: categoryFilter || undefined,
   });
 
-  const filteredAssets = useMemo(() => {
-    return assets.filter((asset) => {
-      const matchesSearch =
-        asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.assetId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.assignedTo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.department.toLowerCase().includes(searchQuery.toLowerCase());
+  const { data: categoriesData } = useListAssetCategoriesQuery();
+  const { data: vendorsData } = useListAssetVendorsQuery();
 
-      const matchesCat =
-        selectedCategory === "All Categories" || asset.category === selectedCategory;
+  const [createAsset, { isLoading: isCreating }] = useCreateAssetMutation();
+  const [updateAsset] = useUpdateAssetMutation();
+  const [deleteAsset] = useDeleteAssetMutation();
+  const [exportReport, { isLoading: isExporting }] = useExportAssetsReportMutation();
 
-      const matchesStatus =
-        selectedStatus === "All Statuses" || asset.status === selectedStatus;
+  const assets = data?.data?.items ?? [];
+  const totalPages = data?.data?.total_pages ?? 1;
+  const categories = categoriesData?.data ?? [];
+  const vendors = vendorsData?.data ?? [];
 
-      return matchesSearch && matchesCat && matchesStatus;
-    });
-  }, [assets, searchQuery, selectedCategory, selectedStatus]);
+  const handleExport = async () => {
+    try {
+      const blob = await exportReport({ format: "csv" }).unwrap();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `assets_inventory_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("Assets inventory report exported.");
+    } catch {
+      toast.error("Failed to export report.");
+    }
+  };
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.serialNumber.trim()) {
-      toast.error("Please enter asset name and serial number.");
+    if (!tagId || !name || !serialNumber) {
+      toast.error("Please fill in Asset Tag, Name, and Serial Number.");
       return;
     }
 
-    const newRecord: AssetRecord = {
-      id: `ast_${Date.now()}`,
-      assetId: `AST-${Math.floor(8850 + Math.random() * 900)}`,
-      name: formData.name.trim(),
-      category: formData.category,
-      assignedTo: formData.assignedTo.trim() || "Unassigned",
-      department: formData.department,
-      status: formData.status,
-      purchaseDate: formData.purchaseDate || new Date().toISOString().split("T")[0]!,
-      warranty: formData.warranty,
-      serialNumber: formData.serialNumber.trim(),
-      purchaseCost: Number(formData.purchaseCost) || 0,
-      currentValue: Number(formData.purchaseCost) || 0,
-      location: formData.location,
-      vendor: formData.vendor,
-    };
+    try {
+      await createAsset({
+        tag_id: tagId,
+        name,
+        serial_number: serialNumber,
+        category_id: categoryId || undefined,
+        vendor_id: vendorId || undefined,
+        purchase_cost: purchaseCost,
+        department,
+        location,
+      }).unwrap();
 
-    setAssets([newRecord, ...assets]);
-    setIsAddModalOpen(false);
-    toast.success("Asset Added to Inventory", {
-      description: `${newRecord.name} (${newRecord.assetId}) successfully registered.`,
-    });
-
-    setFormData({
-      name: "",
-      category: "Laptop",
-      assignedTo: "Unassigned",
-      department: "Product Engineering",
-      status: "Available",
-      purchaseDate: new Date().toISOString().split("T")[0],
-      warranty: "Active (3 Years)",
-      serialNumber: "",
-      purchaseCost: 1200,
-      location: "Bengaluru HQ - IT Stock Room",
-      vendor: "Apple Enterprise Direct",
-    });
+      toast.success("Asset registered in inventory successfully.");
+      setIsCreateOpen(false);
+      setName("");
+      setSerialNumber("");
+      setTagId(`AST-${Math.floor(1000 + Math.random() * 9000)}`);
+    } catch {
+      toast.error("Failed to create asset.");
+    }
   };
 
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingAsset) return;
-
-    setAssets(assets.map((a) => (a.id === editingAsset.id ? editingAsset : a)));
-    setEditingAsset(null);
-    toast.success("Asset Updated", {
-      description: `Saved changes for ${editingAsset.assetId}.`,
-    });
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this asset from inventory?")) return;
+    try {
+      await deleteAsset(id).unwrap();
+      toast.success("Asset deleted.");
+    } catch {
+      toast.error("Failed to delete asset.");
+    }
   };
 
-  const handleConfirmDelete = () => {
-    if (!deletingAsset) return;
-    setAssets(assets.filter((a) => a.id !== deletingAsset.id));
-    toast.success("Asset Removed", {
-      description: `Asset ${deletingAsset.assetId} deleted from system.`,
-    });
-    setDeletingAsset(null);
-  };
-
-  const renderStatusBadge = (status: AssetStatus) => {
+  const getStatusBadge = (status: AssetStatus) => {
     switch (status) {
-      case "Available":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-0.5 text-[10px] font-bold text-sky-400">
-            <CheckCircle2 className="size-3" /> Available
-          </span>
-        );
-      case "Assigned":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
-            <UserCheck className="size-3" /> Assigned
-          </span>
-        );
-      case "Maintenance":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-400">
-            <Wrench className="size-3" /> Maintenance
-          </span>
-        );
-      case "Lost":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/20 bg-rose-500/10 px-2.5 py-0.5 text-[10px] font-bold text-rose-400">
-            <AlertTriangle className="size-3" /> Lost
-          </span>
-        );
-      case "Retired":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-500/20 bg-slate-500/10 px-2.5 py-0.5 text-[10px] font-bold text-slate-400">
-            <XCircle className="size-3" /> Retired
-          </span>
-        );
+      case "AVAILABLE":
+        return <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-500">Available</span>;
+      case "ASSIGNED":
+        return <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 text-[10px] font-bold text-blue-500">Assigned</span>;
+      case "IN_REPAIR":
+        return <span className="rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 text-[10px] font-bold text-amber-500">In Repair</span>;
+      case "DAMAGED":
+        return <span className="rounded-full bg-rose-500/10 border border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold text-rose-500">Damaged</span>;
+      case "LOST":
+        return <span className="rounded-full bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 text-[10px] font-bold text-purple-500">Lost</span>;
       default:
-        return null;
+        return <span className="rounded-full bg-secondary border border-border px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground">Disposed</span>;
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* ── Page Header ────────────────────────────────────────── */}
       <PageHeader
-        title="Asset Inventory Registry"
-        description="Comprehensive hardware and equipment inventory table. View details, serial numbers, allocation status, and warranties."
+        title="Asset Inventory"
+        description="Comprehensive list of company hardware, electronics, licenses, and furniture."
         breadcrumbs={[
-          { label: "Asset Management", href: "/dashboard/assets" },
+          { label: "Assets", href: "/dashboard/assets" },
           { label: "Inventory" },
         ]}
-        backHref="/dashboard/assets"
-        backLabel="Back to Asset Management"
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => toast.success("Exporting Inventory CSV")}
-              className="glass-tile inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+              onClick={handleExport}
+              disabled={isExporting}
+              className="glass-tile inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary disabled:opacity-50"
             >
-              <Download className="size-3.5" /> Export CSV
+              <Download className="size-3.5" /> {isExporting ? "Exporting..." : "Export CSV"}
             </button>
             <button
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => setIsCreateOpen(true)}
               className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
             >
-              <Plus className="size-4" /> Add Asset
+              <Plus className="size-4" /> Register Asset
             </button>
           </div>
         }
       />
 
-      {/* ── Filter Toolbar ────────────────────────────────────── */}
+      {/* ── Toolbar ── */}
       <div className="glass-tile flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by Asset ID, Name, Serial No, Employee, Dept..."
-            className="w-full rounded-xl border border-input bg-card/60 py-2 pl-9 pr-4 text-xs outline-none focus:border-ring focus:shadow-glow"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search assets by tag, name, or serial number..."
+            className="w-full rounded-xl border border-input bg-card/60 py-2 pl-9 pr-4 text-xs outline-none focus:border-ring focus:shadow-glow placeholder:text-muted-foreground/60"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Category Filter */}
-          <div className="relative flex items-center rounded-xl border border-input bg-card/60 px-3 py-1.5">
-            <Filter className="mr-2 size-3.5 text-muted-foreground" />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Filter className="size-3.5" />
             <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as any)}
-              className="bg-transparent text-xs font-semibold outline-none cursor-pointer"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="rounded-xl border border-input bg-card/60 py-1.5 px-3 text-xs text-foreground outline-none"
             >
-              {ALL_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat} className="bg-card text-foreground">
-                  {cat}
-                </option>
-              ))}
+              <option value="">All Statuses</option>
+              <option value="AVAILABLE">Available</option>
+              <option value="ASSIGNED">Assigned</option>
+              <option value="IN_REPAIR">In Repair</option>
+              <option value="DAMAGED">Damaged</option>
+              <option value="LOST">Lost</option>
             </select>
           </div>
 
-          {/* Status Filter */}
-          <div className="relative flex items-center rounded-xl border border-input bg-card/60 px-3 py-1.5">
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value as any)}
-              className="bg-transparent text-xs font-semibold outline-none cursor-pointer"
-            >
-              {ALL_STATUSES.map((st) => (
-                <option key={st} value={st} className="bg-card text-foreground">
-                  {st}
-                </option>
-              ))}
-            </select>
+          <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setPage(1);
+            }}
+            className="rounded-xl border border-input bg-card/60 py-1.5 px-3 text-xs text-foreground outline-none"
+          >
+            <option value="">All Categories</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* ── Content Area ── */}
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-tile h-36 animate-pulse rounded-2xl p-5" />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <AlertTriangle className="size-8 text-destructive" />
+          <h3 className="mt-3 font-display text-base font-bold text-foreground">
+            Failed to load asset inventory
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            An error occurred while fetching asset records from PostgreSQL.
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <RefreshCw className="size-4" /> Retry
+          </button>
+        </div>
+      ) : assets.length === 0 ? (
+        <div className="glass-tile flex flex-col items-center justify-center rounded-2xl p-12 text-center">
+          <div className="grid size-12 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+            <Inbox className="size-6" />
           </div>
-
-          <span className="glass-tile rounded-xl px-3 py-2 text-xs font-semibold text-muted-foreground">
-            Total ({filteredAssets.length})
-          </span>
+          <h3 className="mt-4 font-display text-base font-bold text-foreground">
+            No assets found
+          </h3>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            No asset records exist in PostgreSQL matching your criteria.
+          </p>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <Plus className="size-4" /> Register Asset
+          </button>
         </div>
-      </div>
-
-      {/* ── Asset Inventory Table ───────────────────────────── */}
-      <div className="glass-tile overflow-hidden rounded-2xl border border-border">
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border/60 bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3.5 font-bold">Asset ID</th>
-                <th className="px-5 py-3.5 font-bold">Asset Name</th>
-                <th className="px-5 py-3.5 font-bold">Category</th>
-                <th className="px-5 py-3.5 font-bold">Assigned To</th>
-                <th className="px-5 py-3.5 font-bold">Department</th>
-                <th className="px-5 py-3.5 font-bold">Status</th>
-                <th className="px-5 py-3.5 font-bold">Purchase Date</th>
-                <th className="px-5 py-3.5 font-bold">Warranty</th>
-                <th className="px-5 py-3.5 font-bold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {filteredAssets.map((asset) => (
-                <tr key={asset.id} className="transition-colors hover:bg-secondary/40">
-                  <td className="px-5 py-4 font-mono font-bold text-primary">
-                    {asset.assetId}
-                  </td>
-                  <td className="px-5 py-4 font-bold text-foreground">
-                    <div>
-                      <p>{asset.name}</p>
-                      <p className="font-mono text-[10px] text-muted-foreground">SN: {asset.serialNumber}</p>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex items-center rounded-lg bg-secondary/80 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-                      {asset.category}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-foreground font-medium">
-                    {asset.assignedTo}
-                  </td>
-                  <td className="px-5 py-4 text-muted-foreground">{asset.department}</td>
-                  <td className="px-5 py-4">{renderStatusBadge(asset.status)}</td>
-                  <td className="px-5 py-4 font-mono text-muted-foreground">{asset.purchaseDate}</td>
-                  <td className="px-5 py-4 text-muted-foreground text-[11px] font-medium">{asset.warranty}</td>
-                  <td className="px-5 py-4 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          type="button"
-                          className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground"
-                        >
-                          <MoreHorizontal className="size-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44 glass-elevated rounded-xl p-1.5">
-                        <DropdownMenuItem
-                          onClick={() => setViewingAsset(asset)}
-                          className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold cursor-pointer"
-                        >
-                          <Eye className="size-4 text-muted-foreground" /> View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setEditingAsset(asset)}
-                          className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold cursor-pointer"
-                        >
-                          <Pencil className="size-4 text-muted-foreground" /> Edit Asset
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="my-1 bg-border/60" />
-                        <DropdownMenuItem
-                          onClick={() => setDeletingAsset(asset)}
-                          className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold text-destructive cursor-pointer hover:bg-destructive/10"
-                        >
-                          <Trash2 className="size-4 text-destructive" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* ── Add Asset Dialog ─────────────────────────────────── */}
-      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold">Add Inventory Asset</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              Register a new hardware item into Northwind's central repository.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleAddSubmit} className="mt-4 space-y-4 text-xs">
-            <div>
-              <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Asset Name
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. MacBook Pro 16 M3 Max"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none focus:border-ring"
-              />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {assets.map((asset) => (
+            <div
+              key={asset.id}
+              className="glass-tile group flex flex-col justify-between rounded-2xl p-5 border border-border transition-all duration-300 hover-lift hover:border-primary/40"
+            >
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                  Category
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value as AssetCategory })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none cursor-pointer"
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                    <Tag className="size-3" /> {asset.tag_id}
+                  </span>
+                  {getStatusBadge(asset.status)}
+                </div>
+
+                <h3 className="mt-3 font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  {asset.name}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <Barcode className="size-3 text-muted-foreground/70" /> SN: {asset.serial_number}
+                </p>
+
+                <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                  <p>Category: <span className="text-foreground font-semibold">{asset.category_name || "General"}</span></p>
+                  {asset.assigned_to_name && (
+                    <p className="text-emerald-500 font-semibold">Assigned to: {asset.assigned_to_name}</p>
+                  )}
+                  <p className="flex items-center gap-1">
+                    <MapPin className="size-3" /> {asset.location} · {asset.department}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-between text-xs">
+                <span className="font-bold text-foreground flex items-center gap-0.5">
+                  <DollarSign className="size-3.5 text-muted-foreground" /> {asset.purchase_cost.toLocaleString()}
+                </span>
+
+                <button
+                  onClick={() => handleDelete(asset.id)}
+                  className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Delete Asset"
                 >
-                  {ALL_CATEGORIES.filter((c) => c !== "All Categories").map((c) => (
-                    <option key={c} value={c} className="bg-card text-foreground">
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Register Asset Modal ── */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="glass-tile w-full max-w-md rounded-2xl p-6 border border-border">
+            <h3 className="text-base font-bold font-display text-foreground mb-4">
+              Register New Asset
+            </h3>
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Asset Tag ID
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={tagId}
+                    onChange={(e) => setTagId(e.target.value)}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Serial Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={serialNumber}
+                    onChange={(e) => setSerialNumber(e.target.value)}
+                    placeholder="e.g. C02F1234MD6R"
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                  Status
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as AssetStatus })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none cursor-pointer"
-                >
-                  {ALL_STATUSES.filter((s) => s !== "All Statuses").map((s) => (
-                    <option key={s} value={s} className="bg-card text-foreground">
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                  Serial Number
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Asset Name / Model
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="C02G4109MD6R"
-                  value={formData.serialNumber}
-                  onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none focus:border-ring"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. MacBook Pro 16 M3 Max"
+                  className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                  Purchase Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.purchaseDate}
-                  onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none focus:border-ring"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                  Assigned To
-                </label>
-                <input
-                  type="text"
-                  placeholder="Employee Name or Unassigned"
-                  value={formData.assignedTo}
-                  onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none focus:border-ring"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                  Department
-                </label>
-                <input
-                  type="text"
-                  value={formData.department}
-                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-card/70 px-3 py-2.5 outline-none focus:border-ring"
-                />
-              </div>
-            </div>
-
-            <DialogFooter className="mt-6 flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-gradient-brand px-5 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
-              >
-                Create Asset
-              </button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* ── View Details Modal ────────────────────────────────── */}
-      <Dialog open={Boolean(viewingAsset)} onOpenChange={(o) => !o && setViewingAsset(null)}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float">
-          {viewingAsset && (
-            <>
-              <DialogHeader>
-                <div className="flex items-center gap-3">
-                  <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-brand text-primary-foreground font-display text-lg font-bold shadow-glow">
-                    {viewingAsset.category.charAt(0)}
-                  </div>
-                  <div>
-                    <DialogTitle className="font-display text-lg font-bold">
-                      {viewingAsset.name}
-                    </DialogTitle>
-                    <DialogDescription className="text-xs text-muted-foreground font-mono">
-                      {viewingAsset.assetId} · SN: {viewingAsset.serialNumber}
-                    </DialogDescription>
-                  </div>
-                </div>
-              </DialogHeader>
-
-              <div className="mt-4 space-y-3 rounded-xl border border-border/60 bg-card/40 p-4 text-xs">
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="text-muted-foreground">Category:</span>
-                  <span className="font-bold text-foreground">{viewingAsset.category}</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="text-muted-foreground">Assigned User:</span>
-                  <span className="font-bold text-foreground">{viewingAsset.assignedTo}</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="text-muted-foreground">Department:</span>
-                  <span className="font-semibold text-foreground">{viewingAsset.department}</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="text-muted-foreground">Status:</span>
-                  {renderStatusBadge(viewingAsset.status)}
-                </div>
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="text-muted-foreground">Vendor:</span>
-                  <span className="font-semibold text-foreground">{viewingAsset.vendor}</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="text-muted-foreground">Location:</span>
-                  <span className="font-semibold text-foreground">{viewingAsset.location}</span>
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-muted-foreground">Original Cost:</span>
-                  <span className="font-bold text-primary">${viewingAsset.purchaseCost}</span>
-                </div>
-              </div>
-
-              <DialogFooter className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setViewingAsset(null)}
-                  className="rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
-                >
-                  Close
-                </button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Edit Details Modal ────────────────────────────────── */}
-      <Dialog open={Boolean(editingAsset)} onOpenChange={(o) => !o && setEditingAsset(null)}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float sm:max-w-lg">
-          {editingAsset && (
-            <form onSubmit={handleEditSubmit}>
-              <DialogHeader>
-                <DialogTitle className="font-display text-xl font-bold">Edit Asset {editingAsset.assetId}</DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground">
-                  Update asset details and assignments.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="mt-4 space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-muted-foreground mb-1">Asset Name</label>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Category
+                  </label>
+                  <select
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  >
+                    <option value="">Select Category...</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Vendor
+                  </label>
+                  <select
+                    value={vendorId}
+                    onChange={(e) => setVendorId(e.target.value)}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  >
+                    <option value="">Select Vendor...</option>
+                    {vendors.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Purchase Cost ($)
+                  </label>
                   <input
-                    type="text"
+                    type="number"
                     required
-                    value={editingAsset.name}
-                    onChange={(e) => setEditingAsset({ ...editingAsset, name: e.target.value })}
-                    className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
+                    value={purchaseCost}
+                    onChange={(e) => setPurchaseCost(Number(e.target.value))}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
                   />
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <label className="block font-semibold text-muted-foreground mb-1">Assigned To</label>
-                    <input
-                      type="text"
-                      value={editingAsset.assignedTo}
-                      onChange={(e) => setEditingAsset({ ...editingAsset, assignedTo: e.target.value })}
-                      className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-muted-foreground mb-1">Department</label>
-                    <input
-                      type="text"
-                      value={editingAsset.department}
-                      onChange={(e) => setEditingAsset({ ...editingAsset, department: e.target.value })}
-                      className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <label className="block font-semibold text-muted-foreground mb-1">Status</label>
-                    <select
-                      value={editingAsset.status}
-                      onChange={(e) => setEditingAsset({ ...editingAsset, status: e.target.value as AssetStatus })}
-                      className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none cursor-pointer"
-                    >
-                      {ALL_STATUSES.filter((s) => s !== "All Statuses").map((s) => (
-                        <option key={s} value={s} className="bg-card text-foreground">
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-muted-foreground mb-1">Warranty Info</label>
-                    <input
-                      type="text"
-                      value={editingAsset.warranty}
-                      onChange={(e) => setEditingAsset({ ...editingAsset, warranty: e.target.value })}
-                      className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="w-full rounded-xl border border-input bg-card p-2 text-xs text-foreground outline-none"
+                  />
                 </div>
               </div>
 
-              <DialogFooter className="mt-6 flex items-center justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setEditingAsset(null)}
-                  className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="rounded-xl border border-input px-4 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-gradient-brand px-5 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
+                  disabled={isCreating}
+                  className="rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
                 >
-                  Save Changes
+                  {isCreating ? "Saving..." : "Register Asset"}
                 </button>
-              </DialogFooter>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Delete Confirmation Modal ─────────────────────────── */}
-      <Dialog open={Boolean(deletingAsset)} onOpenChange={(o) => !o && setDeletingAsset(null)}>
-        <DialogContent className="glass-elevated max-w-md rounded-2xl border border-glass-border p-6 shadow-float">
-          <DialogHeader>
-            <div className="flex items-center gap-3 text-destructive mb-1">
-              <div className="grid size-10 place-items-center rounded-xl bg-destructive/10">
-                <AlertTriangle className="size-5" />
               </div>
-              <DialogTitle className="font-display text-xl font-bold">Remove Asset</DialogTitle>
-            </div>
-            <DialogDescription className="text-xs text-muted-foreground pt-2">
-              Are you sure you want to delete <strong className="text-foreground">{deletingAsset?.name} ({deletingAsset?.assetId})</strong>? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter className="mt-6 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setDeletingAsset(null)}
-              className="glass-tile rounded-xl px-4 py-2 text-xs font-semibold"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmDelete}
-              className="rounded-xl bg-destructive px-5 py-2 text-xs font-semibold text-destructive-foreground shadow-glow"
-            >
-              Delete Permanently
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

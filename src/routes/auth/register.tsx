@@ -102,7 +102,7 @@ function RegisterPage() {
       <form onSubmit={onSubmit} className="space-y-3" noValidate>
         <AuthInput
           label="Full name"
-          placeholder="Aarav Mehta"
+          placeholder="John Doe"
           autoComplete="name"
           icon={<User className="size-4" />}
           error={errors.fullName?.message}
