@@ -1,23 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Megaphone, Plus, Search, Eye, Calendar, UserCheck } from "lucide-react";
-import { toast } from "sonner";
+import { Megaphone, Search, Loader2, Inbox } from "lucide-react";
 import { PageHeader } from "@/components/admin/page-header";
-import { MOCK_ANNOUNCEMENTS } from "@/lib/communication/mock-data";
+import { useGetCompanyAnnouncementsQuery } from "@/services/employeeDashboardApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/communication/announcements")({
   component: CommunicationAnnouncementsPage,
 });
 
 function CommunicationAnnouncementsPage() {
-  const [announcements] = useState(MOCK_ANNOUNCEMENTS);
+  const { data: announcementsRes, isLoading } = useGetCompanyAnnouncementsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const announcements = announcementsRes?.data ?? [];
   const [searchQuery, setSearchQuery] = useState("");
 
   const filtered = announcements.filter(
     (a) =>
-      a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.author.toLowerCase().includes(searchQuery.toLowerCase()),
+      (a.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.body || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.priority || "").toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -40,7 +42,7 @@ function CommunicationAnnouncementsPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search announcement title, category, author..."
+            placeholder="Search announcement title, priority, content..."
             className="w-full rounded-xl border border-input bg-card/60 py-2 pl-9 pr-4 text-xs outline-none focus:border-ring"
           />
         </div>
@@ -49,26 +51,36 @@ function CommunicationAnnouncementsPage() {
         </span>
       </div>
 
-      <div className="grid gap-4">
-        {filtered.map((anc) => (
-          <div key={anc.id} className="glass-tile space-y-3 rounded-2xl p-5 transition-all hover-lift">
-            <div className="flex items-center justify-between">
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                {anc.category}
-              </span>
-              <span className="text-xs font-mono text-muted-foreground">{anc.publishedDate}</span>
-            </div>
+      {isLoading ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Loader2 className="size-5 animate-spin text-primary" />
+          Loading company announcements...
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="glass-tile rounded-2xl p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <Inbox className="size-8 text-muted-foreground/50" />
+          <p className="font-medium text-foreground text-sm">No Company Announcements Found</p>
+          <p className="text-[11px] max-w-xs">
+            There are currently no active announcements published.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {filtered.map((anc) => (
+            <div key={anc.id} className="glass-tile space-y-3 rounded-2xl p-5 transition-all hover-lift">
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                  {anc.priority || "Notice"}
+                </span>
+                <span className="text-xs font-mono text-muted-foreground">{anc.date}</span>
+              </div>
 
-            <h3 className="font-display text-lg font-bold text-foreground">{anc.title}</h3>
-            <p className="text-xs leading-relaxed text-muted-foreground">{anc.content}</p>
-
-            <div className="flex items-center justify-between pt-3 border-t border-border/40 text-xs">
-              <span className="text-muted-foreground">Author: <strong className="text-foreground">{anc.author}</strong></span>
-              <span className="font-semibold text-emerald-400">Read Receipts: {anc.readCount} / {anc.totalRecipients} ({Math.round((anc.readCount / anc.totalRecipients) * 100)}%)</span>
+              <h3 className="font-display text-lg font-bold text-foreground">{anc.title}</h3>
+              <p className="text-xs leading-relaxed text-muted-foreground">{anc.body}</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

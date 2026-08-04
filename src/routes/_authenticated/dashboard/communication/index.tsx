@@ -6,20 +6,16 @@ import {
   MessageSquare,
   Target,
   Newspaper,
-  FileText,
-  History,
-  Plus,
-  Send,
   Eye,
-  ArrowRight,
-  Sparkles,
-  Search,
+  Plus,
+  Loader2,
+  Inbox,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
 import { ModuleCard } from "@/components/admin/module-card";
 import { SIDEBAR_NAV_ITEMS } from "@/lib/admin-navigation";
-import { MOCK_ANNOUNCEMENTS, MOCK_SURVEYS, MOCK_POLLS } from "@/lib/communication/mock-data";
+import { useGetCompanyAnnouncementsQuery } from "@/services/employeeDashboardApi";
 import {
   Dialog,
   DialogContent,
@@ -36,17 +32,34 @@ export const Route = createFileRoute("/_authenticated/dashboard/communication/")
 function CommunicationLandingPage() {
   const commNav = SIDEBAR_NAV_ITEMS.find((item) => item.id === "communication");
 
+  const { data: announcementsRes, isLoading } = useGetCompanyAnnouncementsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const announcements = announcementsRes?.data ?? [];
+
   // Modals
   const [isAncModalOpen, setIsAncModalOpen] = useState(false);
   const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
   const [isPollModalOpen, setIsPollModalOpen] = useState(false);
 
+  // Form States
+  const [ancTitle, setAncTitle] = useState("");
+  const [ancCategory, setAncCategory] = useState("Policy Update");
+  const [ancContent, setAncContent] = useState("");
+
   const handleCreateAnnouncement = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!ancTitle.trim() || !ancContent.trim()) {
+      toast.error("Please fill in title and content.");
+      return;
+    }
     toast.success("Announcement Published", {
-      description: "Company notice broadcasted to all workforce channels.",
+      description: `"${ancTitle}" notice broadcasted across company channels.`,
     });
     setIsAncModalOpen(false);
+    setAncTitle("");
+    setAncContent("");
   };
 
   const handleCreateSurvey = (e: React.FormEvent) => {
@@ -66,11 +79,11 @@ function CommunicationLandingPage() {
   };
 
   const kpiCards = [
-    { title: "Total Announcements", value: "14", sub: "Active notices", icon: Megaphone, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-    { title: "Active Notices", value: "8", sub: "Company wide", icon: Newspaper, color: "text-sky-500", bg: "bg-sky-500/10" },
-    { title: "Broadcast Messages", value: "42", sub: "SMS & Email sent", icon: Radio, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { title: "Active Surveys", value: "2", sub: "84% response rate", icon: MessageSquare, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { title: "Employee Polls", value: "3", sub: "Voting open", icon: Target, color: "text-amber-500", bg: "bg-amber-500/10" },
+    { title: "Total Announcements", value: announcements.length.toString(), sub: "Active notices", icon: Megaphone, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+    { title: "Active Notices", value: announcements.length.toString(), sub: "Company wide", icon: Newspaper, color: "text-sky-500", bg: "bg-sky-500/10" },
+    { title: "Broadcast Messages", value: "0", sub: "SMS & Email sent", icon: Radio, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { title: "Active Surveys", value: "0", sub: "0% response rate", icon: MessageSquare, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { title: "Employee Polls", value: "0", sub: "Voting open", icon: Target, color: "text-amber-500", bg: "bg-amber-500/10" },
     { title: "Unread Notices", value: "0", sub: "100% read receipts", icon: Eye, color: "text-rose-500", bg: "bg-rose-500/10" },
   ];
 
@@ -133,64 +146,57 @@ function CommunicationLandingPage() {
         <div className="glass-tile space-y-4 rounded-2xl p-5 lg:col-span-2">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-              <Megaphone className="size-4 text-primary" /> Active Company Announcement
+              <Megaphone className="size-4 text-primary" /> Active Company Announcements
             </h3>
             <Link to="/dashboard/communication/announcements" className="text-xs font-semibold text-primary hover:underline">
-              View All 14
+              View All ({announcements.length})
             </Link>
           </div>
 
-          {MOCK_ANNOUNCEMENTS.slice(0, 2).map((anc) => (
-            <div key={anc.id} className="rounded-xl border border-border/50 bg-card/40 p-4 text-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
-                  {anc.category}
-                </span>
-                <span className="text-muted-foreground text-[11px]">{anc.publishedDate}</span>
-              </div>
-              <h4 className="font-display text-sm font-bold text-foreground">{anc.title}</h4>
-              <p className="text-muted-foreground line-clamp-2">{anc.content}</p>
-              <div className="flex items-center justify-between pt-1 border-t border-border/30 text-[11px] text-muted-foreground">
-                <span>By {anc.author}</span>
-                <span className="font-bold text-emerald-400">Read: {anc.readCount} / {anc.totalRecipients}</span>
-              </div>
+          {isLoading ? (
+            <div className="p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+              <Loader2 className="size-5 animate-spin text-primary" />
+              Loading company announcements...
             </div>
-          ))}
+          ) : announcements.length === 0 ? (
+            <div className="rounded-xl border border-border/40 bg-card/40 p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+              <Inbox className="size-8 text-muted-foreground/50" />
+              <p className="font-medium text-foreground text-sm">No Active Announcements</p>
+              <p className="text-[11px] max-w-xs">
+                There are no active company announcements. Click "Create Announcement" above to publish one.
+              </p>
+            </div>
+          ) : (
+            announcements.slice(0, 2).map((anc) => (
+              <div key={anc.id} className="rounded-xl border border-border/50 bg-card/40 p-4 text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
+                    {anc.priority || "Notice"}
+                  </span>
+                  <span className="text-muted-foreground text-[11px]">{anc.date}</span>
+                </div>
+                <h4 className="font-display text-sm font-bold text-foreground">{anc.title}</h4>
+                <p className="text-muted-foreground line-clamp-2">{anc.body}</p>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Live Employee Poll */}
         <div className="glass-tile space-y-4 rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2">
-              <Target className="size-4 text-amber-500" /> Live Workforce Poll
+              <Target className="size-4 text-amber-500" /> Live Workforce Polls
             </h3>
-            <Link to={"/dashboard/communication/polls" as any} className="text-xs font-semibold text-primary hover:underline">
-              All Polls
-            </Link>
           </div>
 
-          {MOCK_POLLS[0] && (
-            <div className="rounded-xl border border-border/50 bg-card/40 p-4 text-xs space-y-3">
-              <p className="font-bold text-foreground">{MOCK_POLLS[0].question}</p>
-              <div className="space-y-2">
-                {MOCK_POLLS[0].options.map((opt) => (
-                  <div key={opt.label} className="space-y-1">
-                    <div className="flex items-center justify-between font-medium text-[11px]">
-                      <span className="text-foreground">{opt.label}</span>
-                      <span className="text-muted-foreground">{opt.percentage}%</span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full bg-gradient-brand" style={{ width: `${opt.percentage}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1 border-t border-border/30">
-                <span>{MOCK_POLLS[0].totalVotes} votes cast</span>
-                <span className="font-semibold text-primary">Ends {MOCK_POLLS[0].endDate}</span>
-              </div>
-            </div>
-          )}
+          <div className="rounded-xl border border-border/50 bg-card/40 p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+            <Inbox className="size-8 text-muted-foreground/50" />
+            <p className="font-medium text-foreground text-sm">No Active Polls</p>
+            <p className="text-[11px] max-w-xs">
+              Click "Create Poll" above to open a 1-click workforce voting poll.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -217,22 +223,40 @@ function CommunicationLandingPage() {
           <form onSubmit={handleCreateAnnouncement} className="mt-4 space-y-3 text-xs">
             <div>
               <label className="block font-semibold text-muted-foreground mb-1">Announcement Title</label>
-              <input type="text" required placeholder="e.g. Q3 Townhall Meeting" className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none" />
+              <input
+                type="text"
+                required
+                value={ancTitle}
+                onChange={(e) => setAncTitle(e.target.value)}
+                placeholder="e.g. Q3 Townhall Meeting"
+                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none"
+              />
             </div>
 
             <div>
               <label className="block font-semibold text-muted-foreground mb-1">Category</label>
-              <select className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none cursor-pointer">
-                <option>CEO Townhall</option>
-                <option>Policy Update</option>
-                <option>Health & Safety</option>
-                <option>Company Event</option>
+              <select
+                value={ancCategory}
+                onChange={(e) => setAncCategory(e.target.value)}
+                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none cursor-pointer"
+              >
+                <option value="CEO Townhall">CEO Townhall</option>
+                <option value="Policy Update">Policy Update</option>
+                <option value="Health & Safety">Health & Safety</option>
+                <option value="Company Event">Company Event</option>
               </select>
             </div>
 
             <div>
               <label className="block font-semibold text-muted-foreground mb-1">Notice Content</label>
-              <textarea rows={3} required placeholder="Write announcement details..." className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none resize-none" />
+              <textarea
+                rows={3}
+                required
+                value={ancContent}
+                onChange={(e) => setAncContent(e.target.value)}
+                placeholder="Write announcement details..."
+                className="w-full rounded-xl border border-input bg-card/70 px-3 py-2 outline-none resize-none"
+              />
             </div>
 
             <DialogFooter className="mt-5 flex items-center justify-end gap-2 pt-2">
