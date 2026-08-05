@@ -142,6 +142,9 @@ import { Route as AuthenticatedDashboardManagerPerformanceRouteImport } from './
 import { Route as AuthenticatedDashboardManagerReportsRouteImport } from './routes/_authenticated/dashboard/manager/reports'
 import { Route as AuthenticatedDashboardManagerSettingsRouteImport } from './routes/_authenticated/dashboard/manager/settings'
 import { Route as AuthenticatedDashboardManagerTeamRouteImport } from './routes/_authenticated/dashboard/manager/team'
+import { Route as AuthenticatedDashboardOffboardingIndexRouteImport } from './routes/_authenticated/dashboard/offboarding/index'
+import { Route as AuthenticatedDashboardOffboardingChecklistRouteImport } from './routes/_authenticated/dashboard/offboarding/checklist'
+import { Route as AuthenticatedDashboardOffboardingSettlementRouteImport } from './routes/_authenticated/dashboard/offboarding/settlement'
 import { Route as AuthenticatedDashboardOnboardingIndexRouteImport } from './routes/_authenticated/dashboard/onboarding/index'
 import { Route as AuthenticatedDashboardOnboardingDocumentsRouteImport } from './routes/_authenticated/dashboard/onboarding/documents'
 import { Route as AuthenticatedDashboardOnboardingNewHiresRouteImport } from './routes/_authenticated/dashboard/onboarding/new-hires'
@@ -1005,6 +1008,24 @@ const AuthenticatedDashboardManagerTeamRoute =
     path: '/team',
     getParentRoute: () => AuthenticatedDashboardManagerRoute,
   } as any)
+const AuthenticatedDashboardOffboardingIndexRoute =
+  AuthenticatedDashboardOffboardingIndexRouteImport.update({
+    id: '/offboarding/',
+    path: '/offboarding/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardOffboardingChecklistRoute =
+  AuthenticatedDashboardOffboardingChecklistRouteImport.update({
+    id: '/offboarding/checklist',
+    path: '/offboarding/checklist',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardOffboardingSettlementRoute =
+  AuthenticatedDashboardOffboardingSettlementRouteImport.update({
+    id: '/offboarding/settlement',
+    path: '/offboarding/settlement',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardOnboardingIndexRoute =
   AuthenticatedDashboardOnboardingIndexRouteImport.update({
     id: '/onboarding/',
@@ -1591,6 +1612,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/manager/reports': typeof AuthenticatedDashboardManagerReportsRoute
   '/dashboard/manager/settings': typeof AuthenticatedDashboardManagerSettingsRoute
   '/dashboard/manager/team': typeof AuthenticatedDashboardManagerTeamRoute
+  '/dashboard/offboarding/checklist': typeof AuthenticatedDashboardOffboardingChecklistRoute
+  '/dashboard/offboarding/settlement': typeof AuthenticatedDashboardOffboardingSettlementRoute
   '/dashboard/onboarding/documents': typeof AuthenticatedDashboardOnboardingDocumentsRoute
   '/dashboard/onboarding/new-hires': typeof AuthenticatedDashboardOnboardingNewHiresRoute
   '/dashboard/onboarding/tasks': typeof AuthenticatedDashboardOnboardingTasksRoute
@@ -1676,6 +1699,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/it-admin/': typeof AuthenticatedDashboardItAdminIndexRoute
   '/dashboard/leave/': typeof AuthenticatedDashboardLeaveIndexRoute
   '/dashboard/manager/': typeof AuthenticatedDashboardManagerIndexRoute
+  '/dashboard/offboarding/': typeof AuthenticatedDashboardOffboardingIndexRoute
   '/dashboard/onboarding/': typeof AuthenticatedDashboardOnboardingIndexRoute
   '/dashboard/payroll/': typeof AuthenticatedDashboardPayrollIndexRoute
   '/dashboard/performance/': typeof AuthenticatedDashboardPerformanceIndexRoute
@@ -1797,6 +1821,8 @@ export interface FileRoutesByTo {
   '/dashboard/manager/reports': typeof AuthenticatedDashboardManagerReportsRoute
   '/dashboard/manager/settings': typeof AuthenticatedDashboardManagerSettingsRoute
   '/dashboard/manager/team': typeof AuthenticatedDashboardManagerTeamRoute
+  '/dashboard/offboarding/checklist': typeof AuthenticatedDashboardOffboardingChecklistRoute
+  '/dashboard/offboarding/settlement': typeof AuthenticatedDashboardOffboardingSettlementRoute
   '/dashboard/onboarding/documents': typeof AuthenticatedDashboardOnboardingDocumentsRoute
   '/dashboard/onboarding/new-hires': typeof AuthenticatedDashboardOnboardingNewHiresRoute
   '/dashboard/onboarding/tasks': typeof AuthenticatedDashboardOnboardingTasksRoute
@@ -1882,6 +1908,7 @@ export interface FileRoutesByTo {
   '/dashboard/it-admin': typeof AuthenticatedDashboardItAdminIndexRoute
   '/dashboard/leave': typeof AuthenticatedDashboardLeaveIndexRoute
   '/dashboard/manager': typeof AuthenticatedDashboardManagerIndexRoute
+  '/dashboard/offboarding': typeof AuthenticatedDashboardOffboardingIndexRoute
   '/dashboard/onboarding': typeof AuthenticatedDashboardOnboardingIndexRoute
   '/dashboard/payroll': typeof AuthenticatedDashboardPayrollIndexRoute
   '/dashboard/performance': typeof AuthenticatedDashboardPerformanceIndexRoute
@@ -2011,6 +2038,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/manager/reports': typeof AuthenticatedDashboardManagerReportsRoute
   '/_authenticated/dashboard/manager/settings': typeof AuthenticatedDashboardManagerSettingsRoute
   '/_authenticated/dashboard/manager/team': typeof AuthenticatedDashboardManagerTeamRoute
+  '/_authenticated/dashboard/offboarding/checklist': typeof AuthenticatedDashboardOffboardingChecklistRoute
+  '/_authenticated/dashboard/offboarding/settlement': typeof AuthenticatedDashboardOffboardingSettlementRoute
   '/_authenticated/dashboard/onboarding/documents': typeof AuthenticatedDashboardOnboardingDocumentsRoute
   '/_authenticated/dashboard/onboarding/new-hires': typeof AuthenticatedDashboardOnboardingNewHiresRoute
   '/_authenticated/dashboard/onboarding/tasks': typeof AuthenticatedDashboardOnboardingTasksRoute
@@ -2096,6 +2125,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/it-admin/': typeof AuthenticatedDashboardItAdminIndexRoute
   '/_authenticated/dashboard/leave/': typeof AuthenticatedDashboardLeaveIndexRoute
   '/_authenticated/dashboard/manager/': typeof AuthenticatedDashboardManagerIndexRoute
+  '/_authenticated/dashboard/offboarding/': typeof AuthenticatedDashboardOffboardingIndexRoute
   '/_authenticated/dashboard/onboarding/': typeof AuthenticatedDashboardOnboardingIndexRoute
   '/_authenticated/dashboard/payroll/': typeof AuthenticatedDashboardPayrollIndexRoute
   '/_authenticated/dashboard/performance/': typeof AuthenticatedDashboardPerformanceIndexRoute
@@ -2225,6 +2255,8 @@ export interface FileRouteTypes {
     | '/dashboard/manager/reports'
     | '/dashboard/manager/settings'
     | '/dashboard/manager/team'
+    | '/dashboard/offboarding/checklist'
+    | '/dashboard/offboarding/settlement'
     | '/dashboard/onboarding/documents'
     | '/dashboard/onboarding/new-hires'
     | '/dashboard/onboarding/tasks'
@@ -2310,6 +2342,7 @@ export interface FileRouteTypes {
     | '/dashboard/it-admin/'
     | '/dashboard/leave/'
     | '/dashboard/manager/'
+    | '/dashboard/offboarding/'
     | '/dashboard/onboarding/'
     | '/dashboard/payroll/'
     | '/dashboard/performance/'
@@ -2431,6 +2464,8 @@ export interface FileRouteTypes {
     | '/dashboard/manager/reports'
     | '/dashboard/manager/settings'
     | '/dashboard/manager/team'
+    | '/dashboard/offboarding/checklist'
+    | '/dashboard/offboarding/settlement'
     | '/dashboard/onboarding/documents'
     | '/dashboard/onboarding/new-hires'
     | '/dashboard/onboarding/tasks'
@@ -2516,6 +2551,7 @@ export interface FileRouteTypes {
     | '/dashboard/it-admin'
     | '/dashboard/leave'
     | '/dashboard/manager'
+    | '/dashboard/offboarding'
     | '/dashboard/onboarding'
     | '/dashboard/payroll'
     | '/dashboard/performance'
@@ -2644,6 +2680,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/manager/reports'
     | '/_authenticated/dashboard/manager/settings'
     | '/_authenticated/dashboard/manager/team'
+    | '/_authenticated/dashboard/offboarding/checklist'
+    | '/_authenticated/dashboard/offboarding/settlement'
     | '/_authenticated/dashboard/onboarding/documents'
     | '/_authenticated/dashboard/onboarding/new-hires'
     | '/_authenticated/dashboard/onboarding/tasks'
@@ -2729,6 +2767,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/it-admin/'
     | '/_authenticated/dashboard/leave/'
     | '/_authenticated/dashboard/manager/'
+    | '/_authenticated/dashboard/offboarding/'
     | '/_authenticated/dashboard/onboarding/'
     | '/_authenticated/dashboard/payroll/'
     | '/_authenticated/dashboard/performance/'
@@ -3688,6 +3727,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardManagerTeamRouteImport
       parentRoute: typeof AuthenticatedDashboardManagerRoute
     }
+    '/_authenticated/dashboard/offboarding/': {
+      id: '/_authenticated/dashboard/offboarding/'
+      path: '/offboarding'
+      fullPath: '/dashboard/offboarding/'
+      preLoaderRoute: typeof AuthenticatedDashboardOffboardingIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/offboarding/checklist': {
+      id: '/_authenticated/dashboard/offboarding/checklist'
+      path: '/offboarding/checklist'
+      fullPath: '/dashboard/offboarding/checklist'
+      preLoaderRoute: typeof AuthenticatedDashboardOffboardingChecklistRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/offboarding/settlement': {
+      id: '/_authenticated/dashboard/offboarding/settlement'
+      path: '/offboarding/settlement'
+      fullPath: '/dashboard/offboarding/settlement'
+      preLoaderRoute: typeof AuthenticatedDashboardOffboardingSettlementRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/onboarding/': {
       id: '/_authenticated/dashboard/onboarding/'
       path: '/onboarding'
@@ -4499,6 +4559,8 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardLeaveBalancesRoute: typeof AuthenticatedDashboardLeaveBalancesRoute
   AuthenticatedDashboardLeaveCalendarRoute: typeof AuthenticatedDashboardLeaveCalendarRoute
   AuthenticatedDashboardLeaveRequestsRoute: typeof AuthenticatedDashboardLeaveRequestsRoute
+  AuthenticatedDashboardOffboardingChecklistRoute: typeof AuthenticatedDashboardOffboardingChecklistRoute
+  AuthenticatedDashboardOffboardingSettlementRoute: typeof AuthenticatedDashboardOffboardingSettlementRoute
   AuthenticatedDashboardOnboardingDocumentsRoute: typeof AuthenticatedDashboardOnboardingDocumentsRoute
   AuthenticatedDashboardOnboardingNewHiresRoute: typeof AuthenticatedDashboardOnboardingNewHiresRoute
   AuthenticatedDashboardOnboardingTasksRoute: typeof AuthenticatedDashboardOnboardingTasksRoute
@@ -4579,6 +4641,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardEngagementIndexRoute: typeof AuthenticatedDashboardEngagementIndexRoute
   AuthenticatedDashboardIntegrationsIndexRoute: typeof AuthenticatedDashboardIntegrationsIndexRoute
   AuthenticatedDashboardLeaveIndexRoute: typeof AuthenticatedDashboardLeaveIndexRoute
+  AuthenticatedDashboardOffboardingIndexRoute: typeof AuthenticatedDashboardOffboardingIndexRoute
   AuthenticatedDashboardOnboardingIndexRoute: typeof AuthenticatedDashboardOnboardingIndexRoute
   AuthenticatedDashboardPayrollIndexRoute: typeof AuthenticatedDashboardPayrollIndexRoute
   AuthenticatedDashboardPerformanceIndexRoute: typeof AuthenticatedDashboardPerformanceIndexRoute
@@ -4717,6 +4780,10 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardLeaveCalendarRoute,
     AuthenticatedDashboardLeaveRequestsRoute:
       AuthenticatedDashboardLeaveRequestsRoute,
+    AuthenticatedDashboardOffboardingChecklistRoute:
+      AuthenticatedDashboardOffboardingChecklistRoute,
+    AuthenticatedDashboardOffboardingSettlementRoute:
+      AuthenticatedDashboardOffboardingSettlementRoute,
     AuthenticatedDashboardOnboardingDocumentsRoute:
       AuthenticatedDashboardOnboardingDocumentsRoute,
     AuthenticatedDashboardOnboardingNewHiresRoute:
@@ -4877,6 +4944,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardIntegrationsIndexRoute,
     AuthenticatedDashboardLeaveIndexRoute:
       AuthenticatedDashboardLeaveIndexRoute,
+    AuthenticatedDashboardOffboardingIndexRoute:
+      AuthenticatedDashboardOffboardingIndexRoute,
     AuthenticatedDashboardOnboardingIndexRoute:
       AuthenticatedDashboardOnboardingIndexRoute,
     AuthenticatedDashboardPayrollIndexRoute:

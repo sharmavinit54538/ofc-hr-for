@@ -308,7 +308,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         id: "offboarding-hub",
         title: "Offboarding",
         description: "Exit process, asset returns, and final settlement (uses Asset Return flow)",
-        href: "/dashboard/assets/return",
+        href: "/dashboard/offboarding",
         icon: RotateCcw,
         stats: "Exit Process",
         statusBadge: "Linked",
