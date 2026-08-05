@@ -8,12 +8,20 @@ import {
   ArrowRight,
   Building2,
   Loader2,
+  LogIn,
+  LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/page-header";
 import { SIDEBAR_NAV_ITEMS } from "@/lib/admin-navigation";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useGetMeQuery } from "@/services/authApi";
 import { useListEmployeesQuery, useListDepartmentsQuery } from "@/services/employeeApi";
+import {
+  useGetTodayAttendanceQuery,
+  useClockInMutation,
+  useClockOutMutation,
+} from "@/services/employeeDashboardApi";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: MainDashboardOverviewPage,
@@ -28,12 +36,40 @@ function MainDashboardOverviewPage() {
   });
   const { data: departmentsRes, isLoading: isLoadingDepts } = useListDepartmentsQuery();
 
+  const { data: todayAttRes, isLoading: isTodayAttLoading } = useGetTodayAttendanceQuery();
+  const [clockIn, { isLoading: isClockingIn }] = useClockInMutation();
+  const [clockOut, { isLoading: isClockingOut }] = useClockOutMutation();
+
+  const todayAtt = todayAttRes?.data;
+  const isClockedIn = todayAtt?.clocked_in ?? false;
+  const isClocking = isClockingIn || isClockingOut;
+
   const meData = meRes?.data;
   const userName = storeUser?.fullName || meData?.full_name || storeUser?.email || meData?.email || "User";
   const orgName = organization?.name || "Enterprise HQ";
 
   const totalEmployeesCount = employeesRes?.data?.total ?? employeesRes?.data?.items?.length ?? 0;
   const totalDeptsCount = departmentsRes?.data?.length ?? 0;
+
+  const handleClockToggle = async () => {
+    try {
+      if (isClockedIn) {
+        const res = await clockOut().unwrap();
+        toast.success("Clocked Out", {
+          description: res.message || "Clock out recorded successfully.",
+        });
+      } else {
+        const res = await clockIn().unwrap();
+        toast.success("Clocked In", {
+          description: res.message || "Your attendance has been recorded.",
+        });
+      }
+    } catch (err: any) {
+      toast.error("Attendance Action Failed", {
+        description: err?.data?.message || "Something went wrong while recording attendance.",
+      });
+    }
+  };
 
   const stats = [
     {
@@ -68,11 +104,46 @@ function MainDashboardOverviewPage() {
 
   return (
     <div className="space-y-8">
-      {/* ── Page Header ────────────────────────────────────────── */}
-      <PageHeader
-        title={`Welcome back, ${userName}`}
-        description={`${orgName} overview. Monitor live metrics, launch modules, and view real-time workspace activity.`}
-      />
+      {/* ── Page Header & Clock Control ──────────────────────────── */}
+      <div className="glass-tile relative overflow-hidden rounded-2xl p-6 md:p-8">
+        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1.5">
+            <h1 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
+              Welcome back, {userName}
+            </h1>
+            <p className="max-w-xl text-xs text-muted-foreground leading-relaxed sm:text-sm">
+              {orgName} overview · {new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleClockToggle}
+              disabled={isClocking || isTodayAttLoading}
+              className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold shadow-glow transition-all hover:shadow-glow-lg disabled:opacity-50 ${
+                isClockedIn
+                  ? "bg-rose-500 text-white hover:bg-rose-600"
+                  : "bg-gradient-brand text-primary-foreground"
+              }`}
+            >
+              {isClocking ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Processing...
+                </>
+              ) : isClockedIn ? (
+                <>
+                  <LogOut className="size-4" /> Clock Out
+                </>
+              ) : (
+                <>
+                  <LogIn className="size-4" /> Clock In
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* ── Stats Grid ────────────────────────────────────────── */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

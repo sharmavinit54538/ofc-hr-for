@@ -12,10 +12,16 @@ import {
   CalendarDays,
   CheckCircle2,
   AlertCircle,
+  LogIn,
+  LogOut,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import {
   useGetTodayAttendanceQuery,
+  useClockInMutation,
+  useClockOutMutation,
   useGetLeaveBalanceQuery,
   useGetLatestPayrollQuery,
   useGetEmployeeTicketsQuery,
@@ -33,6 +39,9 @@ function EmployeeDashboardHome() {
   const user = useAuthStore((s) => s.user);
 
   const { data: todayAttRes, isLoading: isTodayAttLoading } = useGetTodayAttendanceQuery();
+  const [clockIn, { isLoading: isClockingIn }] = useClockInMutation();
+  const [clockOut, { isLoading: isClockingOut }] = useClockOutMutation();
+
   const { data: leaveBalRes, isLoading: isLeaveBalLoading } = useGetLeaveBalanceQuery();
   const { data: payrollRes, isLoading: isPayrollLoading } = useGetLatestPayrollQuery();
   const { data: ticketsRes, isLoading: isTicketsLoading } = useGetEmployeeTicketsQuery();
@@ -42,6 +51,9 @@ function EmployeeDashboardHome() {
   const { data: holRes, isLoading: isHolLoading } = useGetCompanyHolidaysQuery();
 
   const todayAtt = todayAttRes?.data;
+  const isClockedIn = todayAtt?.clocked_in ?? false;
+  const isClocking = isClockingIn || isClockingOut;
+
   const leaveBal = leaveBalRes?.data;
   const latestPayroll = payrollRes?.data;
   const tickets = ticketsRes?.data ?? [];
@@ -50,6 +62,26 @@ function EmployeeDashboardHome() {
   const attSummary = attSummaryRes?.data;
   const announcements = annRes?.data ?? [];
   const holidays = (holRes?.data ?? []).slice(0, 4);
+
+  const handleClockToggle = async () => {
+    try {
+      if (isClockedIn) {
+        const res = await clockOut().unwrap();
+        toast.success("Clocked Out", {
+          description: res.message || "Clock out recorded successfully.",
+        });
+      } else {
+        const res = await clockIn().unwrap();
+        toast.success("Clocked In", {
+          description: res.message || "Your attendance has been recorded.",
+        });
+      }
+    } catch (err: any) {
+      toast.error("Attendance Action Failed", {
+        description: err?.data?.message || "Something went wrong while recording attendance.",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -70,12 +102,32 @@ function EmployeeDashboardHome() {
               })}
             </p>
           </div>
-          <Link
-            to={"/dashboard/employee/attendance" as any}
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-brand px-5 py-2.5 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all"
-          >
-            <Clock className="size-4" /> Clock In / Out
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleClockToggle}
+              disabled={isClocking || isTodayAttLoading}
+              className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold shadow-glow transition-all hover:shadow-glow-lg disabled:opacity-50 ${
+                isClockedIn
+                  ? "bg-rose-500 text-white hover:bg-rose-600"
+                  : "bg-gradient-brand text-primary-foreground"
+              }`}
+            >
+              {isClocking ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Processing...
+                </>
+              ) : isClockedIn ? (
+                <>
+                  <LogOut className="size-4" /> Clock Out
+                </>
+              ) : (
+                <>
+                  <LogIn className="size-4" /> Clock In
+                </>
+              )}
+            </button>
+          </div>
         </div>
         {/* Background decoration */}
         <div className="absolute -right-20 -top-20 size-60 rounded-full bg-gradient-brand opacity-5 blur-3xl" />
@@ -98,11 +150,11 @@ function EmployeeDashboardHome() {
               <div className="h-7 w-24 animate-pulse rounded bg-secondary/60 my-1" />
             ) : (
               <div className="font-display text-2xl font-bold text-foreground">
-                {todayAtt?.avg_clock_in ?? "09:02 AM"}
+                {todayAtt?.avg_clock_in || "--:--"}
               </div>
             )}
             <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-              Clocked in · {todayAtt?.this_month_hours ?? "164h 20m"} this month
+              {todayAtt?.clocked_in ? "Clocked in" : "Not clocked in"} · {todayAtt?.this_month_hours ?? "0h 0m"} this month
             </p>
           </div>
         </div>
@@ -122,12 +174,12 @@ function EmployeeDashboardHome() {
               <div className="h-7 w-24 animate-pulse rounded bg-secondary/60 my-1" />
             ) : (
               <div className="font-display text-2xl font-bold text-foreground">
-                {leaveBal?.total_remaining ?? 28} days
+                {leaveBal?.total_remaining ?? 0} days
               </div>
             )}
             <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-              CL: {leaveBal?.casual_leave ?? 10} · SL: {leaveBal?.sick_leave ?? 8} · EL:{" "}
-              {leaveBal?.earned_leave ?? 10}
+              CL: {leaveBal?.casual_leave ?? 0} · SL: {leaveBal?.sick_leave ?? 0} · EL:{" "}
+              {leaveBal?.earned_leave ?? 0}
             </p>
           </div>
         </div>
@@ -145,15 +197,25 @@ function EmployeeDashboardHome() {
           <div className="mt-2">
             {isPayrollLoading ? (
               <div className="h-7 w-24 animate-pulse rounded bg-secondary/60 my-1" />
+            ) : latestPayroll && typeof latestPayroll.net_pay === "number" ? (
+              <>
+                <div className="font-display text-2xl font-bold text-foreground">
+                  ₹{latestPayroll.net_pay.toLocaleString("en-IN")}
+                </div>
+                <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                  {latestPayroll.month} {latestPayroll.year} · {latestPayroll.status}
+                </p>
+              </>
             ) : (
-              <div className="font-display text-2xl font-bold text-foreground">
-                ₹{(latestPayroll?.net_pay ?? 63900).toLocaleString("en-IN")}
-              </div>
+              <>
+                <div className="font-display text-2xl font-bold text-muted-foreground/60">
+                  N/A
+                </div>
+                <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                  Salary not configured
+                </p>
+              </>
             )}
-            <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-              {latestPayroll?.month ?? "July"} {latestPayroll?.year ?? 2026} ·{" "}
-              {latestPayroll?.status ?? "Paid"}
-            </p>
           </div>
         </div>
 
@@ -262,22 +324,22 @@ function EmployeeDashboardHome() {
                 [
                   {
                     label: "Present",
-                    value: attSummary?.present ?? 18,
+                    value: attSummary?.present ?? 0,
                     color: "text-emerald-500 bg-emerald-500/10",
                   },
                   {
                     label: "Absent",
-                    value: attSummary?.absent ?? 1,
+                    value: attSummary?.absent ?? 0,
                     color: "text-rose-500 bg-rose-500/10",
                   },
                   {
                     label: "WFH",
-                    value: attSummary?.wfh ?? 2,
+                    value: attSummary?.wfh ?? 0,
                     color: "text-sky-500 bg-sky-500/10",
                   },
                   {
                     label: "Half Day",
-                    value: attSummary?.half_day ?? 1,
+                    value: attSummary?.half_day ?? 0,
                     color: "text-amber-500 bg-amber-500/10",
                   },
                 ].map((item) => (
