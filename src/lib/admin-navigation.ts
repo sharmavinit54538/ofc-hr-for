@@ -77,6 +77,11 @@ import {
   Mail,
   BarChart2,
   FileCode,
+  BriefcaseBusiness,
+  Wallet,
+  MessageSquareMore,
+  ChartColumn,
+  Settings2,
 } from "lucide-react";
 
 
@@ -110,7 +115,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   },
   {
     id: "workforce",
-    title: "Workforce",
+    title: "People",
     href: "/dashboard/workforce",
     icon: Users,
     description: "Manage employee directory, organizational hierarchy, departments & branches",
@@ -182,9 +187,9 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   },
   {
     id: "recruitment",
-    title: "Talent",
+    title: "Talent Hub",
     href: "/dashboard/recruitment",
-    icon: UserPlus,
+    icon: BriefcaseBusiness,
     description: "End-to-end ATS, job openings, Kanban candidate pipeline, interviews, AI copilot & offer workflows",
     subModules: [
       {
@@ -317,7 +322,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   },
   {
     id: "assets",
-    title: "Asset Management",
+    title: "Assets",
     href: "/dashboard/assets",
     icon: Package,
     description: "Hardware inventory, asset allocation, returns, maintenance & category lifecycle",
@@ -416,9 +421,9 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   },
   {
     id: "attendance",
-    title: "Attendance",
+    title: "Time & Attendance",
     href: "/dashboard/attendance",
-    icon: CalendarCheck,
+    icon: Clock3,
     description: "Real-time time tracking, biometric logs, shift scheduling & overtime",
     subModules: [
       {
@@ -490,7 +495,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     id: "payroll",
     title: "Payroll",
     href: "/dashboard/payroll",
-    icon: CreditCard,
+    icon: Wallet,
     description: "Salary processing, statutory deductions, tax calculation & payslip distribution",
     subModules: [
       {
@@ -596,9 +601,9 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   },
   {
     id: "documents",
-    title: "Documents & Compliance",
+    title: "Compliance",
     href: "/dashboard/documents",
-    icon: FileText,
+    icon: ShieldCheck,
     description: "Enterprise document management, offer letters, contracts, templates & digital signatures",
     subModules: [
       {
@@ -696,9 +701,9 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
 
   {
     id: "ai-workforce",
-    title: "AI Workforce",
+    title: "AI Hub",
     href: "/dashboard/ai-workforce",
-    icon: Sparkles,
+    icon: Bot,
     description: "Autonomous HR AI agents, automated workflow orchestration & predictive analytics",
     subModules: [
       {
@@ -743,7 +748,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     id: "communication",
     title: "Communication",
     href: "/dashboard/communication",
-    icon: Megaphone,
+    icon: MessageSquareMore,
     description: "Company announcements, broadcasts, employee surveys, polls & campaign history",
     subModules: [
       {
@@ -823,9 +828,9 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
 
   {
     id: "reports",
-    title: "Reports",
+    title: "Analytics",
     href: "/dashboard/reports",
-    icon: BarChart3,
+    icon: ChartColumn,
     description: "Comprehensive reporting suite, headcount metrics, financial analytics & exports",
     subModules: [
       {
@@ -1039,9 +1044,9 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   },
   {
     id: "settings",
-    title: "Settings",
+    title: "Administration",
     href: "/dashboard/settings",
-    icon: Settings,
+    icon: Settings2,
     description: "Configure tenant workspace, roles & permissions, security policies & billing",
     subModules: [
       {
