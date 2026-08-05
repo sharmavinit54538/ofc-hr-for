@@ -703,7 +703,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     id: "ai-workforce",
     title: "AI Hub",
     href: "/dashboard/ai-workforce",
-    icon: Bot,
+    icon: Sparkles,
     description: "Autonomous HR AI agents, automated workflow orchestration & predictive analytics",
     subModules: [
       {
