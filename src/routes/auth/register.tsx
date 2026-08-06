@@ -82,10 +82,13 @@ function RegisterPage() {
       }).unwrap();
 
       toast.success("Account created successfully", {
-        description: "Your organization and account have been provisioned. Please sign in.",
+        description: "Please enter the verification OTP sent to your work email.",
       });
 
-      navigate({ to: "/auth/login" as any });
+      navigate({
+        to: "/auth/verify-email" as any,
+        search: { email: values.email } as any,
+      });
     } catch (err: any) {
       const detail = err?.data?.detail || err?.data?.message || "Registration failed. Please check your details.";
       toast.error("Registration Failed", {

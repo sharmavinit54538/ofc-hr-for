@@ -204,6 +204,22 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
 
+    verifyEmail: builder.mutation<ApiResponse<{ message: string }>, { email: string; otp: string }>({
+      query: (body) => ({
+        url: "/api/v1/auth/verify-email",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    resendOtp: builder.mutation<ApiResponse<{ message: string }>, { email: string }>({
+      query: (body) => ({
+        url: "/api/v1/auth/resend-verification",
+        method: "POST",
+        body,
+      }),
+    }),
+
     getOnboardingStatus: builder.query<
       ApiResponse<{ completed: boolean; current_step: number; total_steps: number }>,
       void
@@ -406,6 +422,8 @@ export const {
   useCreateOrganizationUserMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useVerifyEmailMutation,
+  useResendOtpMutation,
   useGetOnboardingStatusQuery,
   useLazyGetOnboardingStatusQuery,
   useGetOnboardingDataQuery,
