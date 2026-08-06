@@ -23,11 +23,22 @@ import { Route as AuthSessionExpiredRouteImport } from './routes/auth/session-ex
 import { Route as AuthUnauthorizedRouteImport } from './routes/auth/unauthorized'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth/verify-email'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
+import { Route as AuthenticatedDashboardAiWorkforceRouteImport } from './routes/_authenticated/dashboard/ai-workforce'
+import { Route as AuthenticatedDashboardAttendanceRouteImport } from './routes/_authenticated/dashboard/attendance'
+import { Route as AuthenticatedDashboardComplianceRouteImport } from './routes/_authenticated/dashboard/compliance'
+import { Route as AuthenticatedDashboardDocumentsRouteImport } from './routes/_authenticated/dashboard/documents'
 import { Route as AuthenticatedDashboardEmployeeRouteImport } from './routes/_authenticated/dashboard/employee'
 import { Route as AuthenticatedDashboardExecutiveRouteImport } from './routes/_authenticated/dashboard/executive'
 import { Route as AuthenticatedDashboardHelpdeskRouteImport } from './routes/_authenticated/dashboard/helpdesk'
 import { Route as AuthenticatedDashboardItAdminRouteImport } from './routes/_authenticated/dashboard/it-admin'
+import { Route as AuthenticatedDashboardLeaveRouteImport } from './routes/_authenticated/dashboard/leave'
 import { Route as AuthenticatedDashboardManagerRouteImport } from './routes/_authenticated/dashboard/manager'
+import { Route as AuthenticatedDashboardOnboardingRouteImport } from './routes/_authenticated/dashboard/onboarding'
+import { Route as AuthenticatedDashboardPayrollRouteImport } from './routes/_authenticated/dashboard/payroll'
+import { Route as AuthenticatedDashboardPerformanceRouteImport } from './routes/_authenticated/dashboard/performance'
+import { Route as AuthenticatedDashboardRecruitmentRouteImport } from './routes/_authenticated/dashboard/recruitment'
+import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard/settings'
+import { Route as AuthenticatedDashboardWorkforceRouteImport } from './routes/_authenticated/dashboard/workforce'
 import { Route as AuthenticatedDashboardAiWorkforceIndexRouteImport } from './routes/_authenticated/dashboard/ai-workforce/index'
 import { Route as AuthenticatedDashboardAiWorkforceAgentsRouteImport } from './routes/_authenticated/dashboard/ai-workforce/agents'
 import { Route as AuthenticatedDashboardAiWorkforceAnalyticsRouteImport } from './routes/_authenticated/dashboard/ai-workforce/analytics'
@@ -294,6 +305,30 @@ const AuthenticatedDashboardIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardAiWorkforceRoute =
+  AuthenticatedDashboardAiWorkforceRouteImport.update({
+    id: '/ai-workforce',
+    path: '/ai-workforce',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardAttendanceRoute =
+  AuthenticatedDashboardAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardComplianceRoute =
+  AuthenticatedDashboardComplianceRouteImport.update({
+    id: '/compliance',
+    path: '/compliance',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardDocumentsRoute =
+  AuthenticatedDashboardDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardEmployeeRoute =
   AuthenticatedDashboardEmployeeRouteImport.update({
     id: '/employee',
@@ -318,41 +353,83 @@ const AuthenticatedDashboardItAdminRoute =
     path: '/it-admin',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardLeaveRoute =
+  AuthenticatedDashboardLeaveRouteImport.update({
+    id: '/leave',
+    path: '/leave',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardManagerRoute =
   AuthenticatedDashboardManagerRouteImport.update({
     id: '/manager',
     path: '/manager',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardOnboardingRoute =
+  AuthenticatedDashboardOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardPayrollRoute =
+  AuthenticatedDashboardPayrollRouteImport.update({
+    id: '/payroll',
+    path: '/payroll',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardPerformanceRoute =
+  AuthenticatedDashboardPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRecruitmentRoute =
+  AuthenticatedDashboardRecruitmentRouteImport.update({
+    id: '/recruitment',
+    path: '/recruitment',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardSettingsRoute =
+  AuthenticatedDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardWorkforceRoute =
+  AuthenticatedDashboardWorkforceRouteImport.update({
+    id: '/workforce',
+    path: '/workforce',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardAiWorkforceIndexRoute =
   AuthenticatedDashboardAiWorkforceIndexRouteImport.update({
-    id: '/ai-workforce/',
-    path: '/ai-workforce/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardAiWorkforceRoute,
   } as any)
 const AuthenticatedDashboardAiWorkforceAgentsRoute =
   AuthenticatedDashboardAiWorkforceAgentsRouteImport.update({
-    id: '/ai-workforce/agents',
-    path: '/ai-workforce/agents',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/agents',
+    path: '/agents',
+    getParentRoute: () => AuthenticatedDashboardAiWorkforceRoute,
   } as any)
 const AuthenticatedDashboardAiWorkforceAnalyticsRoute =
   AuthenticatedDashboardAiWorkforceAnalyticsRouteImport.update({
-    id: '/ai-workforce/analytics',
-    path: '/ai-workforce/analytics',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedDashboardAiWorkforceRoute,
   } as any)
 const AuthenticatedDashboardAiWorkforceCopilotsRoute =
   AuthenticatedDashboardAiWorkforceCopilotsRouteImport.update({
-    id: '/ai-workforce/copilots',
-    path: '/ai-workforce/copilots',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/copilots',
+    path: '/copilots',
+    getParentRoute: () => AuthenticatedDashboardAiWorkforceRoute,
   } as any)
 const AuthenticatedDashboardAiWorkforceWorkflowsRoute =
   AuthenticatedDashboardAiWorkforceWorkflowsRouteImport.update({
-    id: '/ai-workforce/workflows',
-    path: '/ai-workforce/workflows',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/workflows',
+    path: '/workflows',
+    getParentRoute: () => AuthenticatedDashboardAiWorkforceRoute,
   } as any)
 const AuthenticatedDashboardApprovalsIndexRoute =
   AuthenticatedDashboardApprovalsIndexRouteImport.update({
@@ -494,33 +571,33 @@ const AuthenticatedDashboardAssetsVendorsRoute =
   } as any)
 const AuthenticatedDashboardAttendanceIndexRoute =
   AuthenticatedDashboardAttendanceIndexRouteImport.update({
-    id: '/attendance/',
-    path: '/attendance/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardAttendanceRoute,
   } as any)
 const AuthenticatedDashboardAttendanceGeofenceRoute =
   AuthenticatedDashboardAttendanceGeofenceRouteImport.update({
-    id: '/attendance/geofence',
-    path: '/attendance/geofence',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/geofence',
+    path: '/geofence',
+    getParentRoute: () => AuthenticatedDashboardAttendanceRoute,
   } as any)
 const AuthenticatedDashboardAttendanceLogsRoute =
   AuthenticatedDashboardAttendanceLogsRouteImport.update({
-    id: '/attendance/logs',
-    path: '/attendance/logs',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/logs',
+    path: '/logs',
+    getParentRoute: () => AuthenticatedDashboardAttendanceRoute,
   } as any)
 const AuthenticatedDashboardAttendanceOvertimeRoute =
   AuthenticatedDashboardAttendanceOvertimeRouteImport.update({
-    id: '/attendance/overtime',
-    path: '/attendance/overtime',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/overtime',
+    path: '/overtime',
+    getParentRoute: () => AuthenticatedDashboardAttendanceRoute,
   } as any)
 const AuthenticatedDashboardAttendanceShiftsRoute =
   AuthenticatedDashboardAttendanceShiftsRouteImport.update({
-    id: '/attendance/shifts',
-    path: '/attendance/shifts',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/shifts',
+    path: '/shifts',
+    getParentRoute: () => AuthenticatedDashboardAttendanceRoute,
   } as any)
 const AuthenticatedDashboardCalendarIndexRoute =
   AuthenticatedDashboardCalendarIndexRouteImport.update({
@@ -560,81 +637,81 @@ const AuthenticatedDashboardCommunicationSurveysRoute =
   } as any)
 const AuthenticatedDashboardComplianceIndexRoute =
   AuthenticatedDashboardComplianceIndexRouteImport.update({
-    id: '/compliance/',
-    path: '/compliance/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardComplianceRoute,
   } as any)
 const AuthenticatedDashboardComplianceAuditLogsRoute =
   AuthenticatedDashboardComplianceAuditLogsRouteImport.update({
-    id: '/compliance/audit-logs',
-    path: '/compliance/audit-logs',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/audit-logs',
+    path: '/audit-logs',
+    getParentRoute: () => AuthenticatedDashboardComplianceRoute,
   } as any)
 const AuthenticatedDashboardComplianceDocumentsRoute =
   AuthenticatedDashboardComplianceDocumentsRouteImport.update({
-    id: '/compliance/documents',
-    path: '/compliance/documents',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => AuthenticatedDashboardComplianceRoute,
   } as any)
 const AuthenticatedDashboardComplianceLawsRoute =
   AuthenticatedDashboardComplianceLawsRouteImport.update({
-    id: '/compliance/laws',
-    path: '/compliance/laws',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/laws',
+    path: '/laws',
+    getParentRoute: () => AuthenticatedDashboardComplianceRoute,
   } as any)
 const AuthenticatedDashboardComplianceRisksRoute =
   AuthenticatedDashboardComplianceRisksRouteImport.update({
-    id: '/compliance/risks',
-    path: '/compliance/risks',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/risks',
+    path: '/risks',
+    getParentRoute: () => AuthenticatedDashboardComplianceRoute,
   } as any)
 const AuthenticatedDashboardDocumentsIndexRoute =
   AuthenticatedDashboardDocumentsIndexRouteImport.update({
-    id: '/documents/',
-    path: '/documents/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsCertificatesRoute =
   AuthenticatedDashboardDocumentsCertificatesRouteImport.update({
-    id: '/documents/certificates',
-    path: '/documents/certificates',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/certificates',
+    path: '/certificates',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsContractsRoute =
   AuthenticatedDashboardDocumentsContractsRouteImport.update({
-    id: '/documents/contracts',
-    path: '/documents/contracts',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/contracts',
+    path: '/contracts',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsDigitalSignaturesRoute =
   AuthenticatedDashboardDocumentsDigitalSignaturesRouteImport.update({
-    id: '/documents/digital-signatures',
-    path: '/documents/digital-signatures',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/digital-signatures',
+    path: '/digital-signatures',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsEmployeesRoute =
   AuthenticatedDashboardDocumentsEmployeesRouteImport.update({
-    id: '/documents/employees',
-    path: '/documents/employees',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/employees',
+    path: '/employees',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsOfferLettersRoute =
   AuthenticatedDashboardDocumentsOfferLettersRouteImport.update({
-    id: '/documents/offer-letters',
-    path: '/documents/offer-letters',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/offer-letters',
+    path: '/offer-letters',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsPoliciesRoute =
   AuthenticatedDashboardDocumentsPoliciesRouteImport.update({
-    id: '/documents/policies',
-    path: '/documents/policies',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/policies',
+    path: '/policies',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardDocumentsTemplatesRoute =
   AuthenticatedDashboardDocumentsTemplatesRouteImport.update({
-    id: '/documents/templates',
-    path: '/documents/templates',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/templates',
+    path: '/templates',
+    getParentRoute: () => AuthenticatedDashboardDocumentsRoute,
   } as any)
 const AuthenticatedDashboardEmployeeIndexRoute =
   AuthenticatedDashboardEmployeeIndexRouteImport.update({
@@ -914,33 +991,33 @@ const AuthenticatedDashboardItAdminUsersRoute =
   } as any)
 const AuthenticatedDashboardLeaveIndexRoute =
   AuthenticatedDashboardLeaveIndexRouteImport.update({
-    id: '/leave/',
-    path: '/leave/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardLeaveRoute,
   } as any)
 const AuthenticatedDashboardLeaveApprovalsRoute =
   AuthenticatedDashboardLeaveApprovalsRouteImport.update({
-    id: '/leave/approvals',
-    path: '/leave/approvals',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/approvals',
+    path: '/approvals',
+    getParentRoute: () => AuthenticatedDashboardLeaveRoute,
   } as any)
 const AuthenticatedDashboardLeaveBalancesRoute =
   AuthenticatedDashboardLeaveBalancesRouteImport.update({
-    id: '/leave/balances',
-    path: '/leave/balances',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/balances',
+    path: '/balances',
+    getParentRoute: () => AuthenticatedDashboardLeaveRoute,
   } as any)
 const AuthenticatedDashboardLeaveCalendarRoute =
   AuthenticatedDashboardLeaveCalendarRouteImport.update({
-    id: '/leave/calendar',
-    path: '/leave/calendar',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedDashboardLeaveRoute,
   } as any)
 const AuthenticatedDashboardLeaveRequestsRoute =
   AuthenticatedDashboardLeaveRequestsRouteImport.update({
-    id: '/leave/requests',
-    path: '/leave/requests',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/requests',
+    path: '/requests',
+    getParentRoute: () => AuthenticatedDashboardLeaveRoute,
   } as any)
 const AuthenticatedDashboardManagerIndexRoute =
   AuthenticatedDashboardManagerIndexRouteImport.update({
@@ -1028,93 +1105,93 @@ const AuthenticatedDashboardOffboardingSettlementRoute =
   } as any)
 const AuthenticatedDashboardOnboardingIndexRoute =
   AuthenticatedDashboardOnboardingIndexRouteImport.update({
-    id: '/onboarding/',
-    path: '/onboarding/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardOnboardingRoute,
   } as any)
 const AuthenticatedDashboardOnboardingDocumentsRoute =
   AuthenticatedDashboardOnboardingDocumentsRouteImport.update({
-    id: '/onboarding/documents',
-    path: '/onboarding/documents',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => AuthenticatedDashboardOnboardingRoute,
   } as any)
 const AuthenticatedDashboardOnboardingNewHiresRoute =
   AuthenticatedDashboardOnboardingNewHiresRouteImport.update({
-    id: '/onboarding/new-hires',
-    path: '/onboarding/new-hires',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/new-hires',
+    path: '/new-hires',
+    getParentRoute: () => AuthenticatedDashboardOnboardingRoute,
   } as any)
 const AuthenticatedDashboardOnboardingTasksRoute =
   AuthenticatedDashboardOnboardingTasksRouteImport.update({
-    id: '/onboarding/tasks',
-    path: '/onboarding/tasks',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/tasks',
+    path: '/tasks',
+    getParentRoute: () => AuthenticatedDashboardOnboardingRoute,
   } as any)
 const AuthenticatedDashboardOnboardingWorkflowsRoute =
   AuthenticatedDashboardOnboardingWorkflowsRouteImport.update({
-    id: '/onboarding/workflows',
-    path: '/onboarding/workflows',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/workflows',
+    path: '/workflows',
+    getParentRoute: () => AuthenticatedDashboardOnboardingRoute,
   } as any)
 const AuthenticatedDashboardPayrollIndexRoute =
   AuthenticatedDashboardPayrollIndexRouteImport.update({
-    id: '/payroll/',
-    path: '/payroll/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardPayrollRoute,
   } as any)
 const AuthenticatedDashboardPayrollPayRunsRoute =
   AuthenticatedDashboardPayrollPayRunsRouteImport.update({
-    id: '/payroll/pay-runs',
-    path: '/payroll/pay-runs',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/pay-runs',
+    path: '/pay-runs',
+    getParentRoute: () => AuthenticatedDashboardPayrollRoute,
   } as any)
 const AuthenticatedDashboardPayrollPayslipsRoute =
   AuthenticatedDashboardPayrollPayslipsRouteImport.update({
-    id: '/payroll/payslips',
-    path: '/payroll/payslips',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/payslips',
+    path: '/payslips',
+    getParentRoute: () => AuthenticatedDashboardPayrollRoute,
   } as any)
 const AuthenticatedDashboardPayrollSalaryStructureRoute =
   AuthenticatedDashboardPayrollSalaryStructureRouteImport.update({
-    id: '/payroll/salary-structure',
-    path: '/payroll/salary-structure',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/salary-structure',
+    path: '/salary-structure',
+    getParentRoute: () => AuthenticatedDashboardPayrollRoute,
   } as any)
 const AuthenticatedDashboardPayrollTaxRoute =
   AuthenticatedDashboardPayrollTaxRouteImport.update({
-    id: '/payroll/tax',
-    path: '/payroll/tax',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/tax',
+    path: '/tax',
+    getParentRoute: () => AuthenticatedDashboardPayrollRoute,
   } as any)
 const AuthenticatedDashboardPerformanceIndexRoute =
   AuthenticatedDashboardPerformanceIndexRouteImport.update({
-    id: '/performance/',
-    path: '/performance/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardPerformanceRoute,
   } as any)
 const AuthenticatedDashboardPerformanceFeedbackRoute =
   AuthenticatedDashboardPerformanceFeedbackRouteImport.update({
-    id: '/performance/feedback',
-    path: '/performance/feedback',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedDashboardPerformanceRoute,
   } as any)
 const AuthenticatedDashboardPerformanceGoalsRoute =
   AuthenticatedDashboardPerformanceGoalsRouteImport.update({
-    id: '/performance/goals',
-    path: '/performance/goals',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/goals',
+    path: '/goals',
+    getParentRoute: () => AuthenticatedDashboardPerformanceRoute,
   } as any)
 const AuthenticatedDashboardPerformanceReviewsRoute =
   AuthenticatedDashboardPerformanceReviewsRouteImport.update({
-    id: '/performance/reviews',
-    path: '/performance/reviews',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => AuthenticatedDashboardPerformanceRoute,
   } as any)
 const AuthenticatedDashboardPerformanceSkillsRoute =
   AuthenticatedDashboardPerformanceSkillsRouteImport.update({
-    id: '/performance/skills',
-    path: '/performance/skills',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => AuthenticatedDashboardPerformanceRoute,
   } as any)
 const AuthenticatedDashboardPoliciesIndexRoute =
   AuthenticatedDashboardPoliciesIndexRouteImport.update({
@@ -1154,87 +1231,87 @@ const AuthenticatedDashboardPoliciesSecurityRoute =
   } as any)
 const AuthenticatedDashboardRecruitmentIndexRoute =
   AuthenticatedDashboardRecruitmentIndexRouteImport.update({
-    id: '/recruitment/',
-    path: '/recruitment/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentAnalyticsRoute =
   AuthenticatedDashboardRecruitmentAnalyticsRouteImport.update({
-    id: '/recruitment/analytics',
-    path: '/recruitment/analytics',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentAutomationRoute =
   AuthenticatedDashboardRecruitmentAutomationRouteImport.update({
-    id: '/recruitment/automation',
-    path: '/recruitment/automation',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/automation',
+    path: '/automation',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentCandidatesRoute =
   AuthenticatedDashboardRecruitmentCandidatesRouteImport.update({
-    id: '/recruitment/candidates',
-    path: '/recruitment/candidates',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/candidates',
+    path: '/candidates',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentCopilotRoute =
   AuthenticatedDashboardRecruitmentCopilotRouteImport.update({
-    id: '/recruitment/copilot',
-    path: '/recruitment/copilot',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/copilot',
+    path: '/copilot',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentCrmRoute =
   AuthenticatedDashboardRecruitmentCrmRouteImport.update({
-    id: '/recruitment/crm',
-    path: '/recruitment/crm',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/crm',
+    path: '/crm',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentInterviewsRoute =
   AuthenticatedDashboardRecruitmentInterviewsRouteImport.update({
-    id: '/recruitment/interviews',
-    path: '/recruitment/interviews',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/interviews',
+    path: '/interviews',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentJobsRoute =
   AuthenticatedDashboardRecruitmentJobsRouteImport.update({
-    id: '/recruitment/jobs',
-    path: '/recruitment/jobs',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/jobs',
+    path: '/jobs',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentOffersRoute =
   AuthenticatedDashboardRecruitmentOffersRouteImport.update({
-    id: '/recruitment/offers',
-    path: '/recruitment/offers',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/offers',
+    path: '/offers',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentOnboardingRoute =
   AuthenticatedDashboardRecruitmentOnboardingRouteImport.update({
-    id: '/recruitment/onboarding',
-    path: '/recruitment/onboarding',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentPipelineRoute =
   AuthenticatedDashboardRecruitmentPipelineRouteImport.update({
-    id: '/recruitment/pipeline',
-    path: '/recruitment/pipeline',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/pipeline',
+    path: '/pipeline',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentRequisitionsRoute =
   AuthenticatedDashboardRecruitmentRequisitionsRouteImport.update({
-    id: '/recruitment/requisitions',
-    path: '/recruitment/requisitions',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/requisitions',
+    path: '/requisitions',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentTalentPoolRoute =
   AuthenticatedDashboardRecruitmentTalentPoolRouteImport.update({
-    id: '/recruitment/talent-pool',
-    path: '/recruitment/talent-pool',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/talent-pool',
+    path: '/talent-pool',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardRecruitmentTemplatesRoute =
   AuthenticatedDashboardRecruitmentTemplatesRouteImport.update({
-    id: '/recruitment/templates',
-    path: '/recruitment/templates',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/templates',
+    path: '/templates',
+    getParentRoute: () => AuthenticatedDashboardRecruitmentRoute,
   } as any)
 const AuthenticatedDashboardReportsIndexRoute =
   AuthenticatedDashboardReportsIndexRouteImport.update({
@@ -1382,33 +1459,33 @@ const AuthenticatedDashboardReportsScheduledRoute =
   } as any)
 const AuthenticatedDashboardSettingsIndexRoute =
   AuthenticatedDashboardSettingsIndexRouteImport.update({
-    id: '/settings/',
-    path: '/settings/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsBillingRoute =
   AuthenticatedDashboardSettingsBillingRouteImport.update({
-    id: '/settings/billing',
-    path: '/settings/billing',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsOrganizationRoute =
   AuthenticatedDashboardSettingsOrganizationRouteImport.update({
-    id: '/settings/organization',
-    path: '/settings/organization',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsRolesRoute =
   AuthenticatedDashboardSettingsRolesRouteImport.update({
-    id: '/settings/roles',
-    path: '/settings/roles',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/roles',
+    path: '/roles',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardSettingsSecurityRoute =
   AuthenticatedDashboardSettingsSecurityRouteImport.update({
-    id: '/settings/security',
-    path: '/settings/security',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => AuthenticatedDashboardSettingsRoute,
   } as any)
 const AuthenticatedDashboardVendorsIndexRoute =
   AuthenticatedDashboardVendorsIndexRouteImport.update({
@@ -1442,57 +1519,57 @@ const AuthenticatedDashboardVendorsPerformanceRoute =
   } as any)
 const AuthenticatedDashboardWorkforceIndexRoute =
   AuthenticatedDashboardWorkforceIndexRouteImport.update({
-    id: '/workforce/',
-    path: '/workforce/',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceBranchesRoute =
   AuthenticatedDashboardWorkforceBranchesRouteImport.update({
-    id: '/workforce/branches',
-    path: '/workforce/branches',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/branches',
+    path: '/branches',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceDepartmentsRoute =
   AuthenticatedDashboardWorkforceDepartmentsRouteImport.update({
-    id: '/workforce/departments',
-    path: '/workforce/departments',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/departments',
+    path: '/departments',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceDesignationsRoute =
   AuthenticatedDashboardWorkforceDesignationsRouteImport.update({
-    id: '/workforce/designations',
-    path: '/workforce/designations',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/designations',
+    path: '/designations',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceEmployeesRoute =
   AuthenticatedDashboardWorkforceEmployeesRouteImport.update({
-    id: '/workforce/employees',
-    path: '/workforce/employees',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/employees',
+    path: '/employees',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceExecutivesRoute =
   AuthenticatedDashboardWorkforceExecutivesRouteImport.update({
-    id: '/workforce/executives',
-    path: '/workforce/executives',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/executives',
+    path: '/executives',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceItAdminsRoute =
   AuthenticatedDashboardWorkforceItAdminsRouteImport.update({
-    id: '/workforce/it-admins',
-    path: '/workforce/it-admins',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/it-admins',
+    path: '/it-admins',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceManagersRoute =
   AuthenticatedDashboardWorkforceManagersRouteImport.update({
-    id: '/workforce/managers',
-    path: '/workforce/managers',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/managers',
+    path: '/managers',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 const AuthenticatedDashboardWorkforceOrgChartRoute =
   AuthenticatedDashboardWorkforceOrgChartRouteImport.update({
-    id: '/workforce/org-chart',
-    path: '/workforce/org-chart',
-    getParentRoute: () => AuthenticatedDashboardRoute,
+    id: '/org-chart',
+    path: '/org-chart',
+    getParentRoute: () => AuthenticatedDashboardWorkforceRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -1508,11 +1585,22 @@ export interface FileRoutesByFullPath {
   '/auth/session-expired': typeof AuthSessionExpiredRoute
   '/auth/unauthorized': typeof AuthUnauthorizedRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/dashboard/ai-workforce': typeof AuthenticatedDashboardAiWorkforceRouteWithChildren
+  '/dashboard/attendance': typeof AuthenticatedDashboardAttendanceRouteWithChildren
+  '/dashboard/compliance': typeof AuthenticatedDashboardComplianceRouteWithChildren
+  '/dashboard/documents': typeof AuthenticatedDashboardDocumentsRouteWithChildren
   '/dashboard/employee': typeof AuthenticatedDashboardEmployeeRouteWithChildren
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRouteWithChildren
   '/dashboard/helpdesk': typeof AuthenticatedDashboardHelpdeskRouteWithChildren
   '/dashboard/it-admin': typeof AuthenticatedDashboardItAdminRouteWithChildren
+  '/dashboard/leave': typeof AuthenticatedDashboardLeaveRouteWithChildren
   '/dashboard/manager': typeof AuthenticatedDashboardManagerRouteWithChildren
+  '/dashboard/onboarding': typeof AuthenticatedDashboardOnboardingRouteWithChildren
+  '/dashboard/payroll': typeof AuthenticatedDashboardPayrollRouteWithChildren
+  '/dashboard/performance': typeof AuthenticatedDashboardPerformanceRouteWithChildren
+  '/dashboard/recruitment': typeof AuthenticatedDashboardRecruitmentRouteWithChildren
+  '/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteWithChildren
+  '/dashboard/workforce': typeof AuthenticatedDashboardWorkforceRouteWithChildren
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/ai-workforce/agents': typeof AuthenticatedDashboardAiWorkforceAgentsRoute
   '/dashboard/ai-workforce/analytics': typeof AuthenticatedDashboardAiWorkforceAnalyticsRoute
@@ -1934,11 +2022,22 @@ export interface FileRoutesById {
   '/auth/session-expired': typeof AuthSessionExpiredRoute
   '/auth/unauthorized': typeof AuthUnauthorizedRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/_authenticated/dashboard/ai-workforce': typeof AuthenticatedDashboardAiWorkforceRouteWithChildren
+  '/_authenticated/dashboard/attendance': typeof AuthenticatedDashboardAttendanceRouteWithChildren
+  '/_authenticated/dashboard/compliance': typeof AuthenticatedDashboardComplianceRouteWithChildren
+  '/_authenticated/dashboard/documents': typeof AuthenticatedDashboardDocumentsRouteWithChildren
   '/_authenticated/dashboard/employee': typeof AuthenticatedDashboardEmployeeRouteWithChildren
   '/_authenticated/dashboard/executive': typeof AuthenticatedDashboardExecutiveRouteWithChildren
   '/_authenticated/dashboard/helpdesk': typeof AuthenticatedDashboardHelpdeskRouteWithChildren
   '/_authenticated/dashboard/it-admin': typeof AuthenticatedDashboardItAdminRouteWithChildren
+  '/_authenticated/dashboard/leave': typeof AuthenticatedDashboardLeaveRouteWithChildren
   '/_authenticated/dashboard/manager': typeof AuthenticatedDashboardManagerRouteWithChildren
+  '/_authenticated/dashboard/onboarding': typeof AuthenticatedDashboardOnboardingRouteWithChildren
+  '/_authenticated/dashboard/payroll': typeof AuthenticatedDashboardPayrollRouteWithChildren
+  '/_authenticated/dashboard/performance': typeof AuthenticatedDashboardPerformanceRouteWithChildren
+  '/_authenticated/dashboard/recruitment': typeof AuthenticatedDashboardRecruitmentRouteWithChildren
+  '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRouteWithChildren
+  '/_authenticated/dashboard/workforce': typeof AuthenticatedDashboardWorkforceRouteWithChildren
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/ai-workforce/agents': typeof AuthenticatedDashboardAiWorkforceAgentsRoute
   '/_authenticated/dashboard/ai-workforce/analytics': typeof AuthenticatedDashboardAiWorkforceAnalyticsRoute
@@ -2151,11 +2250,22 @@ export interface FileRouteTypes {
     | '/auth/session-expired'
     | '/auth/unauthorized'
     | '/auth/verify-email'
+    | '/dashboard/ai-workforce'
+    | '/dashboard/attendance'
+    | '/dashboard/compliance'
+    | '/dashboard/documents'
     | '/dashboard/employee'
     | '/dashboard/executive'
     | '/dashboard/helpdesk'
     | '/dashboard/it-admin'
+    | '/dashboard/leave'
     | '/dashboard/manager'
+    | '/dashboard/onboarding'
+    | '/dashboard/payroll'
+    | '/dashboard/performance'
+    | '/dashboard/recruitment'
+    | '/dashboard/settings'
+    | '/dashboard/workforce'
     | '/dashboard/'
     | '/dashboard/ai-workforce/agents'
     | '/dashboard/ai-workforce/analytics'
@@ -2576,11 +2686,22 @@ export interface FileRouteTypes {
     | '/auth/session-expired'
     | '/auth/unauthorized'
     | '/auth/verify-email'
+    | '/_authenticated/dashboard/ai-workforce'
+    | '/_authenticated/dashboard/attendance'
+    | '/_authenticated/dashboard/compliance'
+    | '/_authenticated/dashboard/documents'
     | '/_authenticated/dashboard/employee'
     | '/_authenticated/dashboard/executive'
     | '/_authenticated/dashboard/helpdesk'
     | '/_authenticated/dashboard/it-admin'
+    | '/_authenticated/dashboard/leave'
     | '/_authenticated/dashboard/manager'
+    | '/_authenticated/dashboard/onboarding'
+    | '/_authenticated/dashboard/payroll'
+    | '/_authenticated/dashboard/performance'
+    | '/_authenticated/dashboard/recruitment'
+    | '/_authenticated/dashboard/settings'
+    | '/_authenticated/dashboard/workforce'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/ai-workforce/agents'
     | '/_authenticated/dashboard/ai-workforce/analytics'
@@ -2894,6 +3015,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/ai-workforce': {
+      id: '/_authenticated/dashboard/ai-workforce'
+      path: '/ai-workforce'
+      fullPath: '/dashboard/ai-workforce'
+      preLoaderRoute: typeof AuthenticatedDashboardAiWorkforceRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/attendance': {
+      id: '/_authenticated/dashboard/attendance'
+      path: '/attendance'
+      fullPath: '/dashboard/attendance'
+      preLoaderRoute: typeof AuthenticatedDashboardAttendanceRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/compliance': {
+      id: '/_authenticated/dashboard/compliance'
+      path: '/compliance'
+      fullPath: '/dashboard/compliance'
+      preLoaderRoute: typeof AuthenticatedDashboardComplianceRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/documents': {
+      id: '/_authenticated/dashboard/documents'
+      path: '/documents'
+      fullPath: '/dashboard/documents'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/employee': {
       id: '/_authenticated/dashboard/employee'
       path: '/employee'
@@ -2922,6 +3071,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardItAdminRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/leave': {
+      id: '/_authenticated/dashboard/leave'
+      path: '/leave'
+      fullPath: '/dashboard/leave'
+      preLoaderRoute: typeof AuthenticatedDashboardLeaveRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/manager': {
       id: '/_authenticated/dashboard/manager'
       path: '/manager'
@@ -2929,40 +3085,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardManagerRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/onboarding': {
+      id: '/_authenticated/dashboard/onboarding'
+      path: '/onboarding'
+      fullPath: '/dashboard/onboarding'
+      preLoaderRoute: typeof AuthenticatedDashboardOnboardingRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/payroll': {
+      id: '/_authenticated/dashboard/payroll'
+      path: '/payroll'
+      fullPath: '/dashboard/payroll'
+      preLoaderRoute: typeof AuthenticatedDashboardPayrollRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/performance': {
+      id: '/_authenticated/dashboard/performance'
+      path: '/performance'
+      fullPath: '/dashboard/performance'
+      preLoaderRoute: typeof AuthenticatedDashboardPerformanceRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/recruitment': {
+      id: '/_authenticated/dashboard/recruitment'
+      path: '/recruitment'
+      fullPath: '/dashboard/recruitment'
+      preLoaderRoute: typeof AuthenticatedDashboardRecruitmentRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/settings': {
+      id: '/_authenticated/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthenticatedDashboardSettingsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/workforce': {
+      id: '/_authenticated/dashboard/workforce'
+      path: '/workforce'
+      fullPath: '/dashboard/workforce'
+      preLoaderRoute: typeof AuthenticatedDashboardWorkforceRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/ai-workforce/': {
       id: '/_authenticated/dashboard/ai-workforce/'
-      path: '/ai-workforce'
+      path: '/'
       fullPath: '/dashboard/ai-workforce/'
       preLoaderRoute: typeof AuthenticatedDashboardAiWorkforceIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAiWorkforceRoute
     }
     '/_authenticated/dashboard/ai-workforce/agents': {
       id: '/_authenticated/dashboard/ai-workforce/agents'
-      path: '/ai-workforce/agents'
+      path: '/agents'
       fullPath: '/dashboard/ai-workforce/agents'
       preLoaderRoute: typeof AuthenticatedDashboardAiWorkforceAgentsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAiWorkforceRoute
     }
     '/_authenticated/dashboard/ai-workforce/analytics': {
       id: '/_authenticated/dashboard/ai-workforce/analytics'
-      path: '/ai-workforce/analytics'
+      path: '/analytics'
       fullPath: '/dashboard/ai-workforce/analytics'
       preLoaderRoute: typeof AuthenticatedDashboardAiWorkforceAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAiWorkforceRoute
     }
     '/_authenticated/dashboard/ai-workforce/copilots': {
       id: '/_authenticated/dashboard/ai-workforce/copilots'
-      path: '/ai-workforce/copilots'
+      path: '/copilots'
       fullPath: '/dashboard/ai-workforce/copilots'
       preLoaderRoute: typeof AuthenticatedDashboardAiWorkforceCopilotsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAiWorkforceRoute
     }
     '/_authenticated/dashboard/ai-workforce/workflows': {
       id: '/_authenticated/dashboard/ai-workforce/workflows'
-      path: '/ai-workforce/workflows'
+      path: '/workflows'
       fullPath: '/dashboard/ai-workforce/workflows'
       preLoaderRoute: typeof AuthenticatedDashboardAiWorkforceWorkflowsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAiWorkforceRoute
     }
     '/_authenticated/dashboard/approvals/': {
       id: '/_authenticated/dashboard/approvals/'
@@ -3127,38 +3325,38 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/attendance/': {
       id: '/_authenticated/dashboard/attendance/'
-      path: '/attendance'
+      path: '/'
       fullPath: '/dashboard/attendance/'
       preLoaderRoute: typeof AuthenticatedDashboardAttendanceIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAttendanceRoute
     }
     '/_authenticated/dashboard/attendance/geofence': {
       id: '/_authenticated/dashboard/attendance/geofence'
-      path: '/attendance/geofence'
+      path: '/geofence'
       fullPath: '/dashboard/attendance/geofence'
       preLoaderRoute: typeof AuthenticatedDashboardAttendanceGeofenceRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAttendanceRoute
     }
     '/_authenticated/dashboard/attendance/logs': {
       id: '/_authenticated/dashboard/attendance/logs'
-      path: '/attendance/logs'
+      path: '/logs'
       fullPath: '/dashboard/attendance/logs'
       preLoaderRoute: typeof AuthenticatedDashboardAttendanceLogsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAttendanceRoute
     }
     '/_authenticated/dashboard/attendance/overtime': {
       id: '/_authenticated/dashboard/attendance/overtime'
-      path: '/attendance/overtime'
+      path: '/overtime'
       fullPath: '/dashboard/attendance/overtime'
       preLoaderRoute: typeof AuthenticatedDashboardAttendanceOvertimeRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAttendanceRoute
     }
     '/_authenticated/dashboard/attendance/shifts': {
       id: '/_authenticated/dashboard/attendance/shifts'
-      path: '/attendance/shifts'
+      path: '/shifts'
       fullPath: '/dashboard/attendance/shifts'
       preLoaderRoute: typeof AuthenticatedDashboardAttendanceShiftsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardAttendanceRoute
     }
     '/_authenticated/dashboard/calendar/': {
       id: '/_authenticated/dashboard/calendar/'
@@ -3204,94 +3402,94 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/compliance/': {
       id: '/_authenticated/dashboard/compliance/'
-      path: '/compliance'
+      path: '/'
       fullPath: '/dashboard/compliance/'
       preLoaderRoute: typeof AuthenticatedDashboardComplianceIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardComplianceRoute
     }
     '/_authenticated/dashboard/compliance/audit-logs': {
       id: '/_authenticated/dashboard/compliance/audit-logs'
-      path: '/compliance/audit-logs'
+      path: '/audit-logs'
       fullPath: '/dashboard/compliance/audit-logs'
       preLoaderRoute: typeof AuthenticatedDashboardComplianceAuditLogsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardComplianceRoute
     }
     '/_authenticated/dashboard/compliance/documents': {
       id: '/_authenticated/dashboard/compliance/documents'
-      path: '/compliance/documents'
+      path: '/documents'
       fullPath: '/dashboard/compliance/documents'
       preLoaderRoute: typeof AuthenticatedDashboardComplianceDocumentsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardComplianceRoute
     }
     '/_authenticated/dashboard/compliance/laws': {
       id: '/_authenticated/dashboard/compliance/laws'
-      path: '/compliance/laws'
+      path: '/laws'
       fullPath: '/dashboard/compliance/laws'
       preLoaderRoute: typeof AuthenticatedDashboardComplianceLawsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardComplianceRoute
     }
     '/_authenticated/dashboard/compliance/risks': {
       id: '/_authenticated/dashboard/compliance/risks'
-      path: '/compliance/risks'
+      path: '/risks'
       fullPath: '/dashboard/compliance/risks'
       preLoaderRoute: typeof AuthenticatedDashboardComplianceRisksRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardComplianceRoute
     }
     '/_authenticated/dashboard/documents/': {
       id: '/_authenticated/dashboard/documents/'
-      path: '/documents'
+      path: '/'
       fullPath: '/dashboard/documents/'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/certificates': {
       id: '/_authenticated/dashboard/documents/certificates'
-      path: '/documents/certificates'
+      path: '/certificates'
       fullPath: '/dashboard/documents/certificates'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsCertificatesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/contracts': {
       id: '/_authenticated/dashboard/documents/contracts'
-      path: '/documents/contracts'
+      path: '/contracts'
       fullPath: '/dashboard/documents/contracts'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsContractsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/digital-signatures': {
       id: '/_authenticated/dashboard/documents/digital-signatures'
-      path: '/documents/digital-signatures'
+      path: '/digital-signatures'
       fullPath: '/dashboard/documents/digital-signatures'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsDigitalSignaturesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/employees': {
       id: '/_authenticated/dashboard/documents/employees'
-      path: '/documents/employees'
+      path: '/employees'
       fullPath: '/dashboard/documents/employees'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsEmployeesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/offer-letters': {
       id: '/_authenticated/dashboard/documents/offer-letters'
-      path: '/documents/offer-letters'
+      path: '/offer-letters'
       fullPath: '/dashboard/documents/offer-letters'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsOfferLettersRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/policies': {
       id: '/_authenticated/dashboard/documents/policies'
-      path: '/documents/policies'
+      path: '/policies'
       fullPath: '/dashboard/documents/policies'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsPoliciesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/documents/templates': {
       id: '/_authenticated/dashboard/documents/templates'
-      path: '/documents/templates'
+      path: '/templates'
       fullPath: '/dashboard/documents/templates'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentsTemplatesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardDocumentsRoute
     }
     '/_authenticated/dashboard/employee/': {
       id: '/_authenticated/dashboard/employee/'
@@ -3617,38 +3815,38 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/leave/': {
       id: '/_authenticated/dashboard/leave/'
-      path: '/leave'
+      path: '/'
       fullPath: '/dashboard/leave/'
       preLoaderRoute: typeof AuthenticatedDashboardLeaveIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardLeaveRoute
     }
     '/_authenticated/dashboard/leave/approvals': {
       id: '/_authenticated/dashboard/leave/approvals'
-      path: '/leave/approvals'
+      path: '/approvals'
       fullPath: '/dashboard/leave/approvals'
       preLoaderRoute: typeof AuthenticatedDashboardLeaveApprovalsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardLeaveRoute
     }
     '/_authenticated/dashboard/leave/balances': {
       id: '/_authenticated/dashboard/leave/balances'
-      path: '/leave/balances'
+      path: '/balances'
       fullPath: '/dashboard/leave/balances'
       preLoaderRoute: typeof AuthenticatedDashboardLeaveBalancesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardLeaveRoute
     }
     '/_authenticated/dashboard/leave/calendar': {
       id: '/_authenticated/dashboard/leave/calendar'
-      path: '/leave/calendar'
+      path: '/calendar'
       fullPath: '/dashboard/leave/calendar'
       preLoaderRoute: typeof AuthenticatedDashboardLeaveCalendarRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardLeaveRoute
     }
     '/_authenticated/dashboard/leave/requests': {
       id: '/_authenticated/dashboard/leave/requests'
-      path: '/leave/requests'
+      path: '/requests'
       fullPath: '/dashboard/leave/requests'
       preLoaderRoute: typeof AuthenticatedDashboardLeaveRequestsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardLeaveRoute
     }
     '/_authenticated/dashboard/manager/': {
       id: '/_authenticated/dashboard/manager/'
@@ -3750,108 +3948,108 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/onboarding/': {
       id: '/_authenticated/dashboard/onboarding/'
-      path: '/onboarding'
+      path: '/'
       fullPath: '/dashboard/onboarding/'
       preLoaderRoute: typeof AuthenticatedDashboardOnboardingIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardOnboardingRoute
     }
     '/_authenticated/dashboard/onboarding/documents': {
       id: '/_authenticated/dashboard/onboarding/documents'
-      path: '/onboarding/documents'
+      path: '/documents'
       fullPath: '/dashboard/onboarding/documents'
       preLoaderRoute: typeof AuthenticatedDashboardOnboardingDocumentsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardOnboardingRoute
     }
     '/_authenticated/dashboard/onboarding/new-hires': {
       id: '/_authenticated/dashboard/onboarding/new-hires'
-      path: '/onboarding/new-hires'
+      path: '/new-hires'
       fullPath: '/dashboard/onboarding/new-hires'
       preLoaderRoute: typeof AuthenticatedDashboardOnboardingNewHiresRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardOnboardingRoute
     }
     '/_authenticated/dashboard/onboarding/tasks': {
       id: '/_authenticated/dashboard/onboarding/tasks'
-      path: '/onboarding/tasks'
+      path: '/tasks'
       fullPath: '/dashboard/onboarding/tasks'
       preLoaderRoute: typeof AuthenticatedDashboardOnboardingTasksRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardOnboardingRoute
     }
     '/_authenticated/dashboard/onboarding/workflows': {
       id: '/_authenticated/dashboard/onboarding/workflows'
-      path: '/onboarding/workflows'
+      path: '/workflows'
       fullPath: '/dashboard/onboarding/workflows'
       preLoaderRoute: typeof AuthenticatedDashboardOnboardingWorkflowsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardOnboardingRoute
     }
     '/_authenticated/dashboard/payroll/': {
       id: '/_authenticated/dashboard/payroll/'
-      path: '/payroll'
+      path: '/'
       fullPath: '/dashboard/payroll/'
       preLoaderRoute: typeof AuthenticatedDashboardPayrollIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPayrollRoute
     }
     '/_authenticated/dashboard/payroll/pay-runs': {
       id: '/_authenticated/dashboard/payroll/pay-runs'
-      path: '/payroll/pay-runs'
+      path: '/pay-runs'
       fullPath: '/dashboard/payroll/pay-runs'
       preLoaderRoute: typeof AuthenticatedDashboardPayrollPayRunsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPayrollRoute
     }
     '/_authenticated/dashboard/payroll/payslips': {
       id: '/_authenticated/dashboard/payroll/payslips'
-      path: '/payroll/payslips'
+      path: '/payslips'
       fullPath: '/dashboard/payroll/payslips'
       preLoaderRoute: typeof AuthenticatedDashboardPayrollPayslipsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPayrollRoute
     }
     '/_authenticated/dashboard/payroll/salary-structure': {
       id: '/_authenticated/dashboard/payroll/salary-structure'
-      path: '/payroll/salary-structure'
+      path: '/salary-structure'
       fullPath: '/dashboard/payroll/salary-structure'
       preLoaderRoute: typeof AuthenticatedDashboardPayrollSalaryStructureRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPayrollRoute
     }
     '/_authenticated/dashboard/payroll/tax': {
       id: '/_authenticated/dashboard/payroll/tax'
-      path: '/payroll/tax'
+      path: '/tax'
       fullPath: '/dashboard/payroll/tax'
       preLoaderRoute: typeof AuthenticatedDashboardPayrollTaxRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPayrollRoute
     }
     '/_authenticated/dashboard/performance/': {
       id: '/_authenticated/dashboard/performance/'
-      path: '/performance'
+      path: '/'
       fullPath: '/dashboard/performance/'
       preLoaderRoute: typeof AuthenticatedDashboardPerformanceIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPerformanceRoute
     }
     '/_authenticated/dashboard/performance/feedback': {
       id: '/_authenticated/dashboard/performance/feedback'
-      path: '/performance/feedback'
+      path: '/feedback'
       fullPath: '/dashboard/performance/feedback'
       preLoaderRoute: typeof AuthenticatedDashboardPerformanceFeedbackRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPerformanceRoute
     }
     '/_authenticated/dashboard/performance/goals': {
       id: '/_authenticated/dashboard/performance/goals'
-      path: '/performance/goals'
+      path: '/goals'
       fullPath: '/dashboard/performance/goals'
       preLoaderRoute: typeof AuthenticatedDashboardPerformanceGoalsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPerformanceRoute
     }
     '/_authenticated/dashboard/performance/reviews': {
       id: '/_authenticated/dashboard/performance/reviews'
-      path: '/performance/reviews'
+      path: '/reviews'
       fullPath: '/dashboard/performance/reviews'
       preLoaderRoute: typeof AuthenticatedDashboardPerformanceReviewsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPerformanceRoute
     }
     '/_authenticated/dashboard/performance/skills': {
       id: '/_authenticated/dashboard/performance/skills'
-      path: '/performance/skills'
+      path: '/skills'
       fullPath: '/dashboard/performance/skills'
       preLoaderRoute: typeof AuthenticatedDashboardPerformanceSkillsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardPerformanceRoute
     }
     '/_authenticated/dashboard/policies/': {
       id: '/_authenticated/dashboard/policies/'
@@ -3897,101 +4095,101 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/recruitment/': {
       id: '/_authenticated/dashboard/recruitment/'
-      path: '/recruitment'
+      path: '/'
       fullPath: '/dashboard/recruitment/'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/analytics': {
       id: '/_authenticated/dashboard/recruitment/analytics'
-      path: '/recruitment/analytics'
+      path: '/analytics'
       fullPath: '/dashboard/recruitment/analytics'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/automation': {
       id: '/_authenticated/dashboard/recruitment/automation'
-      path: '/recruitment/automation'
+      path: '/automation'
       fullPath: '/dashboard/recruitment/automation'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentAutomationRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/candidates': {
       id: '/_authenticated/dashboard/recruitment/candidates'
-      path: '/recruitment/candidates'
+      path: '/candidates'
       fullPath: '/dashboard/recruitment/candidates'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentCandidatesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/copilot': {
       id: '/_authenticated/dashboard/recruitment/copilot'
-      path: '/recruitment/copilot'
+      path: '/copilot'
       fullPath: '/dashboard/recruitment/copilot'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentCopilotRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/crm': {
       id: '/_authenticated/dashboard/recruitment/crm'
-      path: '/recruitment/crm'
+      path: '/crm'
       fullPath: '/dashboard/recruitment/crm'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentCrmRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/interviews': {
       id: '/_authenticated/dashboard/recruitment/interviews'
-      path: '/recruitment/interviews'
+      path: '/interviews'
       fullPath: '/dashboard/recruitment/interviews'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentInterviewsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/jobs': {
       id: '/_authenticated/dashboard/recruitment/jobs'
-      path: '/recruitment/jobs'
+      path: '/jobs'
       fullPath: '/dashboard/recruitment/jobs'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentJobsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/offers': {
       id: '/_authenticated/dashboard/recruitment/offers'
-      path: '/recruitment/offers'
+      path: '/offers'
       fullPath: '/dashboard/recruitment/offers'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentOffersRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/onboarding': {
       id: '/_authenticated/dashboard/recruitment/onboarding'
-      path: '/recruitment/onboarding'
+      path: '/onboarding'
       fullPath: '/dashboard/recruitment/onboarding'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentOnboardingRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/pipeline': {
       id: '/_authenticated/dashboard/recruitment/pipeline'
-      path: '/recruitment/pipeline'
+      path: '/pipeline'
       fullPath: '/dashboard/recruitment/pipeline'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentPipelineRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/requisitions': {
       id: '/_authenticated/dashboard/recruitment/requisitions'
-      path: '/recruitment/requisitions'
+      path: '/requisitions'
       fullPath: '/dashboard/recruitment/requisitions'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentRequisitionsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/talent-pool': {
       id: '/_authenticated/dashboard/recruitment/talent-pool'
-      path: '/recruitment/talent-pool'
+      path: '/talent-pool'
       fullPath: '/dashboard/recruitment/talent-pool'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentTalentPoolRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/recruitment/templates': {
       id: '/_authenticated/dashboard/recruitment/templates'
-      path: '/recruitment/templates'
+      path: '/templates'
       fullPath: '/dashboard/recruitment/templates'
       preLoaderRoute: typeof AuthenticatedDashboardRecruitmentTemplatesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardRecruitmentRoute
     }
     '/_authenticated/dashboard/reports/': {
       id: '/_authenticated/dashboard/reports/'
@@ -4163,38 +4361,38 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/settings/': {
       id: '/_authenticated/dashboard/settings/'
-      path: '/settings'
+      path: '/'
       fullPath: '/dashboard/settings/'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/billing': {
       id: '/_authenticated/dashboard/settings/billing'
-      path: '/settings/billing'
+      path: '/billing'
       fullPath: '/dashboard/settings/billing'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsBillingRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/organization': {
       id: '/_authenticated/dashboard/settings/organization'
-      path: '/settings/organization'
+      path: '/organization'
       fullPath: '/dashboard/settings/organization'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsOrganizationRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/roles': {
       id: '/_authenticated/dashboard/settings/roles'
-      path: '/settings/roles'
+      path: '/roles'
       fullPath: '/dashboard/settings/roles'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsRolesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/settings/security': {
       id: '/_authenticated/dashboard/settings/security'
-      path: '/settings/security'
+      path: '/security'
       fullPath: '/dashboard/settings/security'
       preLoaderRoute: typeof AuthenticatedDashboardSettingsSecurityRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardSettingsRoute
     }
     '/_authenticated/dashboard/vendors/': {
       id: '/_authenticated/dashboard/vendors/'
@@ -4233,69 +4431,186 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/workforce/': {
       id: '/_authenticated/dashboard/workforce/'
-      path: '/workforce'
+      path: '/'
       fullPath: '/dashboard/workforce/'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceIndexRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/branches': {
       id: '/_authenticated/dashboard/workforce/branches'
-      path: '/workforce/branches'
+      path: '/branches'
       fullPath: '/dashboard/workforce/branches'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceBranchesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/departments': {
       id: '/_authenticated/dashboard/workforce/departments'
-      path: '/workforce/departments'
+      path: '/departments'
       fullPath: '/dashboard/workforce/departments'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceDepartmentsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/designations': {
       id: '/_authenticated/dashboard/workforce/designations'
-      path: '/workforce/designations'
+      path: '/designations'
       fullPath: '/dashboard/workforce/designations'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceDesignationsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/employees': {
       id: '/_authenticated/dashboard/workforce/employees'
-      path: '/workforce/employees'
+      path: '/employees'
       fullPath: '/dashboard/workforce/employees'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceEmployeesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/executives': {
       id: '/_authenticated/dashboard/workforce/executives'
-      path: '/workforce/executives'
+      path: '/executives'
       fullPath: '/dashboard/workforce/executives'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceExecutivesRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/it-admins': {
       id: '/_authenticated/dashboard/workforce/it-admins'
-      path: '/workforce/it-admins'
+      path: '/it-admins'
       fullPath: '/dashboard/workforce/it-admins'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceItAdminsRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/managers': {
       id: '/_authenticated/dashboard/workforce/managers'
-      path: '/workforce/managers'
+      path: '/managers'
       fullPath: '/dashboard/workforce/managers'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceManagersRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
     '/_authenticated/dashboard/workforce/org-chart': {
       id: '/_authenticated/dashboard/workforce/org-chart'
-      path: '/workforce/org-chart'
+      path: '/org-chart'
       fullPath: '/dashboard/workforce/org-chart'
       preLoaderRoute: typeof AuthenticatedDashboardWorkforceOrgChartRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
+      parentRoute: typeof AuthenticatedDashboardWorkforceRoute
     }
   }
 }
+
+interface AuthenticatedDashboardAiWorkforceRouteChildren {
+  AuthenticatedDashboardAiWorkforceAgentsRoute: typeof AuthenticatedDashboardAiWorkforceAgentsRoute
+  AuthenticatedDashboardAiWorkforceAnalyticsRoute: typeof AuthenticatedDashboardAiWorkforceAnalyticsRoute
+  AuthenticatedDashboardAiWorkforceCopilotsRoute: typeof AuthenticatedDashboardAiWorkforceCopilotsRoute
+  AuthenticatedDashboardAiWorkforceWorkflowsRoute: typeof AuthenticatedDashboardAiWorkforceWorkflowsRoute
+  AuthenticatedDashboardAiWorkforceIndexRoute: typeof AuthenticatedDashboardAiWorkforceIndexRoute
+}
+
+const AuthenticatedDashboardAiWorkforceRouteChildren: AuthenticatedDashboardAiWorkforceRouteChildren =
+  {
+    AuthenticatedDashboardAiWorkforceAgentsRoute:
+      AuthenticatedDashboardAiWorkforceAgentsRoute,
+    AuthenticatedDashboardAiWorkforceAnalyticsRoute:
+      AuthenticatedDashboardAiWorkforceAnalyticsRoute,
+    AuthenticatedDashboardAiWorkforceCopilotsRoute:
+      AuthenticatedDashboardAiWorkforceCopilotsRoute,
+    AuthenticatedDashboardAiWorkforceWorkflowsRoute:
+      AuthenticatedDashboardAiWorkforceWorkflowsRoute,
+    AuthenticatedDashboardAiWorkforceIndexRoute:
+      AuthenticatedDashboardAiWorkforceIndexRoute,
+  }
+
+const AuthenticatedDashboardAiWorkforceRouteWithChildren =
+  AuthenticatedDashboardAiWorkforceRoute._addFileChildren(
+    AuthenticatedDashboardAiWorkforceRouteChildren,
+  )
+
+interface AuthenticatedDashboardAttendanceRouteChildren {
+  AuthenticatedDashboardAttendanceGeofenceRoute: typeof AuthenticatedDashboardAttendanceGeofenceRoute
+  AuthenticatedDashboardAttendanceLogsRoute: typeof AuthenticatedDashboardAttendanceLogsRoute
+  AuthenticatedDashboardAttendanceOvertimeRoute: typeof AuthenticatedDashboardAttendanceOvertimeRoute
+  AuthenticatedDashboardAttendanceShiftsRoute: typeof AuthenticatedDashboardAttendanceShiftsRoute
+  AuthenticatedDashboardAttendanceIndexRoute: typeof AuthenticatedDashboardAttendanceIndexRoute
+}
+
+const AuthenticatedDashboardAttendanceRouteChildren: AuthenticatedDashboardAttendanceRouteChildren =
+  {
+    AuthenticatedDashboardAttendanceGeofenceRoute:
+      AuthenticatedDashboardAttendanceGeofenceRoute,
+    AuthenticatedDashboardAttendanceLogsRoute:
+      AuthenticatedDashboardAttendanceLogsRoute,
+    AuthenticatedDashboardAttendanceOvertimeRoute:
+      AuthenticatedDashboardAttendanceOvertimeRoute,
+    AuthenticatedDashboardAttendanceShiftsRoute:
+      AuthenticatedDashboardAttendanceShiftsRoute,
+    AuthenticatedDashboardAttendanceIndexRoute:
+      AuthenticatedDashboardAttendanceIndexRoute,
+  }
+
+const AuthenticatedDashboardAttendanceRouteWithChildren =
+  AuthenticatedDashboardAttendanceRoute._addFileChildren(
+    AuthenticatedDashboardAttendanceRouteChildren,
+  )
+
+interface AuthenticatedDashboardComplianceRouteChildren {
+  AuthenticatedDashboardComplianceAuditLogsRoute: typeof AuthenticatedDashboardComplianceAuditLogsRoute
+  AuthenticatedDashboardComplianceDocumentsRoute: typeof AuthenticatedDashboardComplianceDocumentsRoute
+  AuthenticatedDashboardComplianceLawsRoute: typeof AuthenticatedDashboardComplianceLawsRoute
+  AuthenticatedDashboardComplianceRisksRoute: typeof AuthenticatedDashboardComplianceRisksRoute
+  AuthenticatedDashboardComplianceIndexRoute: typeof AuthenticatedDashboardComplianceIndexRoute
+}
+
+const AuthenticatedDashboardComplianceRouteChildren: AuthenticatedDashboardComplianceRouteChildren =
+  {
+    AuthenticatedDashboardComplianceAuditLogsRoute:
+      AuthenticatedDashboardComplianceAuditLogsRoute,
+    AuthenticatedDashboardComplianceDocumentsRoute:
+      AuthenticatedDashboardComplianceDocumentsRoute,
+    AuthenticatedDashboardComplianceLawsRoute:
+      AuthenticatedDashboardComplianceLawsRoute,
+    AuthenticatedDashboardComplianceRisksRoute:
+      AuthenticatedDashboardComplianceRisksRoute,
+    AuthenticatedDashboardComplianceIndexRoute:
+      AuthenticatedDashboardComplianceIndexRoute,
+  }
+
+const AuthenticatedDashboardComplianceRouteWithChildren =
+  AuthenticatedDashboardComplianceRoute._addFileChildren(
+    AuthenticatedDashboardComplianceRouteChildren,
+  )
+
+interface AuthenticatedDashboardDocumentsRouteChildren {
+  AuthenticatedDashboardDocumentsCertificatesRoute: typeof AuthenticatedDashboardDocumentsCertificatesRoute
+  AuthenticatedDashboardDocumentsContractsRoute: typeof AuthenticatedDashboardDocumentsContractsRoute
+  AuthenticatedDashboardDocumentsDigitalSignaturesRoute: typeof AuthenticatedDashboardDocumentsDigitalSignaturesRoute
+  AuthenticatedDashboardDocumentsEmployeesRoute: typeof AuthenticatedDashboardDocumentsEmployeesRoute
+  AuthenticatedDashboardDocumentsOfferLettersRoute: typeof AuthenticatedDashboardDocumentsOfferLettersRoute
+  AuthenticatedDashboardDocumentsPoliciesRoute: typeof AuthenticatedDashboardDocumentsPoliciesRoute
+  AuthenticatedDashboardDocumentsTemplatesRoute: typeof AuthenticatedDashboardDocumentsTemplatesRoute
+  AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
+}
+
+const AuthenticatedDashboardDocumentsRouteChildren: AuthenticatedDashboardDocumentsRouteChildren =
+  {
+    AuthenticatedDashboardDocumentsCertificatesRoute:
+      AuthenticatedDashboardDocumentsCertificatesRoute,
+    AuthenticatedDashboardDocumentsContractsRoute:
+      AuthenticatedDashboardDocumentsContractsRoute,
+    AuthenticatedDashboardDocumentsDigitalSignaturesRoute:
+      AuthenticatedDashboardDocumentsDigitalSignaturesRoute,
+    AuthenticatedDashboardDocumentsEmployeesRoute:
+      AuthenticatedDashboardDocumentsEmployeesRoute,
+    AuthenticatedDashboardDocumentsOfferLettersRoute:
+      AuthenticatedDashboardDocumentsOfferLettersRoute,
+    AuthenticatedDashboardDocumentsPoliciesRoute:
+      AuthenticatedDashboardDocumentsPoliciesRoute,
+    AuthenticatedDashboardDocumentsTemplatesRoute:
+      AuthenticatedDashboardDocumentsTemplatesRoute,
+    AuthenticatedDashboardDocumentsIndexRoute:
+      AuthenticatedDashboardDocumentsIndexRoute,
+  }
+
+const AuthenticatedDashboardDocumentsRouteWithChildren =
+  AuthenticatedDashboardDocumentsRoute._addFileChildren(
+    AuthenticatedDashboardDocumentsRouteChildren,
+  )
 
 interface AuthenticatedDashboardEmployeeRouteChildren {
   AuthenticatedDashboardEmployeeAttendanceRoute: typeof AuthenticatedDashboardEmployeeAttendanceRoute
@@ -4450,6 +4765,33 @@ const AuthenticatedDashboardItAdminRouteWithChildren =
     AuthenticatedDashboardItAdminRouteChildren,
   )
 
+interface AuthenticatedDashboardLeaveRouteChildren {
+  AuthenticatedDashboardLeaveApprovalsRoute: typeof AuthenticatedDashboardLeaveApprovalsRoute
+  AuthenticatedDashboardLeaveBalancesRoute: typeof AuthenticatedDashboardLeaveBalancesRoute
+  AuthenticatedDashboardLeaveCalendarRoute: typeof AuthenticatedDashboardLeaveCalendarRoute
+  AuthenticatedDashboardLeaveRequestsRoute: typeof AuthenticatedDashboardLeaveRequestsRoute
+  AuthenticatedDashboardLeaveIndexRoute: typeof AuthenticatedDashboardLeaveIndexRoute
+}
+
+const AuthenticatedDashboardLeaveRouteChildren: AuthenticatedDashboardLeaveRouteChildren =
+  {
+    AuthenticatedDashboardLeaveApprovalsRoute:
+      AuthenticatedDashboardLeaveApprovalsRoute,
+    AuthenticatedDashboardLeaveBalancesRoute:
+      AuthenticatedDashboardLeaveBalancesRoute,
+    AuthenticatedDashboardLeaveCalendarRoute:
+      AuthenticatedDashboardLeaveCalendarRoute,
+    AuthenticatedDashboardLeaveRequestsRoute:
+      AuthenticatedDashboardLeaveRequestsRoute,
+    AuthenticatedDashboardLeaveIndexRoute:
+      AuthenticatedDashboardLeaveIndexRoute,
+  }
+
+const AuthenticatedDashboardLeaveRouteWithChildren =
+  AuthenticatedDashboardLeaveRoute._addFileChildren(
+    AuthenticatedDashboardLeaveRouteChildren,
+  )
+
 interface AuthenticatedDashboardManagerRouteChildren {
   AuthenticatedDashboardManagerAttendanceRoute: typeof AuthenticatedDashboardManagerAttendanceRoute
   AuthenticatedDashboardManagerCalendarRoute: typeof AuthenticatedDashboardManagerCalendarRoute
@@ -4495,17 +4837,225 @@ const AuthenticatedDashboardManagerRouteWithChildren =
     AuthenticatedDashboardManagerRouteChildren,
   )
 
+interface AuthenticatedDashboardOnboardingRouteChildren {
+  AuthenticatedDashboardOnboardingDocumentsRoute: typeof AuthenticatedDashboardOnboardingDocumentsRoute
+  AuthenticatedDashboardOnboardingNewHiresRoute: typeof AuthenticatedDashboardOnboardingNewHiresRoute
+  AuthenticatedDashboardOnboardingTasksRoute: typeof AuthenticatedDashboardOnboardingTasksRoute
+  AuthenticatedDashboardOnboardingWorkflowsRoute: typeof AuthenticatedDashboardOnboardingWorkflowsRoute
+  AuthenticatedDashboardOnboardingIndexRoute: typeof AuthenticatedDashboardOnboardingIndexRoute
+}
+
+const AuthenticatedDashboardOnboardingRouteChildren: AuthenticatedDashboardOnboardingRouteChildren =
+  {
+    AuthenticatedDashboardOnboardingDocumentsRoute:
+      AuthenticatedDashboardOnboardingDocumentsRoute,
+    AuthenticatedDashboardOnboardingNewHiresRoute:
+      AuthenticatedDashboardOnboardingNewHiresRoute,
+    AuthenticatedDashboardOnboardingTasksRoute:
+      AuthenticatedDashboardOnboardingTasksRoute,
+    AuthenticatedDashboardOnboardingWorkflowsRoute:
+      AuthenticatedDashboardOnboardingWorkflowsRoute,
+    AuthenticatedDashboardOnboardingIndexRoute:
+      AuthenticatedDashboardOnboardingIndexRoute,
+  }
+
+const AuthenticatedDashboardOnboardingRouteWithChildren =
+  AuthenticatedDashboardOnboardingRoute._addFileChildren(
+    AuthenticatedDashboardOnboardingRouteChildren,
+  )
+
+interface AuthenticatedDashboardPayrollRouteChildren {
+  AuthenticatedDashboardPayrollPayRunsRoute: typeof AuthenticatedDashboardPayrollPayRunsRoute
+  AuthenticatedDashboardPayrollPayslipsRoute: typeof AuthenticatedDashboardPayrollPayslipsRoute
+  AuthenticatedDashboardPayrollSalaryStructureRoute: typeof AuthenticatedDashboardPayrollSalaryStructureRoute
+  AuthenticatedDashboardPayrollTaxRoute: typeof AuthenticatedDashboardPayrollTaxRoute
+  AuthenticatedDashboardPayrollIndexRoute: typeof AuthenticatedDashboardPayrollIndexRoute
+}
+
+const AuthenticatedDashboardPayrollRouteChildren: AuthenticatedDashboardPayrollRouteChildren =
+  {
+    AuthenticatedDashboardPayrollPayRunsRoute:
+      AuthenticatedDashboardPayrollPayRunsRoute,
+    AuthenticatedDashboardPayrollPayslipsRoute:
+      AuthenticatedDashboardPayrollPayslipsRoute,
+    AuthenticatedDashboardPayrollSalaryStructureRoute:
+      AuthenticatedDashboardPayrollSalaryStructureRoute,
+    AuthenticatedDashboardPayrollTaxRoute:
+      AuthenticatedDashboardPayrollTaxRoute,
+    AuthenticatedDashboardPayrollIndexRoute:
+      AuthenticatedDashboardPayrollIndexRoute,
+  }
+
+const AuthenticatedDashboardPayrollRouteWithChildren =
+  AuthenticatedDashboardPayrollRoute._addFileChildren(
+    AuthenticatedDashboardPayrollRouteChildren,
+  )
+
+interface AuthenticatedDashboardPerformanceRouteChildren {
+  AuthenticatedDashboardPerformanceFeedbackRoute: typeof AuthenticatedDashboardPerformanceFeedbackRoute
+  AuthenticatedDashboardPerformanceGoalsRoute: typeof AuthenticatedDashboardPerformanceGoalsRoute
+  AuthenticatedDashboardPerformanceReviewsRoute: typeof AuthenticatedDashboardPerformanceReviewsRoute
+  AuthenticatedDashboardPerformanceSkillsRoute: typeof AuthenticatedDashboardPerformanceSkillsRoute
+  AuthenticatedDashboardPerformanceIndexRoute: typeof AuthenticatedDashboardPerformanceIndexRoute
+}
+
+const AuthenticatedDashboardPerformanceRouteChildren: AuthenticatedDashboardPerformanceRouteChildren =
+  {
+    AuthenticatedDashboardPerformanceFeedbackRoute:
+      AuthenticatedDashboardPerformanceFeedbackRoute,
+    AuthenticatedDashboardPerformanceGoalsRoute:
+      AuthenticatedDashboardPerformanceGoalsRoute,
+    AuthenticatedDashboardPerformanceReviewsRoute:
+      AuthenticatedDashboardPerformanceReviewsRoute,
+    AuthenticatedDashboardPerformanceSkillsRoute:
+      AuthenticatedDashboardPerformanceSkillsRoute,
+    AuthenticatedDashboardPerformanceIndexRoute:
+      AuthenticatedDashboardPerformanceIndexRoute,
+  }
+
+const AuthenticatedDashboardPerformanceRouteWithChildren =
+  AuthenticatedDashboardPerformanceRoute._addFileChildren(
+    AuthenticatedDashboardPerformanceRouteChildren,
+  )
+
+interface AuthenticatedDashboardRecruitmentRouteChildren {
+  AuthenticatedDashboardRecruitmentAnalyticsRoute: typeof AuthenticatedDashboardRecruitmentAnalyticsRoute
+  AuthenticatedDashboardRecruitmentAutomationRoute: typeof AuthenticatedDashboardRecruitmentAutomationRoute
+  AuthenticatedDashboardRecruitmentCandidatesRoute: typeof AuthenticatedDashboardRecruitmentCandidatesRoute
+  AuthenticatedDashboardRecruitmentCopilotRoute: typeof AuthenticatedDashboardRecruitmentCopilotRoute
+  AuthenticatedDashboardRecruitmentCrmRoute: typeof AuthenticatedDashboardRecruitmentCrmRoute
+  AuthenticatedDashboardRecruitmentInterviewsRoute: typeof AuthenticatedDashboardRecruitmentInterviewsRoute
+  AuthenticatedDashboardRecruitmentJobsRoute: typeof AuthenticatedDashboardRecruitmentJobsRoute
+  AuthenticatedDashboardRecruitmentOffersRoute: typeof AuthenticatedDashboardRecruitmentOffersRoute
+  AuthenticatedDashboardRecruitmentOnboardingRoute: typeof AuthenticatedDashboardRecruitmentOnboardingRoute
+  AuthenticatedDashboardRecruitmentPipelineRoute: typeof AuthenticatedDashboardRecruitmentPipelineRoute
+  AuthenticatedDashboardRecruitmentRequisitionsRoute: typeof AuthenticatedDashboardRecruitmentRequisitionsRoute
+  AuthenticatedDashboardRecruitmentTalentPoolRoute: typeof AuthenticatedDashboardRecruitmentTalentPoolRoute
+  AuthenticatedDashboardRecruitmentTemplatesRoute: typeof AuthenticatedDashboardRecruitmentTemplatesRoute
+  AuthenticatedDashboardRecruitmentIndexRoute: typeof AuthenticatedDashboardRecruitmentIndexRoute
+}
+
+const AuthenticatedDashboardRecruitmentRouteChildren: AuthenticatedDashboardRecruitmentRouteChildren =
+  {
+    AuthenticatedDashboardRecruitmentAnalyticsRoute:
+      AuthenticatedDashboardRecruitmentAnalyticsRoute,
+    AuthenticatedDashboardRecruitmentAutomationRoute:
+      AuthenticatedDashboardRecruitmentAutomationRoute,
+    AuthenticatedDashboardRecruitmentCandidatesRoute:
+      AuthenticatedDashboardRecruitmentCandidatesRoute,
+    AuthenticatedDashboardRecruitmentCopilotRoute:
+      AuthenticatedDashboardRecruitmentCopilotRoute,
+    AuthenticatedDashboardRecruitmentCrmRoute:
+      AuthenticatedDashboardRecruitmentCrmRoute,
+    AuthenticatedDashboardRecruitmentInterviewsRoute:
+      AuthenticatedDashboardRecruitmentInterviewsRoute,
+    AuthenticatedDashboardRecruitmentJobsRoute:
+      AuthenticatedDashboardRecruitmentJobsRoute,
+    AuthenticatedDashboardRecruitmentOffersRoute:
+      AuthenticatedDashboardRecruitmentOffersRoute,
+    AuthenticatedDashboardRecruitmentOnboardingRoute:
+      AuthenticatedDashboardRecruitmentOnboardingRoute,
+    AuthenticatedDashboardRecruitmentPipelineRoute:
+      AuthenticatedDashboardRecruitmentPipelineRoute,
+    AuthenticatedDashboardRecruitmentRequisitionsRoute:
+      AuthenticatedDashboardRecruitmentRequisitionsRoute,
+    AuthenticatedDashboardRecruitmentTalentPoolRoute:
+      AuthenticatedDashboardRecruitmentTalentPoolRoute,
+    AuthenticatedDashboardRecruitmentTemplatesRoute:
+      AuthenticatedDashboardRecruitmentTemplatesRoute,
+    AuthenticatedDashboardRecruitmentIndexRoute:
+      AuthenticatedDashboardRecruitmentIndexRoute,
+  }
+
+const AuthenticatedDashboardRecruitmentRouteWithChildren =
+  AuthenticatedDashboardRecruitmentRoute._addFileChildren(
+    AuthenticatedDashboardRecruitmentRouteChildren,
+  )
+
+interface AuthenticatedDashboardSettingsRouteChildren {
+  AuthenticatedDashboardSettingsBillingRoute: typeof AuthenticatedDashboardSettingsBillingRoute
+  AuthenticatedDashboardSettingsOrganizationRoute: typeof AuthenticatedDashboardSettingsOrganizationRoute
+  AuthenticatedDashboardSettingsRolesRoute: typeof AuthenticatedDashboardSettingsRolesRoute
+  AuthenticatedDashboardSettingsSecurityRoute: typeof AuthenticatedDashboardSettingsSecurityRoute
+  AuthenticatedDashboardSettingsIndexRoute: typeof AuthenticatedDashboardSettingsIndexRoute
+}
+
+const AuthenticatedDashboardSettingsRouteChildren: AuthenticatedDashboardSettingsRouteChildren =
+  {
+    AuthenticatedDashboardSettingsBillingRoute:
+      AuthenticatedDashboardSettingsBillingRoute,
+    AuthenticatedDashboardSettingsOrganizationRoute:
+      AuthenticatedDashboardSettingsOrganizationRoute,
+    AuthenticatedDashboardSettingsRolesRoute:
+      AuthenticatedDashboardSettingsRolesRoute,
+    AuthenticatedDashboardSettingsSecurityRoute:
+      AuthenticatedDashboardSettingsSecurityRoute,
+    AuthenticatedDashboardSettingsIndexRoute:
+      AuthenticatedDashboardSettingsIndexRoute,
+  }
+
+const AuthenticatedDashboardSettingsRouteWithChildren =
+  AuthenticatedDashboardSettingsRoute._addFileChildren(
+    AuthenticatedDashboardSettingsRouteChildren,
+  )
+
+interface AuthenticatedDashboardWorkforceRouteChildren {
+  AuthenticatedDashboardWorkforceBranchesRoute: typeof AuthenticatedDashboardWorkforceBranchesRoute
+  AuthenticatedDashboardWorkforceDepartmentsRoute: typeof AuthenticatedDashboardWorkforceDepartmentsRoute
+  AuthenticatedDashboardWorkforceDesignationsRoute: typeof AuthenticatedDashboardWorkforceDesignationsRoute
+  AuthenticatedDashboardWorkforceEmployeesRoute: typeof AuthenticatedDashboardWorkforceEmployeesRoute
+  AuthenticatedDashboardWorkforceExecutivesRoute: typeof AuthenticatedDashboardWorkforceExecutivesRoute
+  AuthenticatedDashboardWorkforceItAdminsRoute: typeof AuthenticatedDashboardWorkforceItAdminsRoute
+  AuthenticatedDashboardWorkforceManagersRoute: typeof AuthenticatedDashboardWorkforceManagersRoute
+  AuthenticatedDashboardWorkforceOrgChartRoute: typeof AuthenticatedDashboardWorkforceOrgChartRoute
+  AuthenticatedDashboardWorkforceIndexRoute: typeof AuthenticatedDashboardWorkforceIndexRoute
+}
+
+const AuthenticatedDashboardWorkforceRouteChildren: AuthenticatedDashboardWorkforceRouteChildren =
+  {
+    AuthenticatedDashboardWorkforceBranchesRoute:
+      AuthenticatedDashboardWorkforceBranchesRoute,
+    AuthenticatedDashboardWorkforceDepartmentsRoute:
+      AuthenticatedDashboardWorkforceDepartmentsRoute,
+    AuthenticatedDashboardWorkforceDesignationsRoute:
+      AuthenticatedDashboardWorkforceDesignationsRoute,
+    AuthenticatedDashboardWorkforceEmployeesRoute:
+      AuthenticatedDashboardWorkforceEmployeesRoute,
+    AuthenticatedDashboardWorkforceExecutivesRoute:
+      AuthenticatedDashboardWorkforceExecutivesRoute,
+    AuthenticatedDashboardWorkforceItAdminsRoute:
+      AuthenticatedDashboardWorkforceItAdminsRoute,
+    AuthenticatedDashboardWorkforceManagersRoute:
+      AuthenticatedDashboardWorkforceManagersRoute,
+    AuthenticatedDashboardWorkforceOrgChartRoute:
+      AuthenticatedDashboardWorkforceOrgChartRoute,
+    AuthenticatedDashboardWorkforceIndexRoute:
+      AuthenticatedDashboardWorkforceIndexRoute,
+  }
+
+const AuthenticatedDashboardWorkforceRouteWithChildren =
+  AuthenticatedDashboardWorkforceRoute._addFileChildren(
+    AuthenticatedDashboardWorkforceRouteChildren,
+  )
+
 interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardAiWorkforceRoute: typeof AuthenticatedDashboardAiWorkforceRouteWithChildren
+  AuthenticatedDashboardAttendanceRoute: typeof AuthenticatedDashboardAttendanceRouteWithChildren
+  AuthenticatedDashboardComplianceRoute: typeof AuthenticatedDashboardComplianceRouteWithChildren
+  AuthenticatedDashboardDocumentsRoute: typeof AuthenticatedDashboardDocumentsRouteWithChildren
   AuthenticatedDashboardEmployeeRoute: typeof AuthenticatedDashboardEmployeeRouteWithChildren
   AuthenticatedDashboardExecutiveRoute: typeof AuthenticatedDashboardExecutiveRouteWithChildren
   AuthenticatedDashboardHelpdeskRoute: typeof AuthenticatedDashboardHelpdeskRouteWithChildren
   AuthenticatedDashboardItAdminRoute: typeof AuthenticatedDashboardItAdminRouteWithChildren
+  AuthenticatedDashboardLeaveRoute: typeof AuthenticatedDashboardLeaveRouteWithChildren
   AuthenticatedDashboardManagerRoute: typeof AuthenticatedDashboardManagerRouteWithChildren
+  AuthenticatedDashboardOnboardingRoute: typeof AuthenticatedDashboardOnboardingRouteWithChildren
+  AuthenticatedDashboardPayrollRoute: typeof AuthenticatedDashboardPayrollRouteWithChildren
+  AuthenticatedDashboardPerformanceRoute: typeof AuthenticatedDashboardPerformanceRouteWithChildren
+  AuthenticatedDashboardRecruitmentRoute: typeof AuthenticatedDashboardRecruitmentRouteWithChildren
+  AuthenticatedDashboardSettingsRoute: typeof AuthenticatedDashboardSettingsRouteWithChildren
+  AuthenticatedDashboardWorkforceRoute: typeof AuthenticatedDashboardWorkforceRouteWithChildren
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
-  AuthenticatedDashboardAiWorkforceAgentsRoute: typeof AuthenticatedDashboardAiWorkforceAgentsRoute
-  AuthenticatedDashboardAiWorkforceAnalyticsRoute: typeof AuthenticatedDashboardAiWorkforceAnalyticsRoute
-  AuthenticatedDashboardAiWorkforceCopilotsRoute: typeof AuthenticatedDashboardAiWorkforceCopilotsRoute
-  AuthenticatedDashboardAiWorkforceWorkflowsRoute: typeof AuthenticatedDashboardAiWorkforceWorkflowsRoute
   AuthenticatedDashboardApprovalsAssetsRoute: typeof AuthenticatedDashboardApprovalsAssetsRoute
   AuthenticatedDashboardApprovalsAttendanceRoute: typeof AuthenticatedDashboardApprovalsAttendanceRoute
   AuthenticatedDashboardApprovalsExpensesRoute: typeof AuthenticatedDashboardApprovalsExpensesRoute
@@ -4527,25 +5077,10 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAssetsRequestsRoute: typeof AuthenticatedDashboardAssetsRequestsRoute
   AuthenticatedDashboardAssetsReturnRoute: typeof AuthenticatedDashboardAssetsReturnRoute
   AuthenticatedDashboardAssetsVendorsRoute: typeof AuthenticatedDashboardAssetsVendorsRoute
-  AuthenticatedDashboardAttendanceGeofenceRoute: typeof AuthenticatedDashboardAttendanceGeofenceRoute
-  AuthenticatedDashboardAttendanceLogsRoute: typeof AuthenticatedDashboardAttendanceLogsRoute
-  AuthenticatedDashboardAttendanceOvertimeRoute: typeof AuthenticatedDashboardAttendanceOvertimeRoute
-  AuthenticatedDashboardAttendanceShiftsRoute: typeof AuthenticatedDashboardAttendanceShiftsRoute
   AuthenticatedDashboardCommunicationAnnouncementsRoute: typeof AuthenticatedDashboardCommunicationAnnouncementsRoute
   AuthenticatedDashboardCommunicationBroadcastRoute: typeof AuthenticatedDashboardCommunicationBroadcastRoute
   AuthenticatedDashboardCommunicationNewsRoute: typeof AuthenticatedDashboardCommunicationNewsRoute
   AuthenticatedDashboardCommunicationSurveysRoute: typeof AuthenticatedDashboardCommunicationSurveysRoute
-  AuthenticatedDashboardComplianceAuditLogsRoute: typeof AuthenticatedDashboardComplianceAuditLogsRoute
-  AuthenticatedDashboardComplianceDocumentsRoute: typeof AuthenticatedDashboardComplianceDocumentsRoute
-  AuthenticatedDashboardComplianceLawsRoute: typeof AuthenticatedDashboardComplianceLawsRoute
-  AuthenticatedDashboardComplianceRisksRoute: typeof AuthenticatedDashboardComplianceRisksRoute
-  AuthenticatedDashboardDocumentsCertificatesRoute: typeof AuthenticatedDashboardDocumentsCertificatesRoute
-  AuthenticatedDashboardDocumentsContractsRoute: typeof AuthenticatedDashboardDocumentsContractsRoute
-  AuthenticatedDashboardDocumentsDigitalSignaturesRoute: typeof AuthenticatedDashboardDocumentsDigitalSignaturesRoute
-  AuthenticatedDashboardDocumentsEmployeesRoute: typeof AuthenticatedDashboardDocumentsEmployeesRoute
-  AuthenticatedDashboardDocumentsOfferLettersRoute: typeof AuthenticatedDashboardDocumentsOfferLettersRoute
-  AuthenticatedDashboardDocumentsPoliciesRoute: typeof AuthenticatedDashboardDocumentsPoliciesRoute
-  AuthenticatedDashboardDocumentsTemplatesRoute: typeof AuthenticatedDashboardDocumentsTemplatesRoute
   AuthenticatedDashboardEngagementBadgesRoute: typeof AuthenticatedDashboardEngagementBadgesRoute
   AuthenticatedDashboardEngagementEventsRoute: typeof AuthenticatedDashboardEngagementEventsRoute
   AuthenticatedDashboardEngagementRecognitionRoute: typeof AuthenticatedDashboardEngagementRecognitionRoute
@@ -4555,42 +5090,13 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardIntegrationsApiRoute: typeof AuthenticatedDashboardIntegrationsApiRoute
   AuthenticatedDashboardIntegrationsCommunicationRoute: typeof AuthenticatedDashboardIntegrationsCommunicationRoute
   AuthenticatedDashboardIntegrationsSsoRoute: typeof AuthenticatedDashboardIntegrationsSsoRoute
-  AuthenticatedDashboardLeaveApprovalsRoute: typeof AuthenticatedDashboardLeaveApprovalsRoute
-  AuthenticatedDashboardLeaveBalancesRoute: typeof AuthenticatedDashboardLeaveBalancesRoute
-  AuthenticatedDashboardLeaveCalendarRoute: typeof AuthenticatedDashboardLeaveCalendarRoute
-  AuthenticatedDashboardLeaveRequestsRoute: typeof AuthenticatedDashboardLeaveRequestsRoute
   AuthenticatedDashboardOffboardingChecklistRoute: typeof AuthenticatedDashboardOffboardingChecklistRoute
   AuthenticatedDashboardOffboardingSettlementRoute: typeof AuthenticatedDashboardOffboardingSettlementRoute
-  AuthenticatedDashboardOnboardingDocumentsRoute: typeof AuthenticatedDashboardOnboardingDocumentsRoute
-  AuthenticatedDashboardOnboardingNewHiresRoute: typeof AuthenticatedDashboardOnboardingNewHiresRoute
-  AuthenticatedDashboardOnboardingTasksRoute: typeof AuthenticatedDashboardOnboardingTasksRoute
-  AuthenticatedDashboardOnboardingWorkflowsRoute: typeof AuthenticatedDashboardOnboardingWorkflowsRoute
-  AuthenticatedDashboardPayrollPayRunsRoute: typeof AuthenticatedDashboardPayrollPayRunsRoute
-  AuthenticatedDashboardPayrollPayslipsRoute: typeof AuthenticatedDashboardPayrollPayslipsRoute
-  AuthenticatedDashboardPayrollSalaryStructureRoute: typeof AuthenticatedDashboardPayrollSalaryStructureRoute
-  AuthenticatedDashboardPayrollTaxRoute: typeof AuthenticatedDashboardPayrollTaxRoute
-  AuthenticatedDashboardPerformanceFeedbackRoute: typeof AuthenticatedDashboardPerformanceFeedbackRoute
-  AuthenticatedDashboardPerformanceGoalsRoute: typeof AuthenticatedDashboardPerformanceGoalsRoute
-  AuthenticatedDashboardPerformanceReviewsRoute: typeof AuthenticatedDashboardPerformanceReviewsRoute
-  AuthenticatedDashboardPerformanceSkillsRoute: typeof AuthenticatedDashboardPerformanceSkillsRoute
   AuthenticatedDashboardPoliciesAttendanceRoute: typeof AuthenticatedDashboardPoliciesAttendanceRoute
   AuthenticatedDashboardPoliciesHrRoute: typeof AuthenticatedDashboardPoliciesHrRoute
   AuthenticatedDashboardPoliciesLeaveRoute: typeof AuthenticatedDashboardPoliciesLeaveRoute
   AuthenticatedDashboardPoliciesPayrollRoute: typeof AuthenticatedDashboardPoliciesPayrollRoute
   AuthenticatedDashboardPoliciesSecurityRoute: typeof AuthenticatedDashboardPoliciesSecurityRoute
-  AuthenticatedDashboardRecruitmentAnalyticsRoute: typeof AuthenticatedDashboardRecruitmentAnalyticsRoute
-  AuthenticatedDashboardRecruitmentAutomationRoute: typeof AuthenticatedDashboardRecruitmentAutomationRoute
-  AuthenticatedDashboardRecruitmentCandidatesRoute: typeof AuthenticatedDashboardRecruitmentCandidatesRoute
-  AuthenticatedDashboardRecruitmentCopilotRoute: typeof AuthenticatedDashboardRecruitmentCopilotRoute
-  AuthenticatedDashboardRecruitmentCrmRoute: typeof AuthenticatedDashboardRecruitmentCrmRoute
-  AuthenticatedDashboardRecruitmentInterviewsRoute: typeof AuthenticatedDashboardRecruitmentInterviewsRoute
-  AuthenticatedDashboardRecruitmentJobsRoute: typeof AuthenticatedDashboardRecruitmentJobsRoute
-  AuthenticatedDashboardRecruitmentOffersRoute: typeof AuthenticatedDashboardRecruitmentOffersRoute
-  AuthenticatedDashboardRecruitmentOnboardingRoute: typeof AuthenticatedDashboardRecruitmentOnboardingRoute
-  AuthenticatedDashboardRecruitmentPipelineRoute: typeof AuthenticatedDashboardRecruitmentPipelineRoute
-  AuthenticatedDashboardRecruitmentRequisitionsRoute: typeof AuthenticatedDashboardRecruitmentRequisitionsRoute
-  AuthenticatedDashboardRecruitmentTalentPoolRoute: typeof AuthenticatedDashboardRecruitmentTalentPoolRoute
-  AuthenticatedDashboardRecruitmentTemplatesRoute: typeof AuthenticatedDashboardRecruitmentTemplatesRoute
   AuthenticatedDashboardReportsActivityRoute: typeof AuthenticatedDashboardReportsActivityRoute
   AuthenticatedDashboardReportsAiWorkforceRoute: typeof AuthenticatedDashboardReportsAiWorkforceRoute
   AuthenticatedDashboardReportsAssetsRoute: typeof AuthenticatedDashboardReportsAssetsRoute
@@ -4614,47 +5120,32 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardReportsPerformanceRoute: typeof AuthenticatedDashboardReportsPerformanceRoute
   AuthenticatedDashboardReportsRecruitmentRoute: typeof AuthenticatedDashboardReportsRecruitmentRoute
   AuthenticatedDashboardReportsScheduledRoute: typeof AuthenticatedDashboardReportsScheduledRoute
-  AuthenticatedDashboardSettingsBillingRoute: typeof AuthenticatedDashboardSettingsBillingRoute
-  AuthenticatedDashboardSettingsOrganizationRoute: typeof AuthenticatedDashboardSettingsOrganizationRoute
-  AuthenticatedDashboardSettingsRolesRoute: typeof AuthenticatedDashboardSettingsRolesRoute
-  AuthenticatedDashboardSettingsSecurityRoute: typeof AuthenticatedDashboardSettingsSecurityRoute
   AuthenticatedDashboardVendorsContractsRoute: typeof AuthenticatedDashboardVendorsContractsRoute
   AuthenticatedDashboardVendorsInvoicesRoute: typeof AuthenticatedDashboardVendorsInvoicesRoute
   AuthenticatedDashboardVendorsListRoute: typeof AuthenticatedDashboardVendorsListRoute
   AuthenticatedDashboardVendorsPerformanceRoute: typeof AuthenticatedDashboardVendorsPerformanceRoute
-  AuthenticatedDashboardWorkforceBranchesRoute: typeof AuthenticatedDashboardWorkforceBranchesRoute
-  AuthenticatedDashboardWorkforceDepartmentsRoute: typeof AuthenticatedDashboardWorkforceDepartmentsRoute
-  AuthenticatedDashboardWorkforceDesignationsRoute: typeof AuthenticatedDashboardWorkforceDesignationsRoute
-  AuthenticatedDashboardWorkforceEmployeesRoute: typeof AuthenticatedDashboardWorkforceEmployeesRoute
-  AuthenticatedDashboardWorkforceExecutivesRoute: typeof AuthenticatedDashboardWorkforceExecutivesRoute
-  AuthenticatedDashboardWorkforceItAdminsRoute: typeof AuthenticatedDashboardWorkforceItAdminsRoute
-  AuthenticatedDashboardWorkforceManagersRoute: typeof AuthenticatedDashboardWorkforceManagersRoute
-  AuthenticatedDashboardWorkforceOrgChartRoute: typeof AuthenticatedDashboardWorkforceOrgChartRoute
-  AuthenticatedDashboardAiWorkforceIndexRoute: typeof AuthenticatedDashboardAiWorkforceIndexRoute
   AuthenticatedDashboardApprovalsIndexRoute: typeof AuthenticatedDashboardApprovalsIndexRoute
   AuthenticatedDashboardAssetsIndexRoute: typeof AuthenticatedDashboardAssetsIndexRoute
-  AuthenticatedDashboardAttendanceIndexRoute: typeof AuthenticatedDashboardAttendanceIndexRoute
   AuthenticatedDashboardCalendarIndexRoute: typeof AuthenticatedDashboardCalendarIndexRoute
   AuthenticatedDashboardCommunicationIndexRoute: typeof AuthenticatedDashboardCommunicationIndexRoute
-  AuthenticatedDashboardComplianceIndexRoute: typeof AuthenticatedDashboardComplianceIndexRoute
-  AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
   AuthenticatedDashboardEngagementIndexRoute: typeof AuthenticatedDashboardEngagementIndexRoute
   AuthenticatedDashboardIntegrationsIndexRoute: typeof AuthenticatedDashboardIntegrationsIndexRoute
-  AuthenticatedDashboardLeaveIndexRoute: typeof AuthenticatedDashboardLeaveIndexRoute
   AuthenticatedDashboardOffboardingIndexRoute: typeof AuthenticatedDashboardOffboardingIndexRoute
-  AuthenticatedDashboardOnboardingIndexRoute: typeof AuthenticatedDashboardOnboardingIndexRoute
-  AuthenticatedDashboardPayrollIndexRoute: typeof AuthenticatedDashboardPayrollIndexRoute
-  AuthenticatedDashboardPerformanceIndexRoute: typeof AuthenticatedDashboardPerformanceIndexRoute
   AuthenticatedDashboardPoliciesIndexRoute: typeof AuthenticatedDashboardPoliciesIndexRoute
-  AuthenticatedDashboardRecruitmentIndexRoute: typeof AuthenticatedDashboardRecruitmentIndexRoute
   AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
-  AuthenticatedDashboardSettingsIndexRoute: typeof AuthenticatedDashboardSettingsIndexRoute
   AuthenticatedDashboardVendorsIndexRoute: typeof AuthenticatedDashboardVendorsIndexRoute
-  AuthenticatedDashboardWorkforceIndexRoute: typeof AuthenticatedDashboardWorkforceIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
+    AuthenticatedDashboardAiWorkforceRoute:
+      AuthenticatedDashboardAiWorkforceRouteWithChildren,
+    AuthenticatedDashboardAttendanceRoute:
+      AuthenticatedDashboardAttendanceRouteWithChildren,
+    AuthenticatedDashboardComplianceRoute:
+      AuthenticatedDashboardComplianceRouteWithChildren,
+    AuthenticatedDashboardDocumentsRoute:
+      AuthenticatedDashboardDocumentsRouteWithChildren,
     AuthenticatedDashboardEmployeeRoute:
       AuthenticatedDashboardEmployeeRouteWithChildren,
     AuthenticatedDashboardExecutiveRoute:
@@ -4663,17 +5154,23 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardHelpdeskRouteWithChildren,
     AuthenticatedDashboardItAdminRoute:
       AuthenticatedDashboardItAdminRouteWithChildren,
+    AuthenticatedDashboardLeaveRoute:
+      AuthenticatedDashboardLeaveRouteWithChildren,
     AuthenticatedDashboardManagerRoute:
       AuthenticatedDashboardManagerRouteWithChildren,
+    AuthenticatedDashboardOnboardingRoute:
+      AuthenticatedDashboardOnboardingRouteWithChildren,
+    AuthenticatedDashboardPayrollRoute:
+      AuthenticatedDashboardPayrollRouteWithChildren,
+    AuthenticatedDashboardPerformanceRoute:
+      AuthenticatedDashboardPerformanceRouteWithChildren,
+    AuthenticatedDashboardRecruitmentRoute:
+      AuthenticatedDashboardRecruitmentRouteWithChildren,
+    AuthenticatedDashboardSettingsRoute:
+      AuthenticatedDashboardSettingsRouteWithChildren,
+    AuthenticatedDashboardWorkforceRoute:
+      AuthenticatedDashboardWorkforceRouteWithChildren,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
-    AuthenticatedDashboardAiWorkforceAgentsRoute:
-      AuthenticatedDashboardAiWorkforceAgentsRoute,
-    AuthenticatedDashboardAiWorkforceAnalyticsRoute:
-      AuthenticatedDashboardAiWorkforceAnalyticsRoute,
-    AuthenticatedDashboardAiWorkforceCopilotsRoute:
-      AuthenticatedDashboardAiWorkforceCopilotsRoute,
-    AuthenticatedDashboardAiWorkforceWorkflowsRoute:
-      AuthenticatedDashboardAiWorkforceWorkflowsRoute,
     AuthenticatedDashboardApprovalsAssetsRoute:
       AuthenticatedDashboardApprovalsAssetsRoute,
     AuthenticatedDashboardApprovalsAttendanceRoute:
@@ -4716,14 +5213,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAssetsReturnRoute,
     AuthenticatedDashboardAssetsVendorsRoute:
       AuthenticatedDashboardAssetsVendorsRoute,
-    AuthenticatedDashboardAttendanceGeofenceRoute:
-      AuthenticatedDashboardAttendanceGeofenceRoute,
-    AuthenticatedDashboardAttendanceLogsRoute:
-      AuthenticatedDashboardAttendanceLogsRoute,
-    AuthenticatedDashboardAttendanceOvertimeRoute:
-      AuthenticatedDashboardAttendanceOvertimeRoute,
-    AuthenticatedDashboardAttendanceShiftsRoute:
-      AuthenticatedDashboardAttendanceShiftsRoute,
     AuthenticatedDashboardCommunicationAnnouncementsRoute:
       AuthenticatedDashboardCommunicationAnnouncementsRoute,
     AuthenticatedDashboardCommunicationBroadcastRoute:
@@ -4732,28 +5221,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardCommunicationNewsRoute,
     AuthenticatedDashboardCommunicationSurveysRoute:
       AuthenticatedDashboardCommunicationSurveysRoute,
-    AuthenticatedDashboardComplianceAuditLogsRoute:
-      AuthenticatedDashboardComplianceAuditLogsRoute,
-    AuthenticatedDashboardComplianceDocumentsRoute:
-      AuthenticatedDashboardComplianceDocumentsRoute,
-    AuthenticatedDashboardComplianceLawsRoute:
-      AuthenticatedDashboardComplianceLawsRoute,
-    AuthenticatedDashboardComplianceRisksRoute:
-      AuthenticatedDashboardComplianceRisksRoute,
-    AuthenticatedDashboardDocumentsCertificatesRoute:
-      AuthenticatedDashboardDocumentsCertificatesRoute,
-    AuthenticatedDashboardDocumentsContractsRoute:
-      AuthenticatedDashboardDocumentsContractsRoute,
-    AuthenticatedDashboardDocumentsDigitalSignaturesRoute:
-      AuthenticatedDashboardDocumentsDigitalSignaturesRoute,
-    AuthenticatedDashboardDocumentsEmployeesRoute:
-      AuthenticatedDashboardDocumentsEmployeesRoute,
-    AuthenticatedDashboardDocumentsOfferLettersRoute:
-      AuthenticatedDashboardDocumentsOfferLettersRoute,
-    AuthenticatedDashboardDocumentsPoliciesRoute:
-      AuthenticatedDashboardDocumentsPoliciesRoute,
-    AuthenticatedDashboardDocumentsTemplatesRoute:
-      AuthenticatedDashboardDocumentsTemplatesRoute,
     AuthenticatedDashboardEngagementBadgesRoute:
       AuthenticatedDashboardEngagementBadgesRoute,
     AuthenticatedDashboardEngagementEventsRoute:
@@ -4772,42 +5239,10 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardIntegrationsCommunicationRoute,
     AuthenticatedDashboardIntegrationsSsoRoute:
       AuthenticatedDashboardIntegrationsSsoRoute,
-    AuthenticatedDashboardLeaveApprovalsRoute:
-      AuthenticatedDashboardLeaveApprovalsRoute,
-    AuthenticatedDashboardLeaveBalancesRoute:
-      AuthenticatedDashboardLeaveBalancesRoute,
-    AuthenticatedDashboardLeaveCalendarRoute:
-      AuthenticatedDashboardLeaveCalendarRoute,
-    AuthenticatedDashboardLeaveRequestsRoute:
-      AuthenticatedDashboardLeaveRequestsRoute,
     AuthenticatedDashboardOffboardingChecklistRoute:
       AuthenticatedDashboardOffboardingChecklistRoute,
     AuthenticatedDashboardOffboardingSettlementRoute:
       AuthenticatedDashboardOffboardingSettlementRoute,
-    AuthenticatedDashboardOnboardingDocumentsRoute:
-      AuthenticatedDashboardOnboardingDocumentsRoute,
-    AuthenticatedDashboardOnboardingNewHiresRoute:
-      AuthenticatedDashboardOnboardingNewHiresRoute,
-    AuthenticatedDashboardOnboardingTasksRoute:
-      AuthenticatedDashboardOnboardingTasksRoute,
-    AuthenticatedDashboardOnboardingWorkflowsRoute:
-      AuthenticatedDashboardOnboardingWorkflowsRoute,
-    AuthenticatedDashboardPayrollPayRunsRoute:
-      AuthenticatedDashboardPayrollPayRunsRoute,
-    AuthenticatedDashboardPayrollPayslipsRoute:
-      AuthenticatedDashboardPayrollPayslipsRoute,
-    AuthenticatedDashboardPayrollSalaryStructureRoute:
-      AuthenticatedDashboardPayrollSalaryStructureRoute,
-    AuthenticatedDashboardPayrollTaxRoute:
-      AuthenticatedDashboardPayrollTaxRoute,
-    AuthenticatedDashboardPerformanceFeedbackRoute:
-      AuthenticatedDashboardPerformanceFeedbackRoute,
-    AuthenticatedDashboardPerformanceGoalsRoute:
-      AuthenticatedDashboardPerformanceGoalsRoute,
-    AuthenticatedDashboardPerformanceReviewsRoute:
-      AuthenticatedDashboardPerformanceReviewsRoute,
-    AuthenticatedDashboardPerformanceSkillsRoute:
-      AuthenticatedDashboardPerformanceSkillsRoute,
     AuthenticatedDashboardPoliciesAttendanceRoute:
       AuthenticatedDashboardPoliciesAttendanceRoute,
     AuthenticatedDashboardPoliciesHrRoute:
@@ -4818,32 +5253,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardPoliciesPayrollRoute,
     AuthenticatedDashboardPoliciesSecurityRoute:
       AuthenticatedDashboardPoliciesSecurityRoute,
-    AuthenticatedDashboardRecruitmentAnalyticsRoute:
-      AuthenticatedDashboardRecruitmentAnalyticsRoute,
-    AuthenticatedDashboardRecruitmentAutomationRoute:
-      AuthenticatedDashboardRecruitmentAutomationRoute,
-    AuthenticatedDashboardRecruitmentCandidatesRoute:
-      AuthenticatedDashboardRecruitmentCandidatesRoute,
-    AuthenticatedDashboardRecruitmentCopilotRoute:
-      AuthenticatedDashboardRecruitmentCopilotRoute,
-    AuthenticatedDashboardRecruitmentCrmRoute:
-      AuthenticatedDashboardRecruitmentCrmRoute,
-    AuthenticatedDashboardRecruitmentInterviewsRoute:
-      AuthenticatedDashboardRecruitmentInterviewsRoute,
-    AuthenticatedDashboardRecruitmentJobsRoute:
-      AuthenticatedDashboardRecruitmentJobsRoute,
-    AuthenticatedDashboardRecruitmentOffersRoute:
-      AuthenticatedDashboardRecruitmentOffersRoute,
-    AuthenticatedDashboardRecruitmentOnboardingRoute:
-      AuthenticatedDashboardRecruitmentOnboardingRoute,
-    AuthenticatedDashboardRecruitmentPipelineRoute:
-      AuthenticatedDashboardRecruitmentPipelineRoute,
-    AuthenticatedDashboardRecruitmentRequisitionsRoute:
-      AuthenticatedDashboardRecruitmentRequisitionsRoute,
-    AuthenticatedDashboardRecruitmentTalentPoolRoute:
-      AuthenticatedDashboardRecruitmentTalentPoolRoute,
-    AuthenticatedDashboardRecruitmentTemplatesRoute:
-      AuthenticatedDashboardRecruitmentTemplatesRoute,
     AuthenticatedDashboardReportsActivityRoute:
       AuthenticatedDashboardReportsActivityRoute,
     AuthenticatedDashboardReportsAiWorkforceRoute:
@@ -4890,14 +5299,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardReportsRecruitmentRoute,
     AuthenticatedDashboardReportsScheduledRoute:
       AuthenticatedDashboardReportsScheduledRoute,
-    AuthenticatedDashboardSettingsBillingRoute:
-      AuthenticatedDashboardSettingsBillingRoute,
-    AuthenticatedDashboardSettingsOrganizationRoute:
-      AuthenticatedDashboardSettingsOrganizationRoute,
-    AuthenticatedDashboardSettingsRolesRoute:
-      AuthenticatedDashboardSettingsRolesRoute,
-    AuthenticatedDashboardSettingsSecurityRoute:
-      AuthenticatedDashboardSettingsSecurityRoute,
     AuthenticatedDashboardVendorsContractsRoute:
       AuthenticatedDashboardVendorsContractsRoute,
     AuthenticatedDashboardVendorsInvoicesRoute:
@@ -4906,64 +5307,26 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardVendorsListRoute,
     AuthenticatedDashboardVendorsPerformanceRoute:
       AuthenticatedDashboardVendorsPerformanceRoute,
-    AuthenticatedDashboardWorkforceBranchesRoute:
-      AuthenticatedDashboardWorkforceBranchesRoute,
-    AuthenticatedDashboardWorkforceDepartmentsRoute:
-      AuthenticatedDashboardWorkforceDepartmentsRoute,
-    AuthenticatedDashboardWorkforceDesignationsRoute:
-      AuthenticatedDashboardWorkforceDesignationsRoute,
-    AuthenticatedDashboardWorkforceEmployeesRoute:
-      AuthenticatedDashboardWorkforceEmployeesRoute,
-    AuthenticatedDashboardWorkforceExecutivesRoute:
-      AuthenticatedDashboardWorkforceExecutivesRoute,
-    AuthenticatedDashboardWorkforceItAdminsRoute:
-      AuthenticatedDashboardWorkforceItAdminsRoute,
-    AuthenticatedDashboardWorkforceManagersRoute:
-      AuthenticatedDashboardWorkforceManagersRoute,
-    AuthenticatedDashboardWorkforceOrgChartRoute:
-      AuthenticatedDashboardWorkforceOrgChartRoute,
-    AuthenticatedDashboardAiWorkforceIndexRoute:
-      AuthenticatedDashboardAiWorkforceIndexRoute,
     AuthenticatedDashboardApprovalsIndexRoute:
       AuthenticatedDashboardApprovalsIndexRoute,
     AuthenticatedDashboardAssetsIndexRoute:
       AuthenticatedDashboardAssetsIndexRoute,
-    AuthenticatedDashboardAttendanceIndexRoute:
-      AuthenticatedDashboardAttendanceIndexRoute,
     AuthenticatedDashboardCalendarIndexRoute:
       AuthenticatedDashboardCalendarIndexRoute,
     AuthenticatedDashboardCommunicationIndexRoute:
       AuthenticatedDashboardCommunicationIndexRoute,
-    AuthenticatedDashboardComplianceIndexRoute:
-      AuthenticatedDashboardComplianceIndexRoute,
-    AuthenticatedDashboardDocumentsIndexRoute:
-      AuthenticatedDashboardDocumentsIndexRoute,
     AuthenticatedDashboardEngagementIndexRoute:
       AuthenticatedDashboardEngagementIndexRoute,
     AuthenticatedDashboardIntegrationsIndexRoute:
       AuthenticatedDashboardIntegrationsIndexRoute,
-    AuthenticatedDashboardLeaveIndexRoute:
-      AuthenticatedDashboardLeaveIndexRoute,
     AuthenticatedDashboardOffboardingIndexRoute:
       AuthenticatedDashboardOffboardingIndexRoute,
-    AuthenticatedDashboardOnboardingIndexRoute:
-      AuthenticatedDashboardOnboardingIndexRoute,
-    AuthenticatedDashboardPayrollIndexRoute:
-      AuthenticatedDashboardPayrollIndexRoute,
-    AuthenticatedDashboardPerformanceIndexRoute:
-      AuthenticatedDashboardPerformanceIndexRoute,
     AuthenticatedDashboardPoliciesIndexRoute:
       AuthenticatedDashboardPoliciesIndexRoute,
-    AuthenticatedDashboardRecruitmentIndexRoute:
-      AuthenticatedDashboardRecruitmentIndexRoute,
     AuthenticatedDashboardReportsIndexRoute:
       AuthenticatedDashboardReportsIndexRoute,
-    AuthenticatedDashboardSettingsIndexRoute:
-      AuthenticatedDashboardSettingsIndexRoute,
     AuthenticatedDashboardVendorsIndexRoute:
       AuthenticatedDashboardVendorsIndexRoute,
-    AuthenticatedDashboardWorkforceIndexRoute:
-      AuthenticatedDashboardWorkforceIndexRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =

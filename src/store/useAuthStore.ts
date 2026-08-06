@@ -136,7 +136,16 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
 
   fetchMe: async () => {
     try {
-      const res = await axiosInstance.get("/api/v1/users/me");
+      let res;
+      try {
+        res = await axiosInstance.get("/api/v1/auth/me");
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          res = await axiosInstance.get("/api/v1/users/me");
+        } else {
+          throw err;
+        }
+      }
       const rawUser = res.data?.data || res.data;
 
       if (rawUser) {

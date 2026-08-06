@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { AlertCircle, RefreshCw, ShieldCheck } from "lucide-react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { AddressStep } from "@/components/auth/register/address-step";
@@ -10,14 +10,11 @@ import { OrganizationStep } from "@/components/auth/register/organization-step";
 import { ReviewStep } from "@/components/auth/register/review-step";
 import { SuccessStep } from "@/components/auth/register/success-step";
 import { Stepper } from "@/components/common/stepper";
-import { REGISTRATION_STEPS, type RegistrationDraft } from "@/lib/auth/registration";
-import {
-  useGetOnboardingDataQuery,
-  useGetOnboardingStatusQuery,
-  useSaveOnboardingStepMutation,
-  useCompleteOnboardingMutation,
-  useLazyGetMeQuery,
-} from "@/services/authApi";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { REGISTRATION_STEPS } from "@/lib/auth/registration";
+import { useOnboardingStore } from "@/store/useOnboardingStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export const Route = createFileRoute("/auth/onboarding")({
   head: () => ({
@@ -66,83 +63,54 @@ const STEP_COPY = [
 
 function OnboardingPage() {
   const navigate = useNavigate();
-  const { data: statusRes } = useGetOnboardingStatusQuery();
-  const { data: onboardingDataRes } = useGetOnboardingDataQuery();
-  const [saveStepMutation] = useSaveOnboardingStepMutation();
-  const [completeOnboardingMutation] = useCompleteOnboardingMutation();
-  const [triggerGetMe] = useLazyGetMeQuery();
+  const {
+    currentStep,
+    completed,
+    draft,
+    isLoading,
+    isSaving,
+    error,
+    fetchData,
+    saveStep,
+    completeOnboarding,
+    setStep,
+    clearError,
+  } = useOnboardingStore();
 
-  const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<RegistrationDraft>({});
-  const [submitting, setSubmitting] = useState(false);
+  const fetchMe = useAuthStore((s) => s.fetchMe);
 
-  // Restore step and saved data from backend database on page refresh / load
+  // Synchronize with backend on mount
   useEffect(() => {
-    if (statusRes?.data?.current_step !== undefined) {
-      setStep(statusRes.data.current_step);
-    }
-  }, [statusRes]);
+    void fetchData();
+  }, [fetchData]);
 
+  // Handle step completion redirect
   useEffect(() => {
-    if (onboardingDataRes?.data) {
-      const d = onboardingDataRes.data;
-      setDraft({
-        companyName: d.companyName || "",
-        logo: d.logo || "",
-        industry: d.industry || "",
-        companySize: d.companySize || "",
-        website: d.website || "",
-        country: d.country || "",
-        timezone: d.timezone || "",
-        address: d.address || "",
-        city: d.city || "",
-        state: d.state || "",
-        zipCode: d.zipCode || "",
-        gstNumber: d.gstNumber || "",
-        fullName: d.fullName || "",
-        phone: d.phone || "",
-        avatar: d.avatar || "",
-        ...(d.termsAccepted ? { terms: true } : {}),
-        ...(d.dpaAccepted ? { dataProcessing: true } : {}),
-      });
+    if (completed) {
+      setStep(4);
     }
-  }, [onboardingDataRes]);
+  }, [completed, setStep]);
 
-  const mergeAndSaveStep = async (stepIndex: number, values: Partial<RegistrationDraft>) => {
-    const updated = { ...draft, ...values };
-    setDraft(updated);
-    try {
-      await saveStepMutation({ step: stepIndex, data: values }).unwrap();
-    } catch (err: any) {
-      console.warn("Failed to persist step progress to backend:", err);
+  const handleNextStep = async (stepIndex: number, values: Record<string, any>) => {
+    const success = await saveStep(stepIndex, values);
+    if (success) {
+      toast.success("Progress saved");
+      setStep(stepIndex + 1);
+    } else {
+      toast.error("Failed to save step progress. Please check inputs.");
     }
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
-
-    try {
-      // 1. Save Step 3 agreements
-      await saveStepMutation({
-        step: 3,
-        data: { terms: true, dataProcessing: true },
-      }).unwrap();
-
-      // 2. Complete onboarding in database
-      await completeOnboardingMutation().unwrap();
-
-      // 3. Refresh current user profile so Redux gets is_onboarding_completed: true
-      await triggerGetMe().unwrap();
-
-      setStep(4);
-      toast.success("Enterprise workspace created", {
+    const success = await completeOnboarding();
+    if (success) {
+      await fetchMe();
+      toast.success("Enterprise workspace created!", {
         description: `${draft.companyName || "Your organization"} is provisioned and ready.`,
       });
-    } catch (e: any) {
-      const detail = e?.data?.detail || e?.message || "Onboarding completion failed";
-      toast.error(detail);
-    } finally {
-      setSubmitting(false);
+      void navigate({ to: "/dashboard" });
+    } else {
+      toast.error("Completion failed. Please try again.");
     }
   };
 
@@ -150,7 +118,8 @@ function OnboardingPage() {
     void navigate({ to: "/dashboard" });
   }, [navigate]);
 
-  const copy = STEP_COPY[step] ?? STEP_COPY[0]!;
+  const copy = STEP_COPY[currentStep] ?? STEP_COPY[0]!;
+  const completionPct = Math.round((currentStep / 4) * 100);
 
   return (
     <AuthLayout
@@ -159,63 +128,90 @@ function OnboardingPage() {
       badge={
         <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-primary">
           <ShieldCheck className="size-3.5" aria-hidden="true" />
-          Enterprise onboarding
+          Enterprise onboarding ({completionPct}%)
         </span>
       }
     >
       <div className="space-y-7">
-        <Stepper steps={[...REGISTRATION_STEPS]} current={step} />
+        <Stepper steps={[...REGISTRATION_STEPS]} current={currentStep} />
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -24 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            {step === 0 && (
-              <OrganizationStep
-                draft={draft}
-                onNext={(values) => {
-                  void mergeAndSaveStep(0, values);
-                  setStep(1);
+        {/* Loading Skeleton */}
+        {isLoading ? (
+          <div className="space-y-4 rounded-xl border p-6">
+            <Skeleton className="h-6 w-1/3" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-2/3" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        ) : error ? (
+          /* Error Retry Card */
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center space-y-4">
+            <div className="flex justify-center">
+              <AlertCircle className="size-10 text-destructive" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-semibold text-destructive">Failed to load onboarding</h3>
+              <p className="text-sm text-muted-foreground">{error}</p>
+            </div>
+            <div className="flex justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  clearError();
+                  void fetchData();
                 }}
-              />
-            )}
-            {step === 1 && (
-              <AddressStep
-                draft={draft}
-                onBack={() => setStep(0)}
-                onNext={(values) => {
-                  void mergeAndSaveStep(1, values);
-                  setStep(2);
-                }}
-              />
-            )}
-            {step === 2 && (
-              <AdminStep
-                draft={draft}
-                onBack={() => setStep(1)}
-                onNext={(values) => {
-                  void mergeAndSaveStep(2, values);
-                  setStep(3);
-                }}
-              />
-            )}
-            {step === 3 && (
-              <ReviewStep
-                draft={draft}
-                submitting={submitting}
-                onBack={() => setStep(2)}
-                onSubmit={handleSubmit}
-              />
-            )}
-            {step === 4 && <SuccessStep draft={draft} onRedirect={goToDashboard} />}
-          </motion.div>
-        </AnimatePresence>
+              >
+                <RefreshCw className="mr-2 size-4" />
+                Retry
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* Animated Step Wizard */
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              {currentStep === 0 && (
+                <OrganizationStep
+                  draft={draft}
+                  onNext={(values) => void handleNextStep(0, values)}
+                />
+              )}
+              {currentStep === 1 && (
+                <AddressStep
+                  draft={draft}
+                  onBack={() => setStep(0)}
+                  onNext={(values) => void handleNextStep(1, values)}
+                />
+              )}
+              {currentStep === 2 && (
+                <AdminStep
+                  draft={draft}
+                  onBack={() => setStep(1)}
+                  onNext={(values) => void handleNextStep(2, values)}
+                />
+              )}
+              {currentStep === 3 && (
+                <ReviewStep
+                  draft={draft}
+                  submitting={isSaving}
+                  onBack={() => setStep(2)}
+                  onSubmit={handleSubmit}
+                />
+              )}
+              {currentStep === 4 && <SuccessStep draft={draft} onRedirect={goToDashboard} />}
+            </motion.div>
+          </AnimatePresence>
+        )}
 
-        {step < 4 && (
+        {currentStep < 4 && !isLoading && (
           <p className="text-center text-sm text-muted-foreground">
             Already have a workspace?{" "}
             <Link to="/auth/login" className="font-semibold text-primary hover:underline">

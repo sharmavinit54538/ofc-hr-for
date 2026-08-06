@@ -104,7 +104,10 @@ export const authApi = baseApi.injectEndpoints({
       query: (credentials) => ({
         url: "/api/v1/auth/login",
         method: "POST",
-        body: credentials,
+        body: {
+          identifier: credentials.email,
+          ...credentials,
+        },
       }),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
@@ -173,7 +176,7 @@ export const authApi = baseApi.injectEndpoints({
 
 
     getMe: builder.query<ApiResponse<UserMeResponse>, void>({
-      query: () => "/api/v1/users/me",
+      query: () => "/api/v1/auth/me",
       providesTags: ["User"],
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
