@@ -78,7 +78,7 @@ function AiAgentsPage() {
           { label: "AI Workforce", href: "/dashboard/ai-workforce" },
           { label: "AI Agents" },
         ]}
-        action={
+        actions={
           <Button variant="ghost" size="sm" onClick={loadAgents} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refresh Telemetry
           </Button>

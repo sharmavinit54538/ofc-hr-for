@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogOut, PanelLeft, Search, X } from "lucide-react";
+import { LogOut, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/auth/logo";
 import { SIDEBAR_NAV_ITEMS } from "@/lib/admin-navigation";
@@ -65,16 +65,6 @@ export const AdminSidebar = memo(function AdminSidebar({
               <Search className="size-4" />
             </button>
           )}
-
-          <button
-            type="button"
-            onClick={onToggleSidebar ?? onClose}
-            title="Toggle sidebar"
-            aria-label="Toggle sidebar"
-            className="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <PanelLeft className="size-4" />
-          </button>
 
           {isMobile && (
             <button

@@ -13,7 +13,13 @@ export function ManagerAnalyticsView({
   // Find all employees who have reportees or role MANAGER/EXECUTIVE
   const managers = useMemo(() => {
     return employees.filter((emp) => {
-      if (emp.role === "MANAGER" || emp.role === "EXECUTIVE" || emp.role === "HR_ADMIN") return true;
+      const roleStr =
+        typeof emp.role === "string"
+          ? emp.role
+          : typeof emp.role === "object" && emp.role !== null
+            ? ((emp.role as any).name || (emp.role as any).role || (emp.role as any).title || "")
+            : "";
+      if (roleStr === "MANAGER" || roleStr === "EXECUTIVE" || roleStr === "HR_ADMIN") return true;
       const hasReports = employees.some(
         (e) =>
           e.reporting_manager_id === emp.id ||
@@ -23,13 +29,18 @@ export function ManagerAnalyticsView({
     });
   }, [employees]);
 
+  const managerOptions = useMemo(() => {
+    if (managers.length > 0) return managers;
+    return employees;
+  }, [managers, employees]);
+
   const [selectedManagerId, setSelectedManagerId] = useState<string>(
-    managers[0]?.id ?? employees[0]?.id ?? "",
+    managerOptions[0]?.id ?? "",
   );
 
   const currentManager = useMemo(
-    () => employees.find((e) => e.id === selectedManagerId) ?? managers[0] ?? employees[0],
-    [employees, selectedManagerId, managers],
+    () => employees.find((e) => e.id === selectedManagerId) ?? managerOptions[0],
+    [employees, selectedManagerId, managerOptions],
   );
 
   const managerInfo = useMemo(() => {
@@ -53,35 +64,43 @@ export function ManagerAnalyticsView({
       <div className="glass-tile flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-brand font-display text-base font-bold text-primary-foreground shadow-glow">
-            {currentManager.full_name?.charAt(0)}
+            {currentManager.full_name?.charAt(0) || "M"}
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-lg font-bold text-foreground">
-                {currentManager.full_name}
+                {currentManager.full_name || "Manager Profile"}
               </h3>
               <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
                 Level {managerInfo.level} Manager
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
-              {currentManager.job_title} · {currentManager.department || "Leadership"}
+              {currentManager.job_title || "Designation"} · {currentManager.department || "Leadership"}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold text-muted-foreground">Select Manager:</label>
+          <label className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
+            Select Manager:
+          </label>
           <select
             value={selectedManagerId}
             onChange={(e) => setSelectedManagerId(e.target.value)}
-            className="rounded-xl border border-input bg-card/80 px-3 py-2 text-xs font-semibold outline-none cursor-pointer focus:border-ring focus:shadow-glow"
+            className="min-w-[220px] rounded-xl border border-input bg-card px-3 py-2 text-xs font-semibold text-foreground outline-none cursor-pointer focus:border-ring focus:shadow-glow shadow-sm"
           >
-            {managers.map((m) => (
-              <option key={m.id} value={m.id} className="bg-card text-foreground">
-                {m.full_name} ({m.department || "General"})
+            {managerOptions.length === 0 ? (
+              <option value="" className="bg-card text-foreground">
+                No Managers Available
               </option>
-            ))}
+            ) : (
+              managerOptions.map((m) => (
+                <option key={m.id} value={m.id} className="bg-card text-foreground">
+                  {m.full_name || m.email || "Employee"} ({m.department || "General"})
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>

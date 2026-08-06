@@ -97,7 +97,7 @@ function AutomationWorkflowsPage() {
           { label: "AI Workforce", href: "/dashboard/ai-workforce" },
           { label: "Automation Workflows" },
         ]}
-        action={
+        actions={
           <Button onClick={() => setIsModalOpen(true)} className="gap-2 text-xs">
             <Plus className="w-4 h-4" /> Create New Workflow Trigger
           </Button>
@@ -144,7 +144,7 @@ function AutomationWorkflowsPage() {
                     {wf.steps.map((st, idx) => (
                       <React.Fragment key={idx}>
                         <Badge variant="secondary" className="text-[10px] font-mono">
-                          {st.agent_key}
+                          {st["agent_key"]}
                         </Badge>
                         {idx < wf.steps.length - 1 && <ArrowRight className="w-3 h-3 text-muted-foreground" />}
                       </React.Fragment>

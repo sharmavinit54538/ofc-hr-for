@@ -17,6 +17,7 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
   title,
   description,
   items,
+  headers,
   showActions = false,
   showToolbar = true,
   isLoading = false,
@@ -36,6 +37,13 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
     date: string;
     metric?: string | undefined;
   }[];
+  headers?: {
+    title?: string;
+    subtitle?: string;
+    status?: string;
+    date?: string;
+    metric?: string;
+  };
   showActions?: boolean;
   showToolbar?: boolean;
   isLoading?: boolean;
@@ -98,20 +106,20 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
                 onClick={handleExport}
                 className="glass-tile inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Download className="size-3.5" /> Export Report
+                <Download className="size-3.5" /> Export Data
               </button>
               <button
                 onClick={handleCreate}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg focus-visible:ring-2 focus-visible:ring-ring transition-all"
               >
-                <Plus className="size-4" /> Create New
+                <Plus className="size-3.5" /> Create New
               </button>
             </div>
           ) : undefined
         }
       />
 
-      {/* ── Filter & Search Toolbar ───────────────────────────── */}
+      {/* ── Toolbar / Controls ─────────────────────────────────── */}
       {showToolbar && (
         <div className="glass-tile flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
@@ -177,10 +185,10 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
             <Inbox className="size-6" />
           </div>
           <h3 className="mt-4 font-display text-base font-bold text-foreground">
-            No {title.toLowerCase()} yet
+            No {title.toLowerCase()} recorded
           </h3>
           <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-            There are no {title.toLowerCase()} recorded in the system.
+            There are no {title.toLowerCase()} entries in the database.
           </p>
           {showActions && (
             <button
@@ -219,27 +227,26 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
+                  <h4 className="font-display text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                    {item.title}
+                  </h4>
                   <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
                     {item.status}
                   </span>
-                  <span className="text-[11px] font-medium text-muted-foreground">
-                    {item.date}
-                  </span>
                 </div>
-                <div className="mt-4 space-y-1">
-                  <h3 className="font-display text-base font-bold text-foreground transition-colors group-hover:text-primary">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {item.subtitle}
-                  </p>
-                </div>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{item.subtitle}</p>
               </div>
-              {item.metric && (
-                <div className="mt-4 border-t border-border/60 pt-3 text-xs font-semibold text-foreground">
-                  Telemetry / Metric: <span className="text-primary font-bold">{item.metric}</span>
+
+              <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3">
+                <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  {!item.date || item.date === "—" ? "Updated Recently" : item.date}
                 </div>
-              )}
+                {item.metric && item.metric !== "—" && (
+                  <div className="rounded-xl border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary">
+                    {item.metric}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -248,13 +255,13 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
         <div className="glass-tile overflow-hidden rounded-2xl border border-border">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="border-b border-border bg-card/60 uppercase tracking-[0.08em] text-muted-foreground">
+              <thead className="border-b border-border bg-card/60 uppercase tracking-[0.08em] text-muted-foreground font-bold">
                 <tr>
-                  <th className="px-5 py-3.5 font-bold">Record Title</th>
-                  <th className="px-5 py-3.5 font-bold">Details</th>
-                  <th className="px-5 py-3.5 font-bold">Status</th>
-                  <th className="px-5 py-3.5 font-bold">Timestamp</th>
-                  <th className="px-5 py-3.5 font-bold text-right">Metric</th>
+                  <th className="px-5 py-3.5">{headers?.title ?? "Record Title"}</th>
+                  <th className="px-5 py-3.5">{headers?.subtitle ?? "Details"}</th>
+                  <th className="px-5 py-3.5">{headers?.status ?? "Status"}</th>
+                  <th className="px-5 py-3.5">{headers?.date ?? "Timestamp / Date"}</th>
+                  <th className="px-5 py-3.5 text-right">{headers?.metric ?? "Metric / Score"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -267,9 +274,11 @@ export const GenericSubModuleView = memo(function GenericSubModuleView({
                         {item.status}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-muted-foreground">{item.date}</td>
+                    <td className="px-5 py-4 text-muted-foreground">
+                      {!item.date || item.date === "—" ? "Updated Recently" : item.date}
+                    </td>
                     <td className="px-5 py-4 font-bold text-primary text-right">
-                      {item.metric ?? "—"}
+                      {!item.metric || item.metric === "—" ? "Active" : item.metric}
                     </td>
                   </tr>
                 ))}

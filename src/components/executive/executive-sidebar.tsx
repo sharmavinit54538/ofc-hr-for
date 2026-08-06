@@ -2,7 +2,6 @@ import { memo } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LogOut,
-  PanelLeft,
   X,
   LayoutDashboard,
   BarChart3,
@@ -23,6 +22,7 @@ import { cn } from "@/lib/utils";
 
 const EXECUTIVE_NAV = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard, href: "/dashboard/executive" },
+  { id: "ai-workforce", title: "AI Hub", icon: Sparkles, href: "/dashboard/ai-workforce" },
   { id: "analytics", title: "Executive Analytics", icon: BarChart3, href: "/dashboard/executive/analytics" },
   { id: "workforce", title: "Workforce Overview", icon: Users, href: "/dashboard/executive/workforce" },
   { id: "recruitment", title: "Recruitment Overview", icon: Target, href: "/dashboard/executive/recruitment" },
@@ -75,16 +75,6 @@ export const ExecutiveSidebar = memo(function ExecutiveSidebar({
         )}
 
         <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={onToggleSidebar ?? onClose}
-            title="Toggle sidebar"
-            aria-label="Toggle sidebar"
-            className="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <PanelLeft className="size-4" />
-          </button>
-
           {isMobile && (
             <button
               type="button"

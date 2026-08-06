@@ -17,7 +17,7 @@ export interface Employee {
   reporting_manager?: string | undefined;
   reporting_manager_id?: string | undefined;
   joining_date?: string | undefined;
-  role: Role;
+  role?: Role | any | undefined;
   status: EmployeeStatus;
   avatar_url?: string | undefined;
   photo_url?: string | undefined;

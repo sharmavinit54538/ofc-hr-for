@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/admin/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,7 +71,7 @@ function AiWorkforceLandingPage() {
         title="AI Workforce Suite"
         description="Autonomous HR AI agents, automated workflow orchestration & real-time predictive analytics."
         breadcrumbs={[{ label: "AI Workforce" }]}
-        action={
+        actions={
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -163,6 +163,74 @@ function AiWorkforceLandingPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Sub-Modules Quick Navigation Grid */}
+      <div className="space-y-3">
+        <h2 className="font-display text-base font-bold text-foreground flex items-center gap-2">
+          <Zap className="w-4 h-4 text-primary" /> AI Workforce Functional Modules
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Link to="/dashboard/ai-workforce/agents" className="group block">
+            <Card className="h-full border-border/60 hover:border-primary/50 transition-all hover:shadow-md bg-card/40 hover:bg-card/80">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 group-hover:scale-110 transition-transform">
+                    <Bot className="w-5 h-5" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+                <CardTitle className="text-sm font-bold mt-2">AI Agents Catalog</CardTitle>
+                <CardDescription className="text-xs">32 autonomous agents with live mode toggles & manual time overrides.</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+
+          <Link to="/dashboard/ai-workforce/workflows" className="group block">
+            <Card className="h-full border-border/60 hover:border-primary/50 transition-all hover:shadow-md bg-card/40 hover:bg-card/80">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500 group-hover:scale-110 transition-transform">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+                <CardTitle className="text-sm font-bold mt-2">Automation Workflows</CardTitle>
+                <CardDescription className="text-xs">Multi-agent orchestrations, trigger events & real-time execution logs.</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+
+          <Link to="/dashboard/ai-workforce/analytics" className="group block">
+            <Card className="h-full border-border/60 hover:border-primary/50 transition-all hover:shadow-md bg-card/40 hover:bg-card/80">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 group-hover:scale-110 transition-transform">
+                    <Brain className="w-5 h-5" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+                <CardTitle className="text-sm font-bold mt-2">People Analytics AI</CardTitle>
+                <CardDescription className="text-xs">Attrition risk prediction, flight-risk root cause & comp benchmarking.</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+
+          <Link to="/dashboard/ai-workforce/copilots" className="group block">
+            <Card className="h-full border-border/60 hover:border-primary/50 transition-all hover:shadow-md bg-card/40 hover:bg-card/80">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
+                    <Cpu className="w-5 h-5" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+                <CardTitle className="text-sm font-bold mt-2">Smart Co-Pilots</CardTitle>
+                <CardDescription className="text-xs">Interactive assistants for HRBPs, Recruiters, Managers & Payroll.</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+        </div>
       </div>
 
       {/* Main Domains Launcher Grid */}

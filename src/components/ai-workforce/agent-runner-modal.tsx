@@ -50,9 +50,9 @@ export function AgentRunnerModal({
       prompt: promptInput,
     };
 
-    if (customField1) payload.candidate_name = customField1;
-    if (customField1 && agentKey.includes("employee")) payload.employee_name = customField1;
-    if (customField2) payload.role = customField2;
+    if (customField1) payload["candidate_name"] = customField1;
+    if (customField1 && agentKey.includes("employee")) payload["employee_name"] = customField1;
+    if (customField2) payload["role"] = customField2;
 
     try {
       const res = await runAiMode(agentKey, agentName, payload);

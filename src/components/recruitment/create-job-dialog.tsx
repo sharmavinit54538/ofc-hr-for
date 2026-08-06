@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles, Wand2, FileText } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useCreateJobMutation } from "@/services/recruitmentApi";
+import {
+  useCreateJobMutation,
+  useGenerateJobDescriptionMutation,
+  useAiAutofillJobMutation,
+} from "@/services/recruitmentApi";
+import { getApiErrorMessage } from "@/utils/api-error";
 import type { EmploymentType, JobStatus } from "@/types/recruitment";
 
 interface CreateJobDialogProps {
@@ -17,7 +22,9 @@ interface CreateJobDialogProps {
 }
 
 export function CreateJobDialog({ open, onOpenChange }: CreateJobDialogProps) {
-  const [createJob, { isLoading }] = useCreateJobMutation();
+  const [createJob, { isLoading: isSubmitting }] = useCreateJobMutation();
+  const [generateJobDescription, { isLoading: isGeneratingJd }] = useGenerateJobDescriptionMutation();
+  const [aiAutofillJob, { isLoading: isAutofilling }] = useAiAutofillJobMutation();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -29,7 +36,81 @@ export function CreateJobDialog({ open, onOpenChange }: CreateJobDialogProps) {
     salary_max: "",
     vacancies: "1",
     status: "Active" as JobStatus,
+    description: "",
   });
+
+  /** Call backend API: POST /api/v1/recruitment/jobs/generate-description */
+  const handleGenerateAiJd = async () => {
+    if (!formData.title.trim()) {
+      toast.error("Job Title Required", {
+        description: "Please enter a Job Title first so the backend AI can generate the JD.",
+      });
+      return;
+    }
+
+    try {
+      const res = await generateJobDescription({
+        title: formData.title,
+        department: formData.department || undefined,
+        employment_type: formData.employment_type || undefined,
+        location: formData.location || undefined,
+      }).unwrap();
+
+      const textData = (res as any)?.data ?? res;
+      if (typeof textData === "string" && textData) {
+        setFormData((prev) => ({ ...prev, description: textData }));
+        toast.success("AI Job Description Generated", {
+          description: `Fetched live AI job description for "${formData.title}" from backend server API.`,
+        });
+      } else {
+        toast.error("Invalid Response", {
+          description: "Backend returned an empty job description.",
+        });
+      }
+    } catch (err) {
+      toast.error("Backend AI Error", {
+        description: getApiErrorMessage(err, "Failed to generate AI job description from backend API."),
+      });
+    }
+  };
+
+  /** Call backend API: POST /api/v1/recruitment/jobs/ai-autofill */
+  const handleAiAutofill = async () => {
+    if (!formData.title.trim()) {
+      toast.error("Job Title Required", {
+        description: "Please enter a Job Title to trigger 1-click AI form auto-fill.",
+      });
+      return;
+    }
+
+    try {
+      const res = await aiAutofillJob({
+        title: formData.title,
+        salary_min: formData.salary_min ? Number(formData.salary_min) : undefined,
+        salary_max: formData.salary_max ? Number(formData.salary_max) : undefined,
+      }).unwrap();
+
+      const autofill = (res as any)?.data ?? res;
+      if (autofill) {
+        setFormData((prev) => ({
+          ...prev,
+          department: autofill.department || prev.department,
+          employment_type: (autofill.employment_type as EmploymentType) || prev.employment_type,
+          location: autofill.location || prev.location,
+          work_mode: autofill.work_mode || prev.work_mode,
+          vacancies: autofill.vacancies ? String(autofill.vacancies) : prev.vacancies,
+          description: autofill.description || prev.description,
+        }));
+        toast.success("AI Auto-Fill Completed!", {
+          description: `Form auto-filled with AI recommendations for "${formData.title}".`,
+        });
+      }
+    } catch (err) {
+      toast.error("Backend AI Error", {
+        description: getApiErrorMessage(err, "Failed to auto-fill job fields from backend API."),
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +130,7 @@ export function CreateJobDialog({ open, onOpenChange }: CreateJobDialogProps) {
         salary_max: formData.salary_max ? Number(formData.salary_max) : undefined,
         vacancies: formData.vacancies ? Number(formData.vacancies) : undefined,
         status: formData.status,
+        description: formData.description || undefined,
       }).unwrap();
 
       toast.success("Job Requisition Created", {
@@ -65,21 +147,52 @@ export function CreateJobDialog({ open, onOpenChange }: CreateJobDialogProps) {
         salary_max: "",
         vacancies: "1",
         status: "Active",
+        description: "",
       });
     } catch (err) {
       toast.error("Failed to create job requisition", {
-        description: (err as { data?: { message?: string } })?.data?.message ?? "An unexpected error occurred.",
+        description: getApiErrorMessage(err, "An unexpected error occurred while posting requisition."),
       });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md sm:max-w-lg">
+      <DialogContent className="max-w-md sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-lg font-bold">Create Job Requisition</DialogTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <FileText className="size-5" />
+              </div>
+              <div>
+                <DialogTitle className="font-display text-lg font-bold">Create Job Requisition</DialogTitle>
+                <p className="text-xs text-muted-foreground">Post job opening with backend AI Job Description generator.</p>
+              </div>
+            </div>
+            {formData.title.trim() && (
+              <button
+                type="button"
+                onClick={handleAiAutofill}
+                disabled={isAutofilling}
+                className="relative inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-400 backdrop-blur-sm transition-all duration-200 hover:bg-indigo-500/20 hover:border-indigo-500/60 active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+              >
+                {isAutofilling ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span>Auto-Filling...</span>
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="size-3.5 text-indigo-400" />
+                    <span>AI Auto-Fill Form</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs mt-2">
           <div>
             <label className="block font-semibold mb-1">Job Title *</label>
             <input
@@ -177,6 +290,40 @@ export function CreateJobDialog({ open, onOpenChange }: CreateJobDialogProps) {
             </div>
           </div>
 
+          {/* AI Job Description Section */}
+          <div className="space-y-1.5 pt-2">
+            <div className="flex items-center justify-between">
+              <label className="font-semibold text-foreground flex items-center gap-1.5">
+                Job Description (JD)
+              </label>
+              <button
+                type="button"
+                onClick={handleGenerateAiJd}
+                disabled={isGeneratingJd}
+                className="relative inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-purple-500/20 transition-all duration-200 hover:shadow-purple-500/35 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 cursor-pointer"
+              >
+                {isGeneratingJd ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    <span>Generating JD...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="size-3.5" />
+                    <span>Generate JD with AI</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <textarea
+              rows={6}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Enter or generate complete job description via backend AI endpoint..."
+              className="w-full rounded-xl border border-input bg-card px-3 py-2 outline-none focus:border-primary text-xs leading-relaxed"
+            />
+          </div>
+
           <DialogFooter className="mt-6">
             <button
               type="button"
@@ -187,10 +334,10 @@ export function CreateJobDialog({ open, onOpenChange }: CreateJobDialogProps) {
             </button>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting || isGeneratingJd || isAutofilling}
               className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow hover:shadow-glow-lg transition-all disabled:opacity-50"
             >
-              {isLoading && <Loader2 className="size-3.5 animate-spin" />}
+              {isSubmitting && <Loader2 className="size-3.5 animate-spin" />}
               Create Requisition
             </button>
           </DialogFooter>

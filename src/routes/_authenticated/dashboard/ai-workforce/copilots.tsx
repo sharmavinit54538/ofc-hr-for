@@ -24,7 +24,15 @@ export const Route = createFileRoute("/_authenticated/dashboard/ai-workforce/cop
   component: SmartCopilotsPage,
 });
 
-const COPILOT_ROLES = [
+interface CopilotRole {
+  id: string;
+  title: string;
+  icon: any;
+  desc: string;
+  samplePrompt: string;
+}
+
+const COPILOT_ROLES: CopilotRole[] = [
   { id: "hrbp", title: "HR Business Partner", icon: UserCheck, desc: "Case management assistant, employee relations & stay-interview advisory.", samplePrompt: "How should I structure a stay-interview for a high flight-risk senior engineer?" },
   { id: "recruiter", title: "Recruiter Co-Pilot", icon: UserPlus, desc: "Candidate sourcing strategy, personalized cold outreach drafting & skill mapping.", samplePrompt: "Draft a compelling cold outreach email for a Senior Lead DevOps candidate." },
   { id: "manager", title: "Manager Co-Pilot", icon: Briefcase, desc: "1-on-1 meeting prep, performance review narrative drafting & OKR goal alignment.", samplePrompt: "Help me draft performance review feedback for a frontend developer who exceeded sprint goals." },
@@ -32,8 +40,8 @@ const COPILOT_ROLES = [
 ];
 
 function SmartCopilotsPage() {
-  const [selectedRole, setSelectedRole] = useState(COPILOT_ROLES[0]);
-  const [inputQuery, setInputQuery] = useState(COPILOT_ROLES[0].samplePrompt);
+  const [selectedRole, setSelectedRole] = useState<CopilotRole>(COPILOT_ROLES[0]!);
+  const [inputQuery, setInputQuery] = useState(COPILOT_ROLES[0]!.samplePrompt);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<AICopilotResponse | null>(null);
 

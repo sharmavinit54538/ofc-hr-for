@@ -98,29 +98,77 @@ const ROLES = [
   { value: "EXECUTIVE", label: "Executive" },
 ];
 
-const formatRoleLabel = (role: string) => {
-  switch (role) {
-    case "HR_ADMIN":
-      return "HR Admin";
-    case "IT_ADMIN":
-      return "IT Admin";
-    case "EMPLOYEE":
-      return "Employee";
-    case "MANAGER":
-      return "Manager";
-    case "EXECUTIVE":
-      return "Executive";
-    default:
-      return role.replace(/_/g, " ");
+export const formatRoleLabel = (role?: unknown): string => {
+  if (!role) return "No Role";
+
+  if (typeof role === "string") {
+    const trimmed = role.trim();
+    if (!trimmed) return "No Role";
+
+    switch (trimmed.toUpperCase()) {
+      case "HR_ADMIN":
+        return "HR Admin";
+      case "IT_ADMIN":
+        return "IT Admin";
+      case "EMPLOYEE":
+        return "Employee";
+      case "MANAGER":
+        return "Manager";
+      case "EXECUTIVE":
+        return "Executive";
+      default:
+        return trimmed
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
   }
+
+  if (typeof role === "object" && role !== null) {
+    const value =
+      (role as any).name ??
+      (role as any).role ??
+      (role as any).title ??
+      (role as any).designation ??
+      (role as any).label ??
+      "";
+
+    if (!value) return "No Role";
+
+    return formatRoleLabel(value);
+  }
+
+  return "No Role";
 };
 
-const renderRoleBadge = (role: string) => {
+const renderRoleBadge = (role?: unknown) => {
   const formatted = formatRoleLabel(role);
 
-  switch (role) {
+  let roleKey = "";
+  if (typeof role === "string") {
+    roleKey = role.trim().toUpperCase();
+  } else if (typeof role === "object" && role !== null) {
+    const value =
+      (role as any).name ??
+      (role as any).role ??
+      (role as any).title ??
+      (role as any).designation ??
+      "";
+    if (typeof value === "string") {
+      roleKey = value.trim().toUpperCase();
+    } else if (typeof value === "object" && value !== null) {
+      roleKey = formatRoleLabel(value).toUpperCase().replace(/\s+/g, "_");
+    }
+  }
+
+  if (!roleKey) {
+    roleKey = formatted.toUpperCase().replace(/\s+/g, "_");
+  }
+
+  switch (roleKey) {
     case "HR_ADMIN":
     case "IT_ADMIN":
+    case "HR ADMIN":
+    case "IT ADMIN":
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-0.5 text-[10px] font-bold text-indigo-400 shadow-sm backdrop-blur-sm">
           <Shield className="size-3 text-indigo-400" />
@@ -230,9 +278,44 @@ function EmployeesPage() {
       return rawEmployees.map((emp: Employee) => {
         if (!emp) return {} as any;
         const hierarchyInfo = computeEmployeeHierarchyInfo(emp, rawEmployees);
+
+        const email =
+          emp.email ||
+          (emp as any).company_email ||
+          (emp as any).personal_email ||
+          (emp as any).work_email ||
+          (emp as any).email_address ||
+          (emp as any).user?.email ||
+          "";
+
+        const rawName =
+          emp.full_name ||
+          (emp as any).name ||
+          (((emp as any).first_name || (emp as any).last_name)
+            ? `${(emp as any).first_name || ""} ${(emp as any).last_name || ""}`.trim()
+            : "") ||
+          (emp as any).user?.full_name ||
+          email ||
+          "Employee";
+
+        const jobTitle =
+          emp.job_title ||
+          (emp as any).designation ||
+          (emp as any).role_title ||
+          "";
+
+        const roleVal =
+          emp.role ||
+          (emp as any).role_title ||
+          (emp as any).designation ||
+          "EMPLOYEE";
+
         return {
           ...emp,
-          full_name: emp.full_name || emp.email || "Employee",
+          email,
+          full_name: rawName,
+          job_title: jobTitle,
+          role: roleVal,
           hierarchy_level: hierarchyInfo.level,
           reporting_manager: hierarchyInfo.reportingManager?.full_name || emp.reporting_manager || "—",
           reporting_manager_id: hierarchyInfo.reportingManager?.id || emp.reporting_manager_id,
@@ -243,15 +326,36 @@ function EmployeesPage() {
       });
     } catch (err) {
       console.error("[Hierarchy Computation Error]", err);
-      return rawEmployees.map((emp) => ({
-        ...emp,
-        full_name: emp?.full_name || emp?.email || "Employee",
-        hierarchy_level: 1,
-        reporting_manager: emp?.reporting_manager || "—",
-        direct_reports_count: 0,
-        team_size: 1,
-        organization_path: [],
-      }));
+      return rawEmployees.map((emp) => {
+        const email =
+          emp?.email ||
+          (emp as any)?.company_email ||
+          (emp as any)?.personal_email ||
+          (emp as any)?.work_email ||
+          (emp as any)?.email_address ||
+          "";
+        const rawName =
+          emp?.full_name ||
+          (emp as any)?.name ||
+          (((emp as any)?.first_name || (emp as any)?.last_name)
+            ? `${(emp as any)?.first_name || ""} ${(emp as any)?.last_name || ""}`.trim()
+            : "") ||
+          email ||
+          "Employee";
+
+        return {
+          ...emp,
+          email,
+          full_name: rawName,
+          job_title: emp?.job_title || (emp as any)?.designation || "",
+          role: emp?.role || (emp as any)?.role_title || (emp as any)?.designation || "EMPLOYEE",
+          hierarchy_level: 1,
+          reporting_manager: emp?.reporting_manager || "—",
+          direct_reports_count: 0,
+          team_size: 1,
+          organization_path: [],
+        };
+      });
     }
   }, [rawEmployees]);
 
@@ -313,10 +417,13 @@ function EmployeesPage() {
     sortBy,
   ]);
 
-  const availableDepartments = useMemo<string[]>(
-    () => (departmentsRes?.data ?? []).map((dept: any) => dept.name),
-    [departmentsRes],
-  );
+  const availableDepartments = useMemo<string[]>(() => {
+    if (!departmentsRes?.data) return [];
+    const d = departmentsRes.data;
+    if (Array.isArray(d)) return d.map((dept: any) => dept.name).filter(Boolean);
+    if (Array.isArray((d as any).items)) return (d as any).items.map((dept: any) => dept.name).filter(Boolean);
+    return [];
+  }, [departmentsRes]);
 
   const managerOptions = useMemo<string[]>(
     () => Array.from(new Set(employeesWithHierarchy.map((emp: (typeof employeesWithHierarchy)[number]) => emp.full_name).filter(Boolean))),
@@ -450,12 +557,19 @@ function EmployeesPage() {
       resetForm();
 
       if (created.temp_password) {
+        const isSent =
+          created.email_sent ??
+          (response.message ? response.message.toLowerCase().includes("sent") : true);
+
         setCredentials({
           employeeId: created.employee_id,
-          email: created.email,
+          email: created.email || (created as any).personal_email || (created as any).company_email || formData.email,
           tempPassword: created.temp_password,
-          fullName: created.full_name,
-          emailSent: created.email_sent,
+          fullName:
+            created.full_name ||
+            (`${(created as any).first_name || ""} ${(created as any).last_name || ""}`.trim()) ||
+            formData.fullName,
+          emailSent: isSent,
         });
       }
 
@@ -492,7 +606,9 @@ function EmployeesPage() {
           branch: editingEmp.branch || editingEmp.location,
           reporting_manager: editingEmp.reporting_manager,
           reporting_manager_id: mgrObj?.id,
-          role: editingEmp.role as Role,
+          role: (typeof editingEmp.role === "string"
+            ? editingEmp.role
+            : (editingEmp.role as any)?.name ?? (editingEmp.role as any)?.role ?? "EMPLOYEE") as Role,
           team: editingEmp.team,
           work_mode: editingEmp.work_mode,
         },
@@ -710,35 +826,6 @@ function EmployeesPage() {
                 </select>
               </div>
 
-              {/* Hierarchy Level Filter */}
-              <div className="relative flex items-center rounded-xl border border-input bg-card/60 px-3 py-1.5 text-xs">
-                <ShieldCheck className="mr-1.5 size-3.5 text-muted-foreground" />
-                <select
-                  value={selectedLevel}
-                  onChange={(e) => setSelectedLevel(e.target.value)}
-                  className="bg-transparent text-xs font-semibold outline-none cursor-pointer"
-                >
-                  <option value="All Levels" className="bg-card text-foreground">
-                    All Hierarchy Levels
-                  </option>
-                  <option value="Level 1" className="bg-card text-foreground">
-                    L1 - Executive / CEO
-                  </option>
-                  <option value="Level 2" className="bg-card text-foreground">
-                    L2 - VP / Department Head
-                  </option>
-                  <option value="Level 3" className="bg-card text-foreground">
-                    L3 - Manager / Lead
-                  </option>
-                  <option value="Level 4" className="bg-card text-foreground">
-                    L4 - Senior Staff
-                  </option>
-                  <option value="Level 5" className="bg-card text-foreground">
-                    L5 - Associate / Intern
-                  </option>
-                </select>
-              </div>
-
               {/* Status Filter */}
               <div className="relative flex items-center rounded-xl border border-input bg-card/60 px-3 py-1.5 text-xs">
                 <select
@@ -772,9 +859,6 @@ function EmployeesPage() {
                 >
                   <option value="name" className="bg-card text-foreground">
                     Employee Name
-                  </option>
-                  <option value="level" className="bg-card text-foreground">
-                    Hierarchy Level
                   </option>
                   <option value="department" className="bg-card text-foreground">
                     Department
@@ -842,17 +926,15 @@ function EmployeesPage() {
                     <th className="px-4 py-3.5">Designation</th>
                     <th className="px-4 py-3.5">Department</th>
                     <th className="px-4 py-3.5">Reporting Manager</th>
-                    <th className="px-4 py-3.5 text-center">Level</th>
                     <th className="px-4 py-3.5 text-center">Direct Reports</th>
                     <th className="px-4 py-3.5">Status</th>
-                    <th className="px-4 py-3.5">Role</th>
                     <th className="px-4 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {isLoading && (
                     <tr>
-                      <td colSpan={11} className="px-5 py-10 text-center text-muted-foreground">
+                      <td colSpan={9} className="px-5 py-10 text-center text-muted-foreground">
                         Loading workforce employee hierarchy telemetry…
                       </td>
                     </tr>
@@ -860,7 +942,7 @@ function EmployeesPage() {
 
                   {!isLoading && isError && (
                     <tr>
-                      <td colSpan={11} className="px-5 py-10 text-center">
+                      <td colSpan={9} className="px-5 py-10 text-center">
                         <p className="font-semibold text-destructive">
                           {getApiErrorMessage(error as FetchBaseQueryError)}
                         </p>
@@ -877,7 +959,7 @@ function EmployeesPage() {
 
                   {!isLoading && !isError && filteredEmployees.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="px-5 py-10 text-center text-muted-foreground">
+                      <td colSpan={9} className="px-5 py-10 text-center text-muted-foreground">
                         No employees found matching current search and hierarchy filters.
                       </td>
                     </tr>
@@ -933,11 +1015,6 @@ function EmployeesPage() {
                               {emp.reporting_manager || "—"}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-center">
-                            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
-                              L{emp.hierarchy_level}
-                            </span>
-                          </td>
                           <td className="px-4 py-4 text-center font-bold text-foreground">
                             {emp.direct_reports_count ?? 0}
                           </td>
@@ -957,22 +1034,8 @@ function EmployeesPage() {
                               {emp.status}
                             </span>
                           </td>
-                          <td className="px-4 py-4">{renderRoleBadge(emp.role)}</td>
                           <td className="px-4 py-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setViewingEmp(emp);
-                                  setViewingModalTab("hierarchy");
-                                }}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary transition-all hover:bg-primary/20 hover:border-primary/50 shadow-sm"
-                                title="View Employee Hierarchy & Chain of Command"
-                              >
-                                <GitBranch className="size-3.5" />
-                                <span>Hierarchy</span>
-                              </button>
-
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <button
@@ -1619,7 +1682,14 @@ function EmployeesPage() {
                   <div>
                     <label className={labelClass}>Role</label>
                     <select
-                      value={editingEmp.role}
+                      value={
+                        typeof editingEmp.role === "string"
+                          ? editingEmp.role
+                          : (editingEmp.role as any)?.name ??
+                            (editingEmp.role as any)?.role ??
+                            (editingEmp.role as any)?.title ??
+                            "EMPLOYEE"
+                      }
                       onChange={(e) => setEditingEmp({ ...editingEmp, role: e.target.value as any })}
                       className={inputClass + " cursor-pointer"}
                     >

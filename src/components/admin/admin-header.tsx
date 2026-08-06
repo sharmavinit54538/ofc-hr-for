@@ -1,14 +1,16 @@
 import { memo } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, Search, ShieldCheck } from "lucide-react";
+import { Menu, PanelLeft, Search, ShieldCheck } from "lucide-react";
 import { ThemeSwitch } from "@/components/auth/theme-switch";
 import { NotificationBell } from "@/components/common/notification-bell";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 export const AdminHeader = memo(function AdminHeader({
   onOpenSidebar,
+  onToggleSidebar,
 }: {
   onOpenSidebar?: () => void;
+  onToggleSidebar?: () => void;
 }) {
   const organization = useAuthStore((s) => s.organization);
 
@@ -23,6 +25,17 @@ export const AdminHeader = memo(function AdminHeader({
           className="grid size-9 place-items-center rounded-xl border border-border bg-card/80 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground lg:hidden"
         >
           <Menu className="size-5" />
+        </button>
+
+        {/* Sidebar Collapse/Expand Toggle Button next to Search */}
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          title="Toggle sidebar collapse"
+          aria-label="Toggle sidebar collapse"
+          className="hidden md:grid size-9 place-items-center rounded-xl border border-border bg-card/80 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring shadow-sm"
+        >
+          <PanelLeft className="size-4" />
         </button>
 
         {/* Search Input */}

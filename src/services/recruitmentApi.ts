@@ -245,6 +245,60 @@ export const recruitmentApi = baseApi.injectEndpoints({
       }),
     }),
 
+    // ── AI Job Description & Autofill Endpoints ──────────────────────────────
+    generateJobDescription: builder.mutation<
+      ApiResponse<string>,
+      {
+        title: string;
+        department?: string | undefined;
+        employment_type?: string | undefined;
+        location?: string | undefined;
+        skills?: string[] | undefined;
+        experience?: string | undefined;
+      }
+    >({
+      query: (body) => ({
+        url: "/api/v1/recruitment/jobs/generate-description",
+        method: "POST",
+        body: {
+          title: body.title,
+          department: body.department || "Engineering",
+          employment_type: body.employment_type || "Full-time",
+          location: body.location || "Remote",
+          skills: body.skills || [],
+          experience: body.experience || undefined,
+        },
+      }),
+    }),
+
+    aiAutofillJob: builder.mutation<
+      ApiResponse<{
+        department: string;
+        employment_type: string;
+        location: string;
+        work_mode: string;
+        vacancies: number;
+        skills: string[];
+        description: string;
+        responsibilities: string[];
+        requirements: string[];
+        benefits: string[];
+      }>,
+      {
+        title: string;
+        experience?: string | undefined;
+        salary_min?: number | undefined;
+        salary_max?: number | undefined;
+        currency?: string | undefined;
+      }
+    >({
+      query: (body) => ({
+        url: "/api/v1/recruitment/jobs/ai-autofill",
+        method: "POST",
+        body,
+      }),
+    }),
+
     // ── Report / Dashboard Metrics Endpoint ───────────────────────────────────
     getRecruitmentReport: builder.query<ApiResponse<RecruitmentReport>, void>({
       query: () => "/api/v1/recruitment/dashboard",
@@ -279,6 +333,8 @@ export const {
   useUpdateOfferStatusMutation,
   useDeleteOfferMutation,
   useExportRecruitmentReportMutation,
+  useGenerateJobDescriptionMutation,
+  useAiAutofillJobMutation,
   useGetRecruitmentReportQuery,
 } = recruitmentApi;
 

@@ -2,7 +2,6 @@ import { memo } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LogOut,
-  PanelLeft,
   X,
   LayoutDashboard,
   Users,
@@ -18,6 +17,7 @@ import {
   Database,
   BarChart3,
   Settings,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/auth/logo";
@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 
 const IT_ADMIN_NAV = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard, href: "/dashboard/it-admin" },
+  { id: "ai-workforce", title: "AI Hub", icon: Sparkles, href: "/dashboard/ai-workforce" },
   { id: "users", title: "User Management", icon: Users, href: "/dashboard/it-admin/users" },
   { id: "roles", title: "Roles & Permissions", icon: Lock, href: "/dashboard/it-admin/roles" },
   { id: "security", title: "Security Center", icon: ShieldCheck, href: "/dashboard/it-admin/security" },
@@ -81,16 +82,6 @@ export const ItAdminSidebar = memo(function ItAdminSidebar({
         )}
 
         <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={onToggleSidebar ?? onClose}
-            title="Toggle sidebar"
-            aria-label="Toggle sidebar"
-            className="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <PanelLeft className="size-4" />
-          </button>
-
           {isMobile && (
             <button
               type="button"
