@@ -15,6 +15,9 @@ import { useLoginMutation, useLazyGetMeQuery } from "@/services/authApi";
 import { GuestGuard } from "@/components/auth/guards";
 import { getLandingRoute, normalizeRole } from "@/lib/auth/roles";
 import type { Role } from "@/lib/auth/types";
+import { useAppDispatch } from "@/app/hooks";
+import { setAccessToken } from "@/features/auth/authSlice";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export const Route = createFileRoute("/auth/login")({
   head: () => ({
@@ -66,6 +69,8 @@ function LoginPage() {
     defaultValues: { email: "", password: "" },
   });
 
+  const dispatch = useAppDispatch();
+
   const onSubmit = handleSubmit(async (values) => {
     try {
       const response = await loginMutation({
@@ -73,15 +78,35 @@ function LoginPage() {
         password: values.password,
       }).unwrap();
 
-      let rawRole = (response.data as any)?.role || (response as any)?.role || "HR_ADMIN";
+      const payload = (response as any)?.data || response;
+      const token = payload?.access_token || payload?.tokens?.access_token;
+      const refreshToken = payload?.refresh_token || payload?.tokens?.refresh_token;
+
+      if (token) {
+        dispatch(setAccessToken(token));
+        useAuthStore.getState().setAccessToken(token);
+      }
+      if (refreshToken && typeof window !== "undefined") {
+        localStorage.setItem("refresh_token", refreshToken);
+      }
+
+      const userObj = payload?.user || payload;
+      if (userObj && (userObj.email || userObj.id)) {
+        useAuthStore.getState().setUser(userObj);
+      }
+
+      let rawRole = payload?.role || userObj?.role || "HR_ADMIN";
 
       try {
         const meRes = await triggerGetMe().unwrap();
-        if (meRes.data?.role) {
-          rawRole = meRes.data.role;
+        if (meRes.data) {
+          useAuthStore.getState().setUser(meRes.data as any);
+          if (meRes.data.role) {
+            rawRole = meRes.data.role;
+          }
         }
       } catch {
-        // Fallback to response role
+        // Fallback to response payload if getMe is pending
       }
 
       const role = normalizeRole(rawRole);

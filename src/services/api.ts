@@ -29,7 +29,13 @@ const rawBaseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include", // required for httpOnly refresh-token cookies
   prepareHeaders: (headers, { getState, endpoint }) => {
-    const token = (getState() as RootState).auth.accessToken;
+    const reduxToken = (getState() as RootState).auth.accessToken;
+    const windowToken =
+      typeof window !== "undefined"
+        ? (window as any).__ACCESS_TOKEN__ || localStorage.getItem("access_token")
+        : null;
+    const token = reduxToken || windowToken;
+
     // DO NOT send expired Bearer token on refresh or login endpoints
     if (token && endpoint !== "refresh" && endpoint !== "login") {
       headers.set("Authorization", `Bearer ${token}`);
