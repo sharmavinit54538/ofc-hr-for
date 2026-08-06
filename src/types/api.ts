@@ -67,6 +67,10 @@ export function toQueryParams(params: ListParams = {}): Record<string, string> {
     }
   }
 
+  if (params.page_size && !query["limit"]) {
+    query["limit"] = String(params.page_size);
+  }
+
   if (filters) {
     for (const [key, value] of Object.entries(filters)) {
       if (value !== undefined && value !== null && value !== "") {

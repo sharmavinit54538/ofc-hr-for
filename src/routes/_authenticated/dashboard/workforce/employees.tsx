@@ -215,28 +215,50 @@ function EmployeesPage() {
   const [changeManager] = useChangeManagerMutation();
   const [bulkReassign, { isLoading: isBulkReassigning }] = useBulkReassignMutation();
 
-  const rawEmployees = useMemo(() => employeesRes?.data.items ?? [], [employeesRes]);
+  const rawEmployees = useMemo<Employee[]>(() => {
+    if (!employeesRes?.data) return [];
+    const d = employeesRes.data;
+    if (Array.isArray(d)) return d as Employee[];
+    if (Array.isArray((d as any).items)) return (d as any).items as Employee[];
+    if (Array.isArray((d as any).employees)) return (d as any).employees as Employee[];
+    return [];
+  }, [employeesRes]);
 
   // Compute hierarchy information for each raw employee
   const employeesWithHierarchy = useMemo(() => {
-    return rawEmployees.map((emp) => {
-      const hierarchyInfo = computeEmployeeHierarchyInfo(emp, rawEmployees);
-      return {
+    try {
+      return rawEmployees.map((emp: Employee) => {
+        if (!emp) return {} as any;
+        const hierarchyInfo = computeEmployeeHierarchyInfo(emp, rawEmployees);
+        return {
+          ...emp,
+          full_name: emp.full_name || emp.email || "Employee",
+          hierarchy_level: hierarchyInfo.level,
+          reporting_manager: hierarchyInfo.reportingManager?.full_name || emp.reporting_manager || "—",
+          reporting_manager_id: hierarchyInfo.reportingManager?.id || emp.reporting_manager_id,
+          direct_reports_count: hierarchyInfo.directReports.length,
+          team_size: hierarchyInfo.teamSize,
+          organization_path: hierarchyInfo.organizationPath,
+        };
+      });
+    } catch (err) {
+      console.error("[Hierarchy Computation Error]", err);
+      return rawEmployees.map((emp) => ({
         ...emp,
-        hierarchy_level: hierarchyInfo.level,
-        reporting_manager: hierarchyInfo.reportingManager?.full_name || emp.reporting_manager || "—",
-        reporting_manager_id: hierarchyInfo.reportingManager?.id || emp.reporting_manager_id,
-        direct_reports_count: hierarchyInfo.directReports.length,
-        team_size: hierarchyInfo.teamSize,
-        organization_path: hierarchyInfo.organizationPath,
-      };
-    });
+        full_name: emp?.full_name || emp?.email || "Employee",
+        hierarchy_level: 1,
+        reporting_manager: emp?.reporting_manager || "—",
+        direct_reports_count: 0,
+        team_size: 1,
+        organization_path: [],
+      }));
+    }
   }, [rawEmployees]);
 
   // Filtered & Sorted Employee List for Table View
   const filteredEmployees = useMemo(() => {
     return employeesWithHierarchy
-      .filter((emp) => {
+      .filter((emp: (typeof employeesWithHierarchy)[number]) => {
         // Search filter
         if (debouncedSearch) {
           const q = debouncedSearch.toLowerCase();
@@ -273,7 +295,7 @@ function EmployeesPage() {
 
         return true;
       })
-      .sort((a, b) => {
+      .sort((a: (typeof employeesWithHierarchy)[number], b: (typeof employeesWithHierarchy)[number]) => {
         if (sortBy === "level") return (a.hierarchy_level ?? 99) - (b.hierarchy_level ?? 99);
         if (sortBy === "department") return (a.department ?? "").localeCompare(b.department ?? "");
         if (sortBy === "manager")
@@ -291,13 +313,13 @@ function EmployeesPage() {
     sortBy,
   ]);
 
-  const availableDepartments = useMemo(
-    () => (departmentsRes?.data ?? []).map((dept) => dept.name),
+  const availableDepartments = useMemo<string[]>(
+    () => (departmentsRes?.data ?? []).map((dept: any) => dept.name),
     [departmentsRes],
   );
 
-  const managerOptions = useMemo(
-    () => Array.from(new Set(employeesWithHierarchy.map((emp) => emp.full_name).filter(Boolean))),
+  const managerOptions = useMemo<string[]>(
+    () => Array.from(new Set(employeesWithHierarchy.map((emp: (typeof employeesWithHierarchy)[number]) => emp.full_name).filter(Boolean))),
     [employeesWithHierarchy],
   );
 
@@ -310,7 +332,7 @@ function EmployeesPage() {
     if (selectedRowIds.length === filteredEmployees.length) {
       setSelectedRowIds([]);
     } else {
-      setSelectedRowIds(filteredEmployees.map((e) => e.id));
+      setSelectedRowIds(filteredEmployees.map((e: (typeof employeesWithHierarchy)[number]) => e.id));
     }
   };
 
@@ -325,7 +347,7 @@ function EmployeesPage() {
     if (!selectedRowIds.length || !targetBulkManager) return;
 
     try {
-      const mgrObj = employeesWithHierarchy.find((e) => e.full_name === targetBulkManager);
+      const mgrObj = employeesWithHierarchy.find((e: (typeof employeesWithHierarchy)[number]) => e.full_name === targetBulkManager);
       await bulkReassign({
         employee_ids: selectedRowIds,
         new_manager_id: mgrObj?.id,
@@ -346,7 +368,7 @@ function EmployeesPage() {
   // Drag & Drop manager reassignment handler for OrgChart View
   const handleManagerReassign = async (employeeId: string, newManagerId: string) => {
     try {
-      const managerEmp = employeesWithHierarchy.find((e) => e.id === newManagerId);
+      const managerEmp = employeesWithHierarchy.find((e: (typeof employeesWithHierarchy)[number]) => e.id === newManagerId);
       await changeManager({
         employee_id: employeeId,
         new_manager_id: newManagerId,
@@ -405,7 +427,7 @@ function EmployeesPage() {
     e.preventDefault();
 
     try {
-      const mgrObj = employeesWithHierarchy.find((emp) => emp.full_name === formData.reportingManager);
+      const mgrObj = employeesWithHierarchy.find((emp: (typeof employeesWithHierarchy)[number]) => emp.full_name === formData.reportingManager);
 
       const response = await createEmployee({
         full_name: formData.fullName.trim(),
@@ -457,7 +479,7 @@ function EmployeesPage() {
 
     try {
       const mgrObj = employeesWithHierarchy.find(
-        (emp) => emp.full_name === editingEmp.reporting_manager,
+        (emp: (typeof employeesWithHierarchy)[number]) => emp.full_name === editingEmp.reporting_manager,
       );
 
       const response = await updateEmployee({
@@ -863,7 +885,7 @@ function EmployeesPage() {
 
                   {!isLoading &&
                     !isError &&
-                    filteredEmployees.map((emp) => {
+                    filteredEmployees.map((emp: (typeof employeesWithHierarchy)[number]) => {
                       const isSelected = selectedRowIds.includes(emp.id);
 
                       return (

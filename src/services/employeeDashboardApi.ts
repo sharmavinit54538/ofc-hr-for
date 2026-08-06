@@ -155,7 +155,7 @@ export interface HolidayItem {
 export const employeeDashboardApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getTodayAttendance: builder.query<ApiResponse<TodayAttendance>, void>({
-      query: () => "/api/v1/employee/attendance/today",
+      query: () => "/api/v1/attendance/face/me",
       providesTags: [{ type: "Attendance" as const, id: "TODAY" }],
     }),
 
@@ -269,13 +269,21 @@ export const employeeDashboardApi = baseApi.injectEndpoints({
     }),
 
     getNotifications: builder.query<ApiResponse<NotificationItem[]>, void>({
-      query: () => "/api/v1/employee/notifications",
+      query: () => "/api/v1/global-notifications/notifications",
+      transformResponse: (response: any) => {
+        const items = response?.data?.items || response?.data || response || [];
+        return {
+          success: true,
+          message: response?.message || "Notifications retrieved",
+          data: items,
+        };
+      },
       providesTags: [{ type: "Notification" as const, id: "LIST" }],
     }),
 
     markNotificationsRead: builder.mutation<ApiResponse<boolean>, void>({
       query: () => ({
-        url: "/api/v1/employee/notifications/mark-read",
+        url: "/api/v1/global-notifications/notifications/read-all",
         method: "POST",
       }),
       invalidatesTags: [{ type: "Notification" as const, id: "LIST" }],
