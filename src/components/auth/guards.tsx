@@ -2,36 +2,10 @@ import { Navigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { LoadingOverlay } from "@/components/common/loading-overlay";
 import type { Permission, Role } from "@/lib/auth/types";
-import { getLandingRoute } from "@/lib/auth/roles";
+import { getLandingRoute, normalizeRole, getPermissions } from "@/lib/auth/roles";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useAppSelector } from "@/app/hooks";
 import { selectAccessToken, selectIsInitializing } from "@/features/auth/authSlice";
-import { useGetMeQuery } from "@/services/authApi";
-
-const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-  HR_ADMIN: [
-    "org:manage",
-    "org:view",
-    "people:manage",
-    "people:view",
-    "payroll:view",
-    "security:view",
-    "analytics:view",
-    "team:manage",
-    "self:view",
-  ],
-  IT_ADMIN: [
-    "org:view",
-    "people:view",
-    "security:manage",
-    "security:view",
-    "devices:manage",
-    "analytics:view",
-    "self:view",
-  ],
-  EXECUTIVE: ["org:view", "people:view", "analytics:view", "self:view"],
-  MANAGER: ["people:view", "team:manage", "self:view"],
-  EMPLOYEE: ["self:view"],
-};
 
 export function LoadingGuard({
   children,
@@ -40,12 +14,15 @@ export function LoadingGuard({
   children: ReactNode;
   label?: string;
 }) {
-  const isInitializing = useAppSelector(selectIsInitializing);
+  const reduxInitializing = useAppSelector(selectIsInitializing);
+  const zustandLoading = useAuthStore((state) => state.isLoading);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted || isInitializing) return <LoadingOverlay label={label} />;
+  if (!mounted || reduxInitializing || zustandLoading) {
+    return <LoadingOverlay label={label} />;
+  }
   return <>{children}</>;
 }
 
@@ -60,17 +37,15 @@ export function AuthGuard({
   children: ReactNode;
   fallback?: ReactNode;
 }) {
-  const accessToken = useAppSelector(selectAccessToken);
-  const { data: meData, isLoading, isError } = useGetMeQuery(undefined, {
-    skip: !accessToken,
-  });
+  const reduxToken = useAppSelector(selectAccessToken);
+  const { isAuthenticated, isLoading, user } = useAuthStore();
 
-  if (!accessToken || isError) {
-    return <>{fallback ?? <Navigate to="/auth/login" replace />}</>;
+  if (isLoading) {
+    return <LoadingOverlay label="Verifying server user claims..." />;
   }
 
-  if (isLoading || !meData?.data) {
-    return <LoadingOverlay label="Verifying server user claims..." />;
+  if (!isAuthenticated && !reduxToken && !user) {
+    return <>{fallback ?? <Navigate to="/auth/login" replace />}</>;
   }
 
   return <>{children}</>;
@@ -85,8 +60,9 @@ export function RoleGuard({
   children: ReactNode;
   fallback?: ReactNode;
 }) {
-  const { data: meData } = useGetMeQuery();
-  const role = meData?.data?.role;
+  const storeRole = useAuthStore((state) => state.role);
+  const storeUser = useAuthStore((state) => state.user);
+  const role = normalizeRole(storeRole || storeUser?.role);
 
   if (!role) return <Navigate to="/auth/login" replace />;
   if (!allow.includes(role)) return <>{fallback ?? <UnauthorizedRedirect reason="role" />}</>;
@@ -104,9 +80,10 @@ export function PermissionGuard({
   children: ReactNode;
   fallback?: ReactNode;
 }) {
-  const { data: meData } = useGetMeQuery();
-  const role = meData?.data?.role ?? "EMPLOYEE";
-  const userPermissions = ROLE_PERMISSIONS[role] || [];
+  const storeRole = useAuthStore((state) => state.role);
+  const storeUser = useAuthStore((state) => state.user);
+  const role = normalizeRole(storeRole || storeUser?.role);
+  const userPermissions = getPermissions(role);
 
   const granted =
     mode === "all"
@@ -118,19 +95,19 @@ export function PermissionGuard({
 }
 
 export function GuestGuard({ children }: { children: ReactNode }) {
-  const accessToken = useAppSelector(selectAccessToken);
-  const { data: meData } = useGetMeQuery(undefined, { skip: !accessToken });
-  const role = meData?.data?.role;
+  const reduxToken = useAppSelector(selectAccessToken);
+  const { isAuthenticated, isLoading, role } = useAuthStore();
 
-  return (
-    <LoadingGuard>
-      {accessToken && role ? (
-        <Navigate to={getLandingRoute(role)} replace />
-      ) : (
-        children
-      )}
-    </LoadingGuard>
-  );
+  if (isLoading) {
+    return <LoadingGuard><div>{children}</div></LoadingGuard>;
+  }
+
+  if (isAuthenticated || Boolean(reduxToken)) {
+    const landingRoute = getLandingRoute(role || undefined);
+    return <Navigate to={landingRoute} replace />;
+  }
+
+  return <>{children}</>;
 }
 
 export function ProtectedRoute({

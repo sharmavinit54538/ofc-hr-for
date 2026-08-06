@@ -78,14 +78,27 @@ export const ALL_ROLES: Role[] = [
   "EMPLOYEE",
 ];
 
-export function getRoleDefinition(role: Role): RoleDefinition {
-  return ROLE_DEFINITIONS[role];
+export function normalizeRole(role?: string): Role {
+  if (!role) return "HR_ADMIN";
+  const normalized = String(role).toUpperCase().replace(/[\s_-]+/g, "_");
+  if (normalized.includes("IT")) return "IT_ADMIN";
+  if (normalized.includes("EXEC")) return "EXECUTIVE";
+  if (normalized.includes("MANAGER")) return "MANAGER";
+  if (normalized.includes("EMPLOYEE")) return "EMPLOYEE";
+  return "HR_ADMIN";
 }
 
-export function getLandingRoute(role: Role): string {
-  return ROLE_DEFINITIONS[role].landing;
+export function getRoleDefinition(role?: string): RoleDefinition {
+  const safeRole = normalizeRole(role);
+  return ROLE_DEFINITIONS[safeRole];
 }
 
-export function getPermissions(role: Role): Permission[] {
-  return ROLE_DEFINITIONS[role].permissions;
+export function getLandingRoute(role?: string): string {
+  const safeRole = normalizeRole(role);
+  return ROLE_DEFINITIONS[safeRole]?.landing || "/dashboard";
+}
+
+export function getPermissions(role?: string): Permission[] {
+  const safeRole = normalizeRole(role);
+  return ROLE_DEFINITIONS[safeRole]?.permissions || [];
 }

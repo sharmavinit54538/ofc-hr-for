@@ -9,9 +9,21 @@ import {
 import type { RootState } from "@/app/store";
 import { setAccessToken, logoutAuth } from "@/features/auth/authSlice";
 
-export const API_BASE_URL = (
-  (import.meta.env["VITE_API_BASE_URL"] as string | undefined) || "http://127.0.0.1:8000"
-).replace(/\/$/, "");
+export const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env["VITE_API_BASE_URL"] as string | undefined;
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    const currentHost = window.location.hostname;
+    if (envUrl && (envUrl.includes("127.0.0.1") || envUrl.includes("localhost"))) {
+      return envUrl.replace(/localhost|127\.0\.0\.1/, currentHost).replace(/\/$/, "");
+    }
+    if (!envUrl) {
+      return `http://${currentHost}:8000`;
+    }
+  }
+  return (envUrl || "http://127.0.0.1:8000").replace(/\/$/, "");
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,

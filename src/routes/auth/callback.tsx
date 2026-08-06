@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAppDispatch } from "@/app/hooks";
 import { setAccessToken } from "@/features/auth/authSlice";
 import { getLandingRoute } from "@/lib/auth/roles";
+import { useAuthStore } from "@/store/useAuthStore";
 import type { Role } from "@/lib/auth/types";
 import { Loader2 } from "lucide-react";
 
@@ -55,13 +56,17 @@ function AuthCallbackPage() {
           throw new Error("Backend did not return an access token");
         }
 
-        // Store access token in Redux
+        // Store access token in Redux and Zustand
         dispatch(setAccessToken(accessToken));
+        useAuthStore.getState().setAccessToken(accessToken);
 
         // Store refresh token in localStorage if present
         if (refreshToken && typeof window !== "undefined") {
           localStorage.setItem("refresh_token", refreshToken);
         }
+
+        // Fetch user profile into Zustand store
+        await useAuthStore.getState().fetchMe();
 
         // Redirect to role-appropriate dashboard route
         const destination = getLandingRoute(role);

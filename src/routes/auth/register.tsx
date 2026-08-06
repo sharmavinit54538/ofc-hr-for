@@ -10,6 +10,7 @@ import { Divider } from "@/components/auth/divider";
 import { LoadingButton } from "@/components/auth/loading-button";
 import { PasswordField } from "@/components/auth/password-field";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
+import { GuestGuard } from "@/components/auth/guards";
 import { useRegisterMutation } from "@/services/authApi";
 
 export const Route = createFileRoute("/auth/register")({
@@ -74,20 +75,24 @@ function RegisterPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await registerMutation({
+      const res: any = await registerMutation({
         email: values.email,
         password: values.password,
         full_name: values.fullName,
         organization_name: values.organizationName,
       }).unwrap();
 
+      const devOtp = res?.data?.otp_debug || res?.otp_debug;
+
       toast.success("Account created successfully", {
-        description: "Please enter the verification OTP sent to your work email.",
+        description: devOtp
+          ? `Verification OTP generated. Dev Code: ${devOtp}`
+          : "Please enter the verification OTP sent to your work email.",
       });
 
       navigate({
         to: "/auth/verify-email" as any,
-        search: { email: values.email } as any,
+        search: { email: values.email, devOtp: devOtp || "" } as any,
       });
     } catch (err: any) {
       const detail = err?.data?.detail || err?.data?.message || "Registration failed. Please check your details.";
@@ -98,69 +103,71 @@ function RegisterPage() {
   });
 
   return (
-    <AuthLayout
-      title="Create your OFC HR account"
-      subtitle="Start with your details. We'll verify your email before onboarding your organization."
-    >
-      <form onSubmit={onSubmit} className="space-y-3" noValidate>
-        <AuthInput
-          label="Full name"
-          placeholder="John Doe"
-          autoComplete="name"
-          icon={<User className="size-4" />}
-          error={errors.fullName?.message}
-          {...register("fullName")}
-        />
-        <AuthInput
-          label="Organization Name"
-          placeholder="Acme Corp"
-          autoComplete="organization"
-          icon={<User className="size-4" />}
-          error={errors.organizationName?.message}
-          {...register("organizationName")}
-        />
-        <AuthInput
-          label="Work email"
-          placeholder="you@company.com"
-          autoComplete="email"
-          icon={<Mail className="size-4" />}
-          error={errors.email?.message}
-          {...register("email")}
-        />
-        <PasswordField
-          label="Password"
-          autoComplete="new-password"
-          placeholder="••••••••"
-          error={errors.password?.message}
-          {...register("password")}
-        />
-        <PasswordField
-          label="Confirm password"
-          autoComplete="new-password"
-          placeholder="••••••••"
-          error={errors.confirmPassword?.message}
-          {...register("confirmPassword")}
-        />
+    <GuestGuard>
+      <AuthLayout
+        title="Create your OFC HR account"
+        subtitle="Start with your details. We'll verify your email before onboarding your organization."
+      >
+        <form onSubmit={onSubmit} className="space-y-3" noValidate>
+          <AuthInput
+            label="Full name"
+            placeholder="John Doe"
+            autoComplete="name"
+            icon={<User className="size-4" />}
+            error={errors.fullName?.message}
+            {...register("fullName")}
+          />
+          <AuthInput
+            label="Organization Name"
+            placeholder="Acme Corp"
+            autoComplete="organization"
+            icon={<User className="size-4" />}
+            error={errors.organizationName?.message}
+            {...register("organizationName")}
+          />
+          <AuthInput
+            label="Work email"
+            placeholder="you@company.com"
+            autoComplete="email"
+            icon={<Mail className="size-4" />}
+            error={errors.email?.message}
+            {...register("email")}
+          />
+          <PasswordField
+            label="Password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            error={errors.password?.message}
+            {...register("password")}
+          />
+          <PasswordField
+            label="Confirm password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            error={errors.confirmPassword?.message}
+            {...register("confirmPassword")}
+          />
 
-        <LoadingButton loading={isLoading} type="submit" className="mt-2">
-          <span>Create account</span>
-          <ArrowRight className="size-4" />
-        </LoadingButton>
-      </form>
+          <LoadingButton loading={isLoading} type="submit" className="mt-2">
+            <span>Create account</span>
+            <ArrowRight className="size-4" />
+          </LoadingButton>
+        </form>
 
-      <Divider label="or sign up with" />
+        <Divider label="or sign up with" />
 
-      <SocialLoginButtons />
+        <SocialLoginButtons />
 
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        Already have an account?{" "}
-        <Link
-          to="/auth/login"
-          className="font-semibold text-primary hover:text-primary/90 hover:underline"
-        >
-          Sign in
-        </Link>
-      </p>
-    </AuthLayout>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            to="/auth/login"
+            className="font-semibold text-primary hover:text-primary/90 hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </AuthLayout>
+    </GuestGuard>
   );
 }

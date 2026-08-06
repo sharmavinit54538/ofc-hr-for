@@ -120,6 +120,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+import { useAuthStore } from "@/store/useAuthStore";
+
 function AuthBootstrap({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
   const [triggerRefresh] = useRefreshMutation();
@@ -127,18 +129,17 @@ function AuthBootstrap({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function initSession() {
-      const state = store.getState().auth;
-      if (state.accessToken || !state.isInitializing) {
-        return;
-      }
-
+      const authStore = useAuthStore.getState();
       try {
-        const refreshRes = await triggerRefresh().unwrap();
-        if (refreshRes) {
-          await triggerGetMe().unwrap();
+        const user = await authStore.fetchMe();
+        if (!user) {
+          const success = await authStore.refresh();
+          if (success) {
+            await authStore.fetchMe();
+          }
         }
       } catch {
-        // Silent catch for unauthenticated / guest visitors
+        // Silent catch for unauthenticated guest visitors
       } finally {
         dispatch(setInitializing(false));
       }

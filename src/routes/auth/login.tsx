@@ -12,7 +12,8 @@ import { LoadingButton } from "@/components/auth/loading-button";
 import { PasswordField } from "@/components/auth/password-field";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import { useLoginMutation, useLazyGetMeQuery } from "@/services/authApi";
-import { getLandingRoute } from "@/lib/auth/roles";
+import { GuestGuard } from "@/components/auth/guards";
+import { getLandingRoute, normalizeRole } from "@/lib/auth/roles";
 import type { Role } from "@/lib/auth/types";
 
 export const Route = createFileRoute("/auth/login")({
@@ -72,23 +73,25 @@ function LoginPage() {
         password: values.password,
       }).unwrap();
 
-      let role: Role = (response.data?.role as Role) || "HR_ADMIN";
+      let rawRole = (response.data as any)?.role || (response as any)?.role || "HR_ADMIN";
 
       try {
         const meRes = await triggerGetMe().unwrap();
         if (meRes.data?.role) {
-          role = meRes.data.role;
+          rawRole = meRes.data.role;
         }
       } catch {
         // Fallback to response role
       }
+
+      const role = normalizeRole(rawRole);
 
       toast.success("Signed in successfully", {
         description: `Welcome back to OFC HR`,
       });
 
       const targetLanding = getLandingRoute(role);
-      navigate({ to: targetLanding } as any);
+      navigate({ to: targetLanding as any });
     } catch (err: any) {
       const detail = err?.data?.detail || err?.data?.message || "Invalid email or password.";
       toast.error("Authentication Failed", {
@@ -98,54 +101,56 @@ function LoginPage() {
   });
 
   return (
-    <AuthLayout
-      title="Sign in to your workspace"
-      subtitle="Use your corporate identity to access the OFC HR control plane."
-    >
-      <form onSubmit={onSubmit} className="space-y-5" noValidate>
-        <AuthInput
-          label="Work email"
-          placeholder="you@company.com"
-          autoComplete="email"
-          icon={<Mail className="size-4" />}
-          error={errors.email?.message}
-          {...register("email")}
-        />
-        <PasswordField
-          autoComplete="current-password"
-          placeholder="••••••••"
-          error={errors.password?.message}
-          {...register("password")}
-        />
+    <GuestGuard>
+      <AuthLayout
+        title="Sign in to your workspace"
+        subtitle="Use your corporate identity to access the OFC HR control plane."
+      >
+        <form onSubmit={onSubmit} className="space-y-5" noValidate>
+          <AuthInput
+            label="Work email"
+            placeholder="you@company.com"
+            autoComplete="email"
+            icon={<Mail className="size-4" />}
+            error={errors.email?.message}
+            {...register("email")}
+          />
+          <PasswordField
+            autoComplete="current-password"
+            placeholder="••••••••"
+            error={errors.password?.message}
+            {...register("password")}
+          />
 
-        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-xs">
+            <Link
+              to="/auth/forgot-password"
+              className="font-medium text-primary hover:text-primary/90 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <LoadingButton loading={isLoading} type="submit">
+            <span>Sign in</span>
+            <ArrowRight className="size-4" />
+          </LoadingButton>
+        </form>
+
+        <Divider label="or continue with" />
+
+        <SocialLoginButtons />
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Don&apos;t have an enterprise account?{" "}
           <Link
-            to="/auth/forgot-password"
-            className="font-medium text-primary hover:text-primary/90 hover:underline"
+            to="/auth/register"
+            className="font-semibold text-primary hover:text-primary/90 hover:underline"
           >
-            Forgot password?
+            Request onboarding
           </Link>
-        </div>
-
-        <LoadingButton loading={isLoading} type="submit">
-          <span>Sign in</span>
-          <ArrowRight className="size-4" />
-        </LoadingButton>
-      </form>
-
-      <Divider label="or continue with" />
-
-      <SocialLoginButtons />
-
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        Don&apos;t have an enterprise account?{" "}
-        <Link
-          to="/auth/register"
-          className="font-semibold text-primary hover:text-primary/90 hover:underline"
-        >
-          Request onboarding
-        </Link>
-      </p>
-    </AuthLayout>
+        </p>
+      </AuthLayout>
+    </GuestGuard>
   );
 }

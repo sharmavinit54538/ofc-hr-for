@@ -10,6 +10,7 @@ import { AuthLayout } from "@/components/auth/auth-layout";
 import { LoadingButton } from "@/components/auth/loading-button";
 import { ValidationMessage } from "@/components/auth/validation-message";
 import { useForgotPasswordMutation } from "@/services/authApi";
+import { GuestGuard } from "@/components/auth/guards";
 
 export const Route = createFileRoute("/auth/forgot-password")({
   head: () => ({
@@ -45,70 +46,70 @@ function ForgotPasswordPage() {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await forgotPasswordMutation({ email: values.email }).unwrap();
+    } catch {
+      // Do not reveal email existence to prevent user enumeration
+    } finally {
       setSentSuccess(true);
-      toast.success("Password Reset Requested", {
-        description: "A recovery email has been sent to your inbox.",
-      });
-    } catch (err: any) {
-      const detail = err?.data?.detail || err?.data?.message || "Failed to request password reset.";
-      toast.error("Request Failed", {
-        description: detail,
+      toast.success("Request Processed", {
+        description: "If an active account exists for that email, recovery instructions have been sent.",
       });
     }
   });
 
   return (
-    <AuthLayout
-      title={sentSuccess ? "Check your inbox" : "Reset your password"}
-      subtitle={
-        sentSuccess
-          ? "We've dispatched a password recovery link to your work email."
-          : "We'll send a single-use recovery link to your verified work address."
-      }
-    >
-      {sentSuccess ? (
-        <div className="space-y-6">
-          <ValidationMessage
-            tone="success"
-            message="Instructions sent! Please check your email inbox and click the reset link to choose a new password."
-          />
+    <GuestGuard>
+      <AuthLayout
+        title={sentSuccess ? "Check your inbox" : "Reset your password"}
+        subtitle={
+          sentSuccess
+            ? "If an account matches that email, we've dispatched a password recovery link."
+            : "We'll send a single-use recovery link to your verified work address."
+        }
+      >
+        {sentSuccess ? (
+          <div className="space-y-6">
+            <ValidationMessage
+              tone="success"
+              message="Instructions sent! Please check your email inbox and click the reset link to choose a new password."
+            />
 
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            If you don't see the email within a few minutes, check your spam or promotions folder.
-          </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              If you don't see the email within a few minutes, check your spam or promotions folder.
+            </p>
 
-          <Link
-            to="/auth/login"
-            className="flex items-center justify-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:underline pt-2"
-          >
-            <ArrowLeft className="size-3.5" aria-hidden="true" />
-            Back to sign in
-          </Link>
-        </div>
-      ) : (
-        <form onSubmit={onSubmit} className="space-y-5" noValidate>
-          <AuthInput
-            label="Work email"
-            placeholder="you@company.com"
-            autoComplete="email"
-            icon={<Mail className="size-4" />}
-            error={errors.email?.message}
-            {...register("email")}
-          />
+            <Link
+              to="/auth/login"
+              className="flex items-center justify-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:underline pt-2"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              Back to sign in
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={onSubmit} className="space-y-5" noValidate>
+            <AuthInput
+              label="Work email"
+              placeholder="you@company.com"
+              autoComplete="email"
+              icon={<Mail className="size-4" />}
+              error={errors.email?.message}
+              {...register("email")}
+            />
 
-          <LoadingButton type="submit" loading={isLoading}>
-            Send recovery link
-          </LoadingButton>
+            <LoadingButton type="submit" loading={isLoading}>
+              Send recovery link
+            </LoadingButton>
 
-          <Link
-            to="/auth/login"
-            className="flex items-center justify-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="size-3.5" aria-hidden="true" />
-            Back to sign in
-          </Link>
-        </form>
-      )}
-    </AuthLayout>
+            <Link
+              to="/auth/login"
+              className="flex items-center justify-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              Back to sign in
+            </Link>
+          </form>
+        )}
+      </AuthLayout>
+    </GuestGuard>
   );
 }

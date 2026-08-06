@@ -24,6 +24,7 @@ import { useVerifyEmailMutation, useResendOtpMutation } from "@/services/authApi
 
 const verifyEmailSearchSchema = z.object({
   email: z.string().optional(),
+  devOtp: z.string().optional(),
 });
 
 export const Route = createFileRoute("/auth/verify-email")({
@@ -43,13 +44,15 @@ export const Route = createFileRoute("/auth/verify-email")({
 
 function VerifyEmailPage() {
   const navigate = useNavigate();
-  const search = Route.useSearch();
+  const search = Route.useSearch() as { email?: string; devOtp?: string };
   const initialEmail = search.email || "";
+  const initialDevOtp = search.devOtp || "";
 
   const [email, setEmail] = useState(initialEmail);
   const [isEditingEmail, setIsEditingEmail] = useState(!initialEmail);
   const [tempEmail, setTempEmail] = useState(initialEmail);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(initialDevOtp);
+  const [activeDevOtp, setActiveDevOtp] = useState(initialDevOtp);
   const [resendTimer, setResendTimer] = useState(60);
   const [isVerified, setIsVerified] = useState(false);
 
@@ -80,11 +83,11 @@ function VerifyEmailPage() {
       await verifyEmail({ email, otp: code }).unwrap();
       setIsVerified(true);
       toast.success("Email Verified!", {
-        description: "Your account is now activated. Redirecting to sign in...",
+        description: "Your account is now activated. Proceeding to organization onboarding...",
       });
       setTimeout(() => {
-        navigate({ to: "/auth/login" as any });
-      }, 2000);
+        navigate({ to: "/auth/onboarding" as any });
+      }, 1500);
     } catch (err: any) {
       const detail =
         err?.data?.detail ||
@@ -102,11 +105,17 @@ function VerifyEmailPage() {
       return;
     }
     try {
-      await resendOtp({ email }).unwrap();
+      const res: any = await resendOtp({ email }).unwrap();
+      const newDevOtp = res?.data?.otp_debug || res?.otp_debug;
+      if (newDevOtp) {
+        setActiveDevOtp(newDevOtp);
+        setOtp(newDevOtp);
+      }
       setResendTimer(60);
-      setOtp("");
       toast.success("OTP Sent!", {
-        description: `A new 6-digit OTP code has been dispatched to ${email}`,
+        description: newDevOtp
+          ? `New 6-digit OTP generated: ${newDevOtp}`
+          : `A new 6-digit OTP code has been dispatched to ${email}`,
       });
     } catch (err: any) {
       const detail =
@@ -226,6 +235,17 @@ function VerifyEmailPage() {
               <label className="text-xs font-medium text-muted-foreground">
                 Enter 6-digit security code
               </label>
+
+              {activeDevOtp && (
+                <button
+                  type="button"
+                  onClick={() => setOtp(activeDevOtp)}
+                  className="glass-soft inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-mono font-semibold text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <span>Dev OTP: <strong>{activeDevOtp}</strong></span>
+                  <span className="text-[10px] text-muted-foreground">(Click to fill)</span>
+                </button>
+              )}
 
               <InputOTP
                 maxLength={6}

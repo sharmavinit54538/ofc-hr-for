@@ -83,6 +83,21 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const token = (data as any)?.data?.access_token || (data as any)?.access_token || (data as any)?.data?.tokens?.access_token;
+          const refreshToken = (data as any)?.data?.refresh_token || (data as any)?.refresh_token || (data as any)?.data?.tokens?.refresh_token;
+          if (token) {
+            dispatch(setAccessToken(token));
+          }
+          if (refreshToken && typeof window !== "undefined") {
+            localStorage.setItem("refresh_token", refreshToken);
+          }
+        } catch {
+          // Handled in component
+        }
+      },
     }),
 
     login: builder.mutation<ApiResponse<LoginData>, LoginRequest>({
